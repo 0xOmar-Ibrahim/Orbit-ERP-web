@@ -42,7 +42,7 @@ class LoginSerializer(serializers.Serializer):
             "access": str(refresh.access_token),
             "refresh": str(refresh),
             "user": {
-                "id": employee.employee_id,
+                "code": employee.employee_code,
                 "email": employee.work_email,
                 "role": employee.role_id,
             },
