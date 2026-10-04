@@ -93,6 +93,7 @@ class Employee(models.Model):
     )
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    password = models.CharField(max_length=128, null=True, blank=True)
     date_of_birth = models.DateField()
     gender = models.CharField(max_length=1, choices=Gender.choices)
     national_id = models.CharField(max_length=30, unique=True)
@@ -160,3 +161,4 @@ class RolePermission(models.Model):
     # Edit the str attribute to return the role, module, and permission
     def __str__(self):
         return f"{self.role} | {self.module} | {self.permission}"
+
