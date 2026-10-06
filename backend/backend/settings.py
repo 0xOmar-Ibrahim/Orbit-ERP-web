@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'apps.hr',
     'apps.accounting',
     'apps.reporting',
-]
+    'apps.admin_control'
+]   
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
