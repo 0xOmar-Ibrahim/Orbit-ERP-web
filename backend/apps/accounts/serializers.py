@@ -36,7 +36,7 @@ class LoginSerializer(serializers.Serializer):
             )
 
         # Create JWT
-        refresh = RefreshToken()
+        refresh = RefreshToken.for_user(employee)
 
         # Get user role name
         role_name = employee.role.role_name if employee.role_id else None

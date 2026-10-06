@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+
 
 
 class Role(models.Model):
@@ -51,76 +54,104 @@ class Permission(models.Model):
     def __str__(self):
         return self.permission_name
 
+class EmployeeManager(BaseUserManager):
 
-class Employee(models.Model):
-    """
-        Create the Base class Employee with name (employee) in db
-    """
+    def create_user(self, work_email, password=None, **extra_fields):
+        if not work_email:
+            raise ValueError("Work email is required")
+
+        employee = self.model(
+            work_email=self.normalize_email(work_email),
+            **extra_fields
+        )
+
+        employee.set_password(password)
+        employee.save(using=self._db)
+
+        return employee
+
+class Employee(AbstractBaseUser, PermissionsMixin):
+
     class Gender(models.TextChoices):
-        """
-            Create class Gender to choose the gender from it.
-        """
         MALE = "M", "Male"
         FEMALE = "F", "Female"
 
     class EmploymentStatus(models.TextChoices):
-        """
-            Create class EmploymentStatus to choose the employment status from it.
-        """
         ACTIVE = "active", "Active"
         ON_LEAVE = "on_leave", "On Leave"
         SUSPENDED = "suspended", "Suspended"
         TERMINATED = "terminated", "Terminated"
 
     class EmploymentType(models.TextChoices):
-        """
-            Create class EmploymentType to choose the employment type from it.
-        """
         FULL_TIME = "full_time", "Full Time"
         PART_TIME = "part_time", "Part Time"
         CONTRACT = "contract", "Contract"
         INTERN = "intern", "Intern"
 
-    # Create the Employee model with the following fields
     employee_id = models.AutoField(primary_key=True)
-    employee_code = models.CharField(max_length=30, unique=True)
-    # Create a foreign key to the Role model with on_delete=models.PROTECT (Block the deletion of a role if it is assigned to any employee)
+
+    employee_code = models.CharField(
+        max_length=30,
+        unique=True
+    )
+
     role = models.ForeignKey(
-        Role,
+        "Role",
         on_delete=models.PROTECT,
         related_name="employees",
         db_column="role_id",
     )
+
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    password = models.CharField(max_length=128, null=True, blank=True)
+
     date_of_birth = models.DateField()
-    gender = models.CharField(max_length=1, choices=Gender.choices)
-    national_id = models.CharField(max_length=30, unique=True)
+
+    gender = models.CharField(
+        max_length=1,
+        choices=Gender.choices
+    )
+
+    national_id = models.CharField(
+        max_length=30,
+        unique=True
+    )
+
     phone = models.CharField(max_length=20)
-    work_email = models.EmailField(unique=True)
-    address = models.TextField(blank=True)
+
+    work_email = models.EmailField(
+        unique=True
+    )
+
+    address = models.TextField(
+        blank=True
+    )
+
     hire_date = models.DateField()
-    # Create a foreign key to the Employee model with on_delete=models.SET_NULL (Set the manager to null if the manager is deleted)
+
     employment_status = models.CharField(
         max_length=20,
         choices=EmploymentStatus.choices,
         default=EmploymentStatus.ACTIVE,
     )
+
     employment_type = models.CharField(
         max_length=20,
         choices=EmploymentType.choices,
         default=EmploymentType.FULL_TIME,
     )
 
-    # Create the Meta class to set the table name to "employee"
+    objects = EmployeeManager()
+
+    USERNAME_FIELD = "work_email"
+
+    REQUIRED_FIELDS = []
+
     class Meta:
         db_table = "employee"
 
-    # Edit the str attribute to return the employee code and name
     def __str__(self):
         return f"{self.employee_code} - {self.first_name} {self.last_name}"
-
 
 class RolePermission(models.Model):
     """
