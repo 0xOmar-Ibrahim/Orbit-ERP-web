@@ -12,28 +12,17 @@ class LoginSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         try:
-            employee = Employee.objects.get(
-                work_email=attrs["email"]
-            )
+            employee = Employee.objects.get(work_email=attrs["email"])
         except Employee.DoesNotExist:
-            raise AuthenticationFailed(
-                "Invalid email or password."
-            )
+            raise AuthenticationFailed("Invalid email or password.")
 
         # Check hashed password
-        if not employee.password or not check_password(
-            attrs["password"],
-            employee.password
-        ):
-            raise AuthenticationFailed(
-                "Invalid email or password."
-            )
+        if not employee.password or not check_password(attrs["password"], employee.password):
+            raise AuthenticationFailed("Invalid email or password.")
 
         # Check employment status
         if employee.employment_status != Employee.EmploymentStatus.ACTIVE:
-            raise AuthenticationFailed(
-                "This account is disabled."
-            )
+            raise AuthenticationFailed("This account is disabled.")
 
         # Create JWT
         refresh = RefreshToken.for_user(employee)
@@ -43,6 +32,7 @@ class LoginSerializer(serializers.Serializer):
 
         # Get role permissions
         permissions = []
+
         if employee.role_id:
             permissions = [
                 {
