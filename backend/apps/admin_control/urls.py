@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import get
+from .views import getEmployees
 
 urlpatterns = [
-    path("", get, name="login"),
+    path("employees", getEmployees.as_view(), name="get_employees"),
 ]
