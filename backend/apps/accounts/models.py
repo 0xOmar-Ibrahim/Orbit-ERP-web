@@ -73,8 +73,8 @@ class EmployeeManager(BaseUserManager):
 class Employee(AbstractBaseUser, PermissionsMixin):
 
     class Gender(models.TextChoices):
-        MALE = "M", "Male"
-        FEMALE = "F", "Female"
+        MALE = "male", "Male"
+        FEMALE = "female", "Female"
 
     class EmploymentStatus(models.TextChoices):
         ACTIVE = "active", "Active"
@@ -108,7 +108,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     date_of_birth = models.DateField()
 
     gender = models.CharField(
-        max_length=1,
+        max_length=6,
         choices=Gender.choices
     )
 
@@ -141,8 +141,12 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         default=EmploymentType.FULL_TIME,
     )
 
+
     objects = EmployeeManager()
 
+    is_superuser = models.BooleanField(default=False)
+    last_login = models.DateTimeField(null=True, blank=True)
+    
     USERNAME_FIELD = "work_email"
 
     REQUIRED_FIELDS = []
