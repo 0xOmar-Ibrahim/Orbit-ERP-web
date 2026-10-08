@@ -6,6 +6,7 @@ from rest_framework.throttling import AnonRateThrottle
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import LoginSerializer
+from .models import Employee
 
 class LoginThrottle(AnonRateThrottle):
     rate = "10/min"          # slows down password guessing
