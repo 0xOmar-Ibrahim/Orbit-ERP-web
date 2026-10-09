@@ -1,0 +1,277 @@
+{
+  "info": {
+    "_postman_id": "e1837aca-e0eb-4b30-8685-f524a7f8d570",
+    "name": "Orbit",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58738667",
+    "_collection_link": "https://go.postman.co/collection/58738667-e1837aca-e0eb-4b30-8685-f524a7f8d570?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "auth",
+          "item": [
+            {
+              "name": "login",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"omar@example.com\",\r\n    \"password\": \"101010\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_user_url}}/api/auth/login/",
+                  "host": [
+                    "{{base_user_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "logout",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": ""
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "auth",
+          "item": [
+            {
+              "name": "login",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_admin_url}}/admin/login",
+                  "host": [
+                    "{{base_admin_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "logout",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_admin_url}}/admin/logout",
+                  "host": [
+                    "{{base_admin_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "logout"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "employee management",
+          "item": [
+            {
+              "name": "employees",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_0219}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"first_name\":\"Rana\",\r\n    \"last_name\":\"Ibrahim\",\r\n    \"role\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"1034456789\",\r\n    \"phone\":\"01000000000\",\r\n    \"work_email\":\"o6ma4r@example.com\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\",\r\n    \"password\":\"123456\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_admin_url}}/employees",
+                  "host": [
+                    "{{base_admin_url}}"
+                  ],
+                  "path": [
+                    "employees"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "employees",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_1bpr}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"employee_code\": \"EMP001\",\r\n    \"last_name\": \"Mohammed\",\r\n    \"address\": \"Cairo\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_admin_url}}/employees",
+                  "host": [
+                    "{{base_admin_url}}"
+                  ],
+                  "path": [
+                    "employees"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "employees",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_0s79}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"employee_code\": \"EMP054\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_admin_url}}/employees",
+                  "host": [
+                    "{{base_admin_url}}"
+                  ],
+                  "path": [
+                    "employees"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "employees",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_0cbg}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_admin_url}}/employees",
+                  "host": [
+                    "{{base_admin_url}}"
+                  ],
+                  "path": [
+                    "employees"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "bearer_token_12ei",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0tem",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_14oc",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_08kc",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0219",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0o0t",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_1bpr",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0lna",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0s79",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_17gv",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0cbg",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0s59",
+      "secret": true
+    }
+  ]
+}
