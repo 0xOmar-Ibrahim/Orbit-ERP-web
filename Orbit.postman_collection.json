@@ -28,10 +28,15 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_user_url}}/api/auth/login/",
+                  "raw": "http://127.0.0.1:8000/api/auth/login/",
+                  "protocol": "http",
                   "host": [
-                    "{{base_user_url}}"
+                    "127",
+                    "0",
+                    "0",
+                    "1"
                   ],
+                  "port": "8000",
                   "path": [
                     "api",
                     "auth",
@@ -49,6 +54,50 @@
                 "header": [],
                 "url": {
                   "raw": ""
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "SSO",
+          "item": [
+            {
+              "name": "sso_login",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_user_url}}api/auth/sso/login",
+                  "host": [
+                    "{{base_user_url}}api"
+                  ],
+                  "path": [
+                    "auth",
+                    "sso",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "sso_signup",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_admin_url}}/api/auth/sso/logout",
+                  "host": [
+                    "{{base_admin_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "sso",
+                    "logout"
+                  ]
                 }
               },
               "response": []
@@ -111,7 +160,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNzQ3MjQ3LCJpYXQiOjE3OTE3NDYzNDcsImp0aSI6ImVhZDI2NTM1NTRkYzQ1MTdhZmYyOTE2YWY5NjZkZmJkIiwidXNlcl9pZCI6IjEifQ.Dj3KsUFpXqa6QBP0f8uGVrY5MAO70hHVjBN3Jy9zzqM"
+                    "value": "{{bearer_token_0219}}"
                   }
                 ],
                 "body": {
@@ -125,10 +174,16 @@
                 },
                 "url": {
                   "raw": "http://127.0.0.1:8000/admin/employees",
+                  "protocol": "http",
                   "host": [
-                    "http://127.0.0.1:8000/admin"
+                    "127",
+                    "0",
+                    "0",
+                    "1"
                   ],
+                  "port": "8000",
                   "path": [
+                    "admin",
                     "employees"
                   ]
                 }
@@ -220,6 +275,43 @@
               "response": []
             }
           ]
+        },
+        {
+          "name": "Approved",
+          "item": [
+            {
+              "name": "approved employee",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer "
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"1034456789\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_admin_url}}/approved/employee",
+                  "host": [
+                    "{{base_admin_url}}"
+                  ],
+                  "path": [
+                    "approved",
+                    "employee"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     }
@@ -271,6 +363,14 @@
     },
     {
       "key": "json_web_token_0s59",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_1a1f",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0i3z",
       "secret": true
     }
   ]
