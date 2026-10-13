@@ -90,7 +90,8 @@ def sso_callback(request):
     try:
         token = oauth.google.authorize_access_token(request)
         claims = token.get("userinfo")
-
+        print(claims)
+        
         if not claims:
             return JsonResponse(
                 {"error": "User information is unavailable"},
@@ -103,6 +104,7 @@ def sso_callback(request):
             status=401,
         )
 
+    
     issuer = settings.SSO_ISSUER.rstrip("/")
     subject = claims.get("sub")
     email = claims.get("email")
