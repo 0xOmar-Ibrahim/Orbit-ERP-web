@@ -1,12 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from apps.accounts.models import Employee
+from apps.accounts.models import Employee, RegistrationRequest, Role
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from apps.accounts.serializers import LoginSerializer
 from apps.accounts.views import LoginThrottle
 from .serializers import AddEmployeeSerializer, UpdateEmployeeSerializer
+from django.db import transaction
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
+import random, time
 class getEmployees(APIView):
     permission_classes = [IsAuthenticated]  # must be open, the user isn't logged in yet
 
@@ -107,3 +111,120 @@ class AdminLogoutView(APIView):
             return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
         except Exception:
             return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ApproveRegistrationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @transaction.atomic
+    def post(self, request):
+
+        request_id = request.data.get("request_id")
+
+        registration = get_object_or_404(
+            RegistrationRequest.objects.select_for_update(),
+            request_id=request_id,
+        )
+
+        if registration.status != "pending":
+            return Response(
+                {
+                    "detail": (
+                        f"Request is already {registration.status}."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # The admin must explicitly select the employee's role.
+        role_id = request.data.get("role_id")
+        date_of_birth = request.data.get("date_of_birth")
+        gender = request.data.get("gender")
+        national_id = request.data.get("national_id")
+        phone = request.data.get("phone")
+        address = request.data.get("address")
+        hire_date = request.data.get("hire_date")
+        employee_type = request.data.get("employment_type")
+
+        random_number = random.randint(1000, 9999)
+        current_year = time.strftime("%Y")
+        employee_code = f"EMP-{current_year}-{random_number}"
+
+        if not role_id:
+            return Response(
+                {"detail": "role_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        role = get_object_or_404(Role, role_id=role_id)
+
+        # Never automatically link an existing employee by email.
+        if Employee.objects.filter(
+            work_email__iexact=registration.work_email
+        ).exists():
+            return Response(
+                {
+                    "detail": (
+                        "An employee with this email already exists. "
+                        "Review and link the account through a separate "
+                        "verified process."
+                    )
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        if Employee.objects.filter(
+            sso_issuer=registration.sso_issuer,
+            sso_subject=registration.sso_subject,
+        ).exists():
+            return Response(
+                {"detail": "This SSO identity is already linked."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        # Add any other required Employee fields from your model here.
+        employee = Employee(
+            employee_code=employee_code,
+            first_name=registration.first_name,
+            last_name=registration.last_name,
+            work_email=registration.work_email,
+            role=role,
+            sso_issuer=registration.sso_issuer,
+            sso_subject=registration.sso_subject,
+            sso_enabled=True,
+            employment_status="active",
+            date_of_birth=date_of_birth,
+            gender=gender,
+            national_id=national_id,
+            phone=phone,
+            address=address,
+            hire_date=hire_date,
+            employment_type=employee_type
+        )
+
+        # SSO users do not need a local password.
+        employee.set_unusable_password()
+        employee.save()
+
+        registration.status = "approved"
+        registration.reviewed_by = request.user
+        registration.reviewed_at = timezone.now()
+        registration.save(
+            update_fields=[
+                "status",
+                "reviewed_by",
+                "reviewed_at",
+            ]
+        )
+
+        return Response(
+            {
+                "detail": "Registration approved successfully.",
+                "employee_id": employee.employee_id,
+                "work_email": employee.work_email,
+                "role": role.role_name,
+                "sso_enabled": employee.sso_enabled,
+            },
+            status=status.HTTP_200_OK,
+        )
+

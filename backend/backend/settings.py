@@ -12,9 +12,15 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Reads .env from the current working directory
+ENV_FILE = BASE_DIR / ".env"
+load_dotenv(ENV_FILE)
 
 
 # Quick-start development settings - unsuitable for production
@@ -60,7 +66,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -162,9 +168,17 @@ MAILERS = {
 AUTH_USER_MODEL = "accounts.Employee"
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     
     "USER_ID_FIELD": "employee_id",
     "USER_ID_CLAIM": "user_id",
 }
+
+
+SSO_CLIENT_ID = os.environ.get("SSO_CLIENT_ID")
+SSO_CLIENT_SECRET = os.environ.get("SSO_CLIENT_SECRET")
+SSO_ISSUER = os.environ.get(
+    "SSO_ISSUER",
+    "https://accounts.google.com",
+)

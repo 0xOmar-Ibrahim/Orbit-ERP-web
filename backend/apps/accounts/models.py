@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-
+from django.conf import settings
 
 
 class Role(models.Model):
@@ -141,6 +141,20 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         default=EmploymentType.FULL_TIME,
     )
 
+    sso_issuer = models.URLField(
+    null=True,
+    blank=True,
+    )
+
+    sso_subject = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+    )
+
+    sso_enabled = models.BooleanField(
+        default=False,
+    )
 
     objects = EmployeeManager()
 
@@ -153,6 +167,12 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = "employee"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["sso_issuer", "sso_subject"],
+                name="unique_employee_sso_identity",
+                )
+        ]
 
     def __str__(self):
         return f"{self.employee_code} - {self.first_name} {self.last_name}"
@@ -197,3 +217,56 @@ class RolePermission(models.Model):
     def __str__(self):
         return f"{self.role} | {self.module} | {self.permission}"
 
+
+class RegistrationRequest(models.Model):
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+
+    request_id = models.AutoField(primary_key=True)
+
+    # Identity verified by the SSO provider
+    sso_issuer = models.URLField()
+    sso_subject = models.CharField(max_length=255)
+
+    work_email = models.EmailField()
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+
+    # Optional message from the applicant
+    reason = models.TextField(blank=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="reviewed_registration_requests",
+    )
+
+    reviewed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "registration_request"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["sso_issuer", "sso_subject"],
+                name="unique_registration_sso_identity",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.work_email} - {self.status}"

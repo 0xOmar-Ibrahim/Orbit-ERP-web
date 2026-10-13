@@ -4,6 +4,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
 from apps.accounts.models import Employee
+from .helpers import get_user_permissions
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -26,29 +27,4 @@ class LoginSerializer(serializers.Serializer):
         # Create JWT
         refresh = RefreshToken.for_user(employee)
 
-        # Get user role name
-        role_name = employee.role.role_name if employee.role_id else None
-
-        # Get role permissions
-        permissions = []
-
-        if employee.role_id:
-            permissions = [
-                {
-                    "module": rp.module.module_name,
-                    "permission": rp.permission.permission_name
-                }
-                for rp in employee.role.role_permissions.select_related("module", "permission")
-            ]
-
-        return {
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
-            "user": {
-                "code": employee.employee_code,
-                "email": employee.work_email,
-                "role": employee.role_id,
-                "role_name": role_name,
-                "permissions": permissions,
-            },
-        }
+        return get_user_permissions(employee, refresh)

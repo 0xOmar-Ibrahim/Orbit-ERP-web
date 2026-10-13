@@ -111,7 +111,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0219}}"
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNzQ3MjQ3LCJpYXQiOjE3OTE3NDYzNDcsImp0aSI6ImVhZDI2NTM1NTRkYzQ1MTdhZmYyOTE2YWY5NjZkZmJkIiwidXNlcl9pZCI6IjEifQ.Dj3KsUFpXqa6QBP0f8uGVrY5MAO70hHVjBN3Jy9zzqM"
                   }
                 ],
                 "body": {
@@ -124,9 +124,9 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_admin_url}}/employees",
+                  "raw": "http://127.0.0.1:8000/admin/employees",
                   "host": [
-                    "{{base_admin_url}}"
+                    "http://127.0.0.1:8000/admin"
                   ],
                   "path": [
                     "employees"
