@@ -87,7 +87,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         PART_TIME = "part_time", "Part Time"
         CONTRACT = "contract", "Contract"
         INTERN = "intern", "Intern"
-
+        
     employee_id = models.AutoField(primary_key=True)
 
     employee_code = models.CharField(
@@ -167,12 +167,6 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = "employee"
-        constraints = [
-            models.UniqueConstraint(
-                fields=["sso_issuer", "sso_subject"],
-                name="unique_employee_sso_identity",
-                )
-        ]
 
     def __str__(self):
         return f"{self.employee_code} - {self.first_name} {self.last_name}"
@@ -220,6 +214,9 @@ class RolePermission(models.Model):
 
 class RegistrationRequest(models.Model):
 
+    class RegistrationMethod(models.TextChoices):
+        SSO = "sso", "SSO"
+        PASSWORD = "password", "Email and Password"
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
         APPROVED = "approved", "Approved"
@@ -227,6 +224,12 @@ class RegistrationRequest(models.Model):
 
     request_id = models.AutoField(primary_key=True)
 
+    registration_method = models.CharField(
+        max_length=20,
+        choices=RegistrationMethod.choices,
+        default=""
+    )
+    
     # Identity verified by the SSO provider
     sso_issuer = models.URLField()
     sso_subject = models.CharField(max_length=255)
@@ -237,6 +240,12 @@ class RegistrationRequest(models.Model):
 
     # Optional message from the applicant
     reason = models.TextField(blank=True)
+
+    password = models.CharField(
+        max_length=128,
+        blank=True,
+        default=""
+    )
 
     status = models.CharField(
         max_length=20,
@@ -261,12 +270,7 @@ class RegistrationRequest(models.Model):
 
     class Meta:
         db_table = "registration_request"
-        constraints = [
-            models.UniqueConstraint(
-                fields=["sso_issuer", "sso_subject"],
-                name="unique_registration_sso_identity",
-            )
-        ]
+        
 
     def __str__(self):
         return f"{self.work_email} - {self.status}"

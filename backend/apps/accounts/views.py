@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import LoginSerializer
+from .serializers import LoginSerializer, SignUPSerializer
 from .models import Employee
 from django.conf import settings
 from django.http import JsonResponse
@@ -49,49 +49,49 @@ class LogoutView(APIView):
             return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class SignUP(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        serializer = SignUPSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.save())
+
+
+class GetEmployeeStatus(APIView):
+    permission_classes = [AllowAny]      # must be open, the user isn't logged in yet
+    throttle_classes = [LoginThrottle]
+
+    def get(self, request):
+        employee_email = request.data.get("email")
+        if not employee_email:
+            return Response({"error": "Employee email is required."}, status=400) 
+
+        reg_req = RegistrationRequest.objects.get(work_email=employee_email)
+        
+        return Response({
+            "user" : {
+                "first_name": reg_req.first_name,
+                "last_name": reg_req.last_name,
+                "status": reg_req.status
+            }
+        })
+
+
 @require_GET
-def sso_login(request):
-    request.session["sso_mode"] = "login"
-
+def sso_start(request):
     callback_url = request.build_absolute_uri(
-        "/api/auth/sso/callback/"
+        "/api/auth/sso/callback"
     )
-
     return oauth.google.authorize_redirect(
         request,
         callback_url,
     )
-
-
-@require_GET
-def sso_signup(request):
-    request.session["sso_mode"] = "signup"
-
-    callback_url = request.build_absolute_uri(
-        "/api/auth/sso/callback/"
-    )
-
-    return oauth.google.authorize_redirect(
-        request,
-        callback_url,
-    )
-
-
 @require_GET
 def sso_callback(request):
-    mode = request.session.pop("sso_mode", None)
-
-    if mode not in {"login", "signup"}:
-        return JsonResponse(
-            {"error": "Invalid or expired login flow"},
-            status=400,
-        )
-
     try:
         token = oauth.google.authorize_access_token(request)
         claims = token.get("userinfo")
-        print(claims)
-        
+
         if not claims:
             return JsonResponse(
                 {"error": "User information is unavailable"},
@@ -104,7 +104,6 @@ def sso_callback(request):
             status=401,
         )
 
-    
     issuer = settings.SSO_ISSUER.rstrip("/")
     subject = claims.get("sub")
     email = claims.get("email")
@@ -126,48 +125,45 @@ def sso_callback(request):
         employment_status="active",
     ).select_related("role").first()
 
-    if mode == "signup":
-        if employee:
-            return redirect(f"{FRONTEND_URL}/login?message=account_exists")
-
-        # Never automatically attach an SSO identity to an
-        # existing employee just because their email matches.
-        if Employee.objects.filter(
-            work_email__iexact=email
-        ).exists():
-            return redirect(
-                f"{FRONTEND_URL}/login?message=contact_admin"
-            )
-
-        registration, created = (
-            RegistrationRequest.objects.get_or_create(
-                sso_issuer=issuer,
-                sso_subject=subject,
-                defaults={
-                    "work_email": email,
-                    "first_name": claims.get("given_name", ""),
-                    "last_name": claims.get("family_name", ""),
-                },
-            )
+    # Login: existing active employee
+    if employee:
+        refresh = RefreshToken.for_user(employee)
+        return JsonResponse(
+            get_user_permissions(employee, refresh)
         )
 
-        if registration.status == "rejected":
-            return redirect(
-                f"{FRONTEND_URL}/login?message=registration_rejected"
-            )
-
+    # Do not automatically link an existing employee by email
+    if Employee.objects.filter(
+        work_email__iexact=email
+    ).exists():
         return redirect(
-            f"{FRONTEND_URL}/login?message=registration_pending"
+            f"{FRONTEND_URL}/login?message=contact_admin"
         )
 
-    # Login mode
-    if employee is None:
+    # Signup: create or retrieve a registration request
+    registration, created = (
+        RegistrationRequest.objects.get_or_create(
+            sso_issuer=issuer,
+            sso_subject=subject,
+            registration_method="sso",
+            defaults={
+                "work_email": email,
+                "first_name": claims.get("given_name", ""),
+                "last_name": claims.get("family_name", ""),
+            },
+        )
+    )
+
+    if registration.status == "rejected":
+        return redirect(
+            f"{FRONTEND_URL}/login?message=registration_rejected"
+        )
+
+    if registration.status == "approved":
         return redirect(
             f"{FRONTEND_URL}/login?message=account_not_approved"
         )
 
-    refresh = RefreshToken.for_user(employee)
-
-    # Illustrative token handoff only. See the secure session
-    # handoff section below before using this in a browser.
-    return JsonResponse(get_user_permissions(employee, refresh))
+    return redirect(
+        f"{FRONTEND_URL}/login?message=registration_pending"
+    )

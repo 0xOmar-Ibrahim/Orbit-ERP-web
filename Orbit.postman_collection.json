@@ -48,12 +48,78 @@
               "response": []
             },
             {
+              "name": "signup",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"first_name\":\"Omar\",\r\n    \"last_name\":\"ahmed\",\r\n    \"work_email\":\"Omar12_35@gmail.com\",\r\n    \"password\":12345678\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_user_url}}/api/auth/signup/",
+                  "host": [
+                    "{{base_user_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "signup",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
               "name": "logout",
               "request": {
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": ""
+                  "raw": "{{base_user_url}}/api/auth/logout",
+                  "host": [
+                    "{{base_user_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "logout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get_employee_status",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\":\"omaribrahimtbdc@gmail.com\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_user_url}}/api/auth/get_employee_status/",
+                  "host": [
+                    "{{base_user_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "get_employee_status",
+                    ""
+                  ]
                 }
               },
               "response": []
@@ -64,39 +130,19 @@
           "name": "SSO",
           "item": [
             {
-              "name": "sso_login",
+              "name": "sso",
               "request": {
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{base_user_url}}api/auth/sso/login",
+                  "raw": "{{base_user_url}}api/auth/sso/",
                   "host": [
                     "{{base_user_url}}api"
                   ],
                   "path": [
                     "auth",
                     "sso",
-                    "login"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "sso_signup",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{base_admin_url}}/api/auth/sso/logout",
-                  "host": [
-                    "{{base_admin_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "auth",
-                    "sso",
-                    "logout"
+                    ""
                   ]
                 }
               },
@@ -286,12 +332,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer "
+                    "value": "Baerer "
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"1034456789\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\"\r\n}",
+                  "raw": "{\r\n    \"request_id\":8,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"00344569\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -371,6 +417,14 @@
     },
     {
       "key": "json_web_token_0i3z",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0ts1",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0lkx",
       "secret": true
     }
   ]

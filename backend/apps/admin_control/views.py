@@ -173,14 +173,15 @@ class ApproveRegistrationView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
-        if Employee.objects.filter(
-            sso_issuer=registration.sso_issuer,
-            sso_subject=registration.sso_subject,
-        ).exists():
-            return Response(
-                {"detail": "This SSO identity is already linked."},
-                status=status.HTTP_409_CONFLICT,
-            )
+        if registration.sso_issuer and registration.sso_subject:
+            if Employee.objects.filter(
+                sso_issuer=registration.sso_issuer,
+                sso_subject=registration.sso_subject,
+            ).exists():
+                return Response(
+                    {"detail": "This SSO identity is already linked."},
+                    status=status.HTTP_409_CONFLICT,
+                )
 
         # Add any other required Employee fields from your model here.
         employee = Employee(
@@ -191,7 +192,7 @@ class ApproveRegistrationView(APIView):
             role=role,
             sso_issuer=registration.sso_issuer,
             sso_subject=registration.sso_subject,
-            sso_enabled=True,
+            sso_enabled=True if registration.registration_method == "sso" else False,
             employment_status="active",
             date_of_birth=date_of_birth,
             gender=gender,
@@ -202,8 +203,12 @@ class ApproveRegistrationView(APIView):
             employment_type=employee_type
         )
 
-        # SSO users do not need a local password.
-        employee.set_unusable_password()
+        if registration.registration_method == "sso":
+            # SSO users do not need a local password.
+            employee.set_unusable_password()
+        else: 
+           employee.password = registration.password
+
         employee.save()
 
         registration.status = "approved"
