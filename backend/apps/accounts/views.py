@@ -15,7 +15,7 @@ from authlib.integrations.base_client.errors import OAuthError
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import RegistrationRequest
 from .oidc import oauth
-from .helpers import get_user_permissions
+from ..helpers import get_user_permissions
 
 
 # Assuming the first allowed origin is your frontend URL

@@ -10,8 +10,8 @@ from .serializers import AddEmployeeSerializer, UpdateEmployeeSerializer
 from django.db import transaction
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
-import random, time
-class getEmployees(APIView):
+from ..helpers import generate_code
+class Employees(APIView):
     permission_classes = [IsAuthenticated]  # must be open, the user isn't logged in yet
 
     def get(self, request):
@@ -146,9 +146,8 @@ class ApproveRegistrationView(APIView):
         hire_date = request.data.get("hire_date")
         employee_type = request.data.get("employment_type")
 
-        random_number = random.randint(1000, 9999)
-        current_year = time.strftime("%Y")
-        employee_code = f"EMP-{current_year}-{random_number}"
+        
+        employee_code = generate_code()
 
         if not role_id:
             return Response(

@@ -4,7 +4,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
 from apps.accounts.models import Employee, RegistrationRequest
-from .helpers import get_user_permissions
+from ..helpers import get_user_permissions
 from django.contrib.auth.hashers import make_password
 
 class LoginSerializer(serializers.Serializer):
