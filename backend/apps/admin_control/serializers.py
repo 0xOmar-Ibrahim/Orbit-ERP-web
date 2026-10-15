@@ -3,6 +3,7 @@ from apps.accounts.models import Employee
 import random
 import time
 from django.contrib.auth.hashers import make_password
+
 class AddEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee

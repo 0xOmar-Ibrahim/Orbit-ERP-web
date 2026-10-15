@@ -78,6 +78,7 @@ class getEmployees(APIView):
 
         employee.delete()
         return Response({"message": "Employee deleted successfully."})
+        
 class AdminLoginView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [LoginThrottle]
@@ -89,8 +90,9 @@ class AdminLoginView(APIView):
         email = serializer.validated_data.get("user", {}).get("email")
         if email:
             try:
-                employee = Employee.objects.get(work_email=email)
-                if not employee.is_superuser:
+                employee = Employee.objects.select_related("role").get(work_email=email)
+                role_name = employee.role.role_name.strip().lower() if employee.role else ""
+                if role_name not in ["admin", "administrator"]:
                     return Response({"detail": "You do not have permission to access the admin panel."}, status=status.HTTP_403_FORBIDDEN)
             except Employee.DoesNotExist:
                 return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
