@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import check_password
 from apps.accounts.models import Employee, RegistrationRequest
 from ..helpers import get_user_permissions
 from django.contrib.auth.hashers import make_password
+from django.utils import timezone
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -24,6 +25,9 @@ class LoginSerializer(serializers.Serializer):
         # Check employment status
         if employee.employment_status != Employee.EmploymentStatus.ACTIVE:
             raise AuthenticationFailed("This account is disabled.")
+
+        employee.last_login = timezone.now()
+        employee.save(update_fields=["last_login"])
 
         # Create JWT
         refresh = RefreshToken.for_user(employee)
