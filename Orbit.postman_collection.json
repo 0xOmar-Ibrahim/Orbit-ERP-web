@@ -28,7 +28,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/api/auth/login/",
+                  "raw": "http://127.0.0.1:8000/api/auth/login",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -40,8 +40,7 @@
                   "path": [
                     "api",
                     "auth",
-                    "login",
-                    ""
+                    "login"
                   ]
                 }
               },
@@ -62,15 +61,19 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_user_url}}/api/auth/signup/",
+                  "raw": "http://127.0.0.1:8000/api/auth/signup",
+                  "protocol": "http",
                   "host": [
-                    "{{base_user_url}}"
+                    "127",
+                    "0",
+                    "0",
+                    "1"
                   ],
+                  "port": "8000",
                   "path": [
                     "api",
                     "auth",
-                    "signup",
-                    ""
+                    "signup"
                   ]
                 }
               },
@@ -80,7 +83,12 @@
               "name": "logout",
               "request": {
                 "method": "GET",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTU2MjYyLCJpYXQiOjE3OTIxNTI2NjIsImp0aSI6ImE2MmFkODViZDg2NDQyMjhhODhjYzQ5NWYzMGUxODUxIiwidXNlcl9pZCI6IjEifQ.X_Q4Ttt_rJMeskZkoMxBtVKfIfykZbE7Yl9YiVrFj20"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_user_url}}/api/auth/logout",
                   "host": [
@@ -110,15 +118,19 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_user_url}}/api/auth/get_employee_status/",
+                  "raw": "http://127.0.0.1:8000/api/auth/get_employee_status",
+                  "protocol": "http",
                   "host": [
-                    "{{base_user_url}}"
+                    "127",
+                    "0",
+                    "0",
+                    "1"
                   ],
+                  "port": "8000",
                   "path": [
                     "api",
                     "auth",
-                    "get_employee_status",
-                    ""
+                    "get_employee_status"
                   ]
                 }
               },
@@ -135,11 +147,17 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{base_user_url}}api/auth/sso/",
+                  "raw": "http://127.0.0.1:8000/api/auth/sso/",
+                  "protocol": "http",
                   "host": [
-                    "{{base_user_url}}api"
+                    "127",
+                    "0",
+                    "0",
+                    "1"
                   ],
+                  "port": "8000",
                   "path": [
+                    "api",
                     "auth",
                     "sso",
                     ""
@@ -163,11 +181,25 @@
               "request": {
                 "method": "POST",
                 "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"omar@example.com\",\r\n    \"password\": \"101010\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "{{base_admin_url}}/admin/login",
+                  "raw": "http://127.0.0.1:8000/admin/login",
+                  "protocol": "http",
                   "host": [
-                    "{{base_admin_url}}"
+                    "127",
+                    "0",
+                    "0",
+                    "1"
                   ],
+                  "port": "8000",
                   "path": [
                     "admin",
                     "login"
@@ -180,7 +212,12 @@
               "name": "logout",
               "request": {
                 "method": "POST",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTU2MjYyLCJpYXQiOjE3OTIxNTI2NjIsImp0aSI6ImE2MmFkODViZDg2NDQyMjhhODhjYzQ5NWYzMGUxODUxIiwidXNlcl9pZCI6IjEifQ.X_Q4Ttt_rJMeskZkoMxBtVKfIfykZbE7Yl9YiVrFj20"
+                  }
+                ],
                 "url": {
                   "raw": "{{base_admin_url}}/admin/logout",
                   "host": [
@@ -243,7 +280,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_1bpr}}"
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTU2MjYyLCJpYXQiOjE3OTIxNTI2NjIsImp0aSI6ImE2MmFkODViZDg2NDQyMjhhODhjYzQ5NWYzMGUxODUxIiwidXNlcl9pZCI6IjEifQ.X_Q4Ttt_rJMeskZkoMxBtVKfIfykZbE7Yl9YiVrFj20"
                   }
                 ],
                 "body": {
@@ -256,11 +293,17 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_admin_url}}/employees",
+                  "raw": "http://127.0.0.1:8000/admin/employees",
+                  "protocol": "http",
                   "host": [
-                    "{{base_admin_url}}"
+                    "127",
+                    "0",
+                    "0",
+                    "1"
                   ],
+                  "port": "8000",
                   "path": [
+                    "admin",
                     "employees"
                   ]
                 }
@@ -287,11 +330,17 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_admin_url}}/employees",
+                  "raw": "http://127.0.0.1:8000/admin/employees",
+                  "protocol": "http",
                   "host": [
-                    "{{base_admin_url}}"
+                    "127",
+                    "0",
+                    "0",
+                    "1"
                   ],
+                  "port": "8000",
                   "path": [
+                    "admin",
                     "employees"
                   ]
                 }
@@ -309,11 +358,17 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_admin_url}}/employees",
+                  "raw": "http://127.0.0.1:8000/admin/employees",
+                  "protocol": "http",
                   "host": [
-                    "{{base_admin_url}}"
+                    "127",
+                    "0",
+                    "0",
+                    "1"
                   ],
+                  "port": "8000",
                   "path": [
+                    "admin",
                     "employees"
                   ]
                 }
@@ -332,12 +387,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Baerer "
+                    "value": "{{bearer_token_0ts1}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"request_id\":8,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"00344569\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\"\r\n}",
+                  "raw": "{\r\n    \"request_id\":12,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"103040000969\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -345,11 +400,17 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_admin_url}}/approved/employee",
+                  "raw": "http://127.0.0.1:8000/admin/approved/employee",
+                  "protocol": "http",
                   "host": [
-                    "{{base_admin_url}}"
+                    "127",
+                    "0",
+                    "0",
+                    "1"
                   ],
+                  "port": "8000",
                   "path": [
+                    "admin",
                     "approved",
                     "employee"
                   ]
@@ -358,6 +419,172 @@
               "response": []
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "CRM",
+      "item": [
+        {
+          "name": "Customer",
+          "item": [
+            {
+              "name": "customers",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTU2MjYyLCJpYXQiOjE3OTIxNTI2NjIsImp0aSI6ImE2MmFkODViZDg2NDQyMjhhODhjYzQ5NWYzMGUxODUxIiwidXNlcl9pZCI6IjEifQ.X_Q4Ttt_rJMeskZkoMxBtVKfIfykZbE7Yl9YiVrFj20"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\":\"omaribrahimtbdc@gmail.com\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/customers",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "customers"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "customers",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_109l}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"first_name\": \"Ahmed\",\r\n    \"last_name\": \"Nasser\",\r\n    \"phone\": \"1000245\",\r\n    \"company_name\": \"PWC\",\r\n    \"email\": \"ahmed@gmail.com\",\r\n    \"address\":\"Cairo\",\r\n    \"campaign\": \"UnKnown\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/customers",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "customers"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "customers",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_109l}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"customer_code\": \"CUS-2026-5107\",\r\n    \"first_name\": \"Mostafa\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/customers",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "customers"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "customers",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_109l}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"customer_code\": \"CUS-2026-5107\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/customers",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "customers"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Contact",
+          "item": []
+        },
+        {
+          "name": "Interaction",
+          "item": []
         }
       ]
     }
@@ -425,6 +652,14 @@
     },
     {
       "key": "json_web_token_0lkx",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_109l",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0w5h",
       "secret": true
     }
   ]
