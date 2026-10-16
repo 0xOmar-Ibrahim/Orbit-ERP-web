@@ -28,7 +28,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/api/auth/login",
+                  "raw": "http://127.0.0.1:8000/api/auth/login/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -40,7 +40,8 @@
                   "path": [
                     "api",
                     "auth",
-                    "login"
+                    "login",
+                    ""
                   ]
                 }
               },
@@ -354,11 +355,11 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0cbg}}"
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/admin/employees",
+                  "raw": "http://127.0.0.1:8000/admin/employee/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -369,7 +370,8 @@
                   "port": "8000",
                   "path": [
                     "admin",
-                    "employees"
+                    "employee",
+                    ""
                   ]
                 }
               },
@@ -580,11 +582,299 @@
         },
         {
           "name": "Contact",
-          "item": []
+          "item": [
+            {
+              "name": "contacts",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/contacts/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "contacts",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "add new contact",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"customer_id\": 1,\r\n    \"name\":\"phone\",\r\n    \"job_title\": \"HR Manager\",\r\n    \"email\": \"omar@example.com\",\r\n    \"phone\": \"01144130977\",\r\n    \"is_primary\": true\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/contacts/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "contacts",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "edit contact",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"contact_id\": 6,\r\n    \"name\": \"meeting\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/contacts/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "contacts",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete contact",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"contact_id\": 6\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/contacts/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "contacts",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
         },
         {
           "name": "Interaction",
-          "item": []
+          "item": [
+            {
+              "name": "interactions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/interactions/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "interactions",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "add Interaction",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"type\": \"meeting\",\r\n    \"subject\": \"Requirements analysis\",\r\n    \"description\": \"To fetch the reqs\",\r\n    \"interaction_date\": \"2006-10-14\",\r\n    \"customer_id\": 1,\r\n    \"employee_id\": 22\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/interactions/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "interactions",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "edit interaction",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"interaction_id\": 1,\r\n    \"type\": \"call\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/interactions/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "interactions",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "New Request",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n\r\n    \"interaction_id\": 1\r\n    \r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/interactions/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "interactions",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     }
@@ -660,6 +950,14 @@
     },
     {
       "key": "json_web_token_0w5h",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_1a5p",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0e9y",
       "secret": true
     }
   ]
