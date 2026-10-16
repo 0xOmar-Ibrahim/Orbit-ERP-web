@@ -80,7 +80,7 @@ class GetEmployeeStatus(APIView):
 @require_GET
 def sso_start(request):
     callback_url = request.build_absolute_uri(
-        "/api/auth/sso/callback"
+        "/api/auth/sso/callback/"
     )
     return oauth.google.authorize_redirect(
         request,
