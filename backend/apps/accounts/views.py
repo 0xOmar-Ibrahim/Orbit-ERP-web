@@ -76,6 +76,16 @@ class GetEmployeeStatus(APIView):
             }
         })
 
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        employee = request.user
+
+        refresh = RefreshToken.for_user(employee)
+        data = get_user_permissions(employee, refresh)
+
+        return Response(data, status=status.HTTP_200_OK)
 
 @require_GET
 def sso_start(request):
@@ -128,10 +138,29 @@ def sso_callback(request):
     # Login: existing active employee
     if employee:
         refresh = RefreshToken.for_user(employee)
-        return JsonResponse(
-            get_user_permissions(employee, refresh)
+
+        response = redirect(f"{FRONTEND_URL}/home")
+
+        response.set_cookie(
+            key="access_token",
+            value=str(refresh.access_token),
+            httponly=True,
+            secure=False,       #! we must change it 
+            samesite="Lax",
+            path="/",
         )
 
+        response.set_cookie(
+            key="refresh_token",
+            value=str(refresh),
+            httponly=True,  
+            secure=False,       #! we must change it
+            samesite="Lax",
+            path="/",
+        )
+
+        return response
+    
     # Do not automatically link an existing employee by email
     if Employee.objects.filter(
         work_email__iexact=email
