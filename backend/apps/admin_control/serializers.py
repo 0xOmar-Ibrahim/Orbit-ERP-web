@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from apps.accounts.models import Employee
-import random
-import time
+from ..helpers import generate_code
 from django.contrib.auth.hashers import make_password
 class AddEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,9 +33,7 @@ class AddEmployeeSerializer(serializers.ModelSerializer):
             # Hash the password to store it in data base securely
             password = validated_data.pop("password")
 
-            random_number = random.randint(1000, 9999)
-            current_year = time.strftime("%Y")
-            employee_code = f"EMP-{current_year}-{random_number}"
+            employee_code = generate_code()
             
             employee = Employee.objects.create(**validated_data, employee_code=employee_code)
             employee.set_password(make_password(password))

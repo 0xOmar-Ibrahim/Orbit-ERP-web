@@ -1,4 +1,7 @@
 
+import random
+import time
+
 def get_user_permissions(employee, refresh):
     """
     Get the permissions for a given employee based on their role.
@@ -34,3 +37,23 @@ def get_user_permissions(employee, refresh):
             "permissions": permissions,
         },
     }
+
+def generate_code(account_type = 1):
+    """
+        generate code based on account type
+        1 ==> employee
+        2 ==> customer
+    """
+
+    if account_type == 1:
+        prefix = "EMP"
+    elif account_type == 2: 
+        prefix = "CUS" 
+    else:
+        raise ValueError("The Code type must be Employee or Customer.")
+
+    random_number = random.randint(1000, 9999)
+    current_year = time.strftime("%Y")
+    generated_code = f"{prefix}-{current_year}-{random_number}"
+
+    return generated_code
