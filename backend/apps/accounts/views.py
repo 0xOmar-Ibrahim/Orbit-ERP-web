@@ -58,7 +58,7 @@ class SignUP(APIView):
 
 
 class GetEmployeeStatus(APIView):
-    permission_classes = [AllowAny]      # must be open, the user isn't logged in yet
+    permission_classes = [AllowAny]
     throttle_classes = [LoginThrottle]
 
     def get(self, request):
@@ -66,7 +66,9 @@ class GetEmployeeStatus(APIView):
         if not employee_email:
             return Response({"error": "Employee email is required."}, status=400) 
 
-        reg_req = RegistrationRequest.objects.get(work_email=employee_email)
+        reg_req = RegistrationRequest.objects.filter(
+            work_email=employee_email
+        ).order_by('-created_at').first()
         
         return Response({
             "user" : {
