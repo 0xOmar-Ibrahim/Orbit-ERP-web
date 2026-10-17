@@ -875,6 +875,361 @@
               "response": []
             }
           ]
+        },
+        {
+          "name": "Opportunity",
+          "item": [
+            {
+              "name": "get all opportunities",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/opportunity/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "opportunity",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get single opportunity",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/opportunity/1/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "opportunity",
+                    "1",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "add opportunity",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"title\": \"Enterprise ERP Implementation\",\n    \"estimated_value\": 50000,\n    \"stage\": \"proposal\",\n    \"probability\": 60,\n    \"expected_close_date\": \"2026-11-30\",\n    \"status\": \"open\",\n    \"customer_id\": 1,\n    \"employee_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/opportunity/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "opportunity",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "edit opportunity",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"opportunity_id\": 1,\n    \"stage\": \"negotiation\",\n    \"probability\": 80,\n    \"estimated_value\": 55000\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/opportunity/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "opportunity",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete opportunity",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"opportunity_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/opportunity/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "opportunity",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Customer Note",
+          "item": [
+            {
+              "name": "get notes by customer id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/customer_note/?customer_id=1",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "customer_note",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "customer_id",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get single note by note id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/customer_note/1/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "customer_note",
+                    "1",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "add customer note",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"customer_id\": 1,\n    \"employee_id\": 1,\n    \"note_text\": \"Client requested a detailed proposal and follow-up call next Monday.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/customer_note/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "customer_note",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "edit customer note",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"note_id\": 1,\n    \"note_text\": \"Updated note: Client agreed to proceed with phase 1 scope.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/customer_note/1/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "customer_note",
+                    "1",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete customer note",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/customer_note/1/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "customer_note",
+                    "1",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     }

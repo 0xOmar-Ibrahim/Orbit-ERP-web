@@ -2,10 +2,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .models import Opportunity
-from .serializers import OpportunitySerializer
-from apps.crm.models import Customer, Contact, Interaction
-from apps.crm.serializers import AddCustomerSerializer, UpdateCustomerSerializer, UpdateContactSerializer, AddContactSerializer, AddInteractionSerializer, UpdateInteractionSerializer
+from .models import Opportunity, Customer, Contact, Interaction, CustomerNote
+from .serializers import (
+    OpportunitySerializer,
+    CustomerNoteSerializer,
+    AddCustomerSerializer,
+    UpdateCustomerSerializer,
+    AddContactSerializer,
+    UpdateContactSerializer,
+    AddInteractionSerializer,
+    UpdateInteractionSerializer,
+)
 
 
 class OpportunityView(APIView):
@@ -36,7 +43,28 @@ class OpportunityView(APIView):
         except (ValueError, TypeError):
             end_range = 50
 
-        queryset = Opportunity.objects.select_related("customer", "employee").all()
+        # Query filters matching Supabase schema fields
+        filters = {}
+        if "customer_id" in request.query_params:
+            filters["customer_id"] = request.query_params["customer_id"]
+        elif "customer" in request.query_params:
+            filters["customer_id"] = request.query_params["customer"]
+
+        if "employee_id" in request.query_params:
+            filters["employee_id"] = request.query_params["employee_id"]
+        elif "employee" in request.query_params:
+            filters["employee_id"] = request.query_params["employee"]
+
+        if "stage" in request.query_params:
+            filters["stage"] = request.query_params["stage"].lower()
+
+        if "status" in request.query_params:
+            filters["status"] = request.query_params["status"].lower()
+
+        queryset = Opportunity.objects.select_related("customer", "employee").filter(**filters)
+        if "search" in request.query_params:
+            queryset = queryset.filter(title__icontains=request.query_params["search"])
+
         total_count = queryset.count()
         opportunities = queryset[start_range:end_range]
         serializer = OpportunitySerializer(opportunities, many=True)
@@ -58,7 +86,13 @@ class OpportunityView(APIView):
         }, status=status.HTTP_201_CREATED)
 
     def patch(self, request, opportunity_id=None):
-        opp_id = opportunity_id or request.data.get("opportunity_id") or request.query_params.get("opportunity_id") or request.data.get("id")
+        opp_id = (
+            opportunity_id
+            or request.data.get("opportunity_id")
+            or request.query_params.get("opportunity_id")
+            or request.data.get("id")
+            or request.query_params.get("id")
+        )
         if not opp_id:
             return Response({"error": "opportunity_id is required."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -75,8 +109,17 @@ class OpportunityView(APIView):
             "opportunity": OpportunitySerializer(updated_opportunity).data,
         }, status=status.HTTP_200_OK)
 
+    def put(self, request, opportunity_id=None):
+        return self.patch(request, opportunity_id)
+
     def delete(self, request, opportunity_id=None):
-        opp_id = opportunity_id or request.data.get("opportunity_id") or request.query_params.get("opportunity_id") or request.data.get("id")
+        opp_id = (
+            opportunity_id
+            or request.data.get("opportunity_id")
+            or request.query_params.get("opportunity_id")
+            or request.data.get("id")
+            or request.query_params.get("id")
+        )
         if not opp_id:
             return Response({"error": "opportunity_id is required."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -270,3 +313,114 @@ class InteractionManagement(APIView):
 
         interaction.delete()
         return Response({"message": "Interaction deleted successfully."})
+
+
+class CustomerNoteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, customer_id=None, note_id=None):
+        # 1. Single note lookup by note_id
+        target_note_id = (
+            note_id
+            or request.query_params.get("note_id")
+            or request.query_params.get("id")
+        )
+        if target_note_id:
+            try:
+                note = CustomerNote.objects.select_related("customer", "employee").get(note_id=target_note_id)
+                serializer = CustomerNoteSerializer(note)
+                return Response({"note": serializer.data}, status=status.HTTP_200_OK)
+            except CustomerNote.DoesNotExist:
+                return Response({"error": "Customer note not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # 2. Notes under a specific customer
+        target_customer_id = (
+            customer_id
+            or request.query_params.get("customer_id")
+            or request.query_params.get("customer")
+        )
+        if not target_customer_id:
+            return Response(
+                {"error": "customer_id is required to retrieve customer notes."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Verify customer exists
+        if not Customer.objects.filter(customer_id=target_customer_id).exists():
+            return Response({"error": "Customer not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        notes = CustomerNote.objects.select_related("customer", "employee").filter(
+            customer_id=target_customer_id
+        )
+        serializer = CustomerNoteSerializer(notes, many=True)
+        return Response({
+            "customer_id": int(target_customer_id),
+            "total": notes.count(),
+            "notes": serializer.data,
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request, customer_id=None):
+        data = request.data.copy() if hasattr(request.data, "copy") else dict(request.data)
+
+        # Allow customer_id from path param if using /crm/customers/<customer_id>/notes/
+        if customer_id and "customer_id" not in data and "customer" not in data:
+            data["customer_id"] = customer_id
+
+        # If employee_id is not provided, default to authenticated employee user
+        if "employee_id" not in data and "employee" not in data:
+            if hasattr(request.user, "employee_id"):
+                data["employee_id"] = request.user.employee_id
+
+        serializer = CustomerNoteSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        note = serializer.save()
+        return Response({
+            "message": "Customer note created successfully.",
+            "note": CustomerNoteSerializer(note).data,
+        }, status=status.HTTP_201_CREATED)
+
+    def patch(self, request, note_id=None, customer_id=None):
+        target_note_id = (
+            note_id
+            or request.data.get("note_id")
+            or request.query_params.get("note_id")
+            or request.data.get("id")
+            or request.query_params.get("id")
+        )
+        if not target_note_id:
+            return Response({"error": "note_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            note = CustomerNote.objects.get(note_id=target_note_id)
+        except CustomerNote.DoesNotExist:
+            return Response({"error": "Customer note not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CustomerNoteSerializer(note, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        updated_note = serializer.save()
+        return Response({
+            "message": "Customer note updated successfully.",
+            "note": CustomerNoteSerializer(updated_note).data,
+        }, status=status.HTTP_200_OK)
+
+    def put(self, request, note_id=None, customer_id=None):
+        return self.patch(request, note_id, customer_id)
+
+    def delete(self, request, note_id=None, customer_id=None):
+        target_note_id = (
+            note_id
+            or request.data.get("note_id")
+            or request.query_params.get("note_id")
+            or request.data.get("id")
+            or request.query_params.get("id")
+        )
+        if not target_note_id:
+            return Response({"error": "note_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            note = CustomerNote.objects.get(note_id=target_note_id)
+        except CustomerNote.DoesNotExist:
+            return Response({"error": "Customer note not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        note.delete()
+        return Response({"message": "Customer note deleted successfully."}, status=status.HTTP_200_OK)
