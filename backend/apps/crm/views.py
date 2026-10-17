@@ -4,6 +4,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .models import Opportunity
 from .serializers import OpportunitySerializer
+from apps.crm.models import Customer, Contact, Interaction
+from apps.crm.serializers import AddCustomerSerializer, UpdateCustomerSerializer, UpdateContactSerializer, AddContactSerializer, AddInteractionSerializer, UpdateInteractionSerializer
 
 
 class OpportunityView(APIView):
@@ -86,6 +88,7 @@ class OpportunityView(APIView):
         opportunity.delete()
         return Response({"message": "Opportunity deleted successfully."}, status=status.HTTP_200_OK)
 
+
 class CustomerManagement(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -148,3 +151,122 @@ class CustomerManagement(APIView):
 
         customer.delete()
         return Response({"message": "Customer deleted successfully."})
+
+
+class ContactManagement(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        request_parameters = request.query_params
+
+        contacts = [
+            {
+                **contact, 
+            } 
+            for contact in Contact.objects.values(
+                "customer_id",
+                "contact_id",
+                "name",
+                "job_title",
+                "phone",
+                "email",
+                "is_primary"
+            ).filter(**{field:value for field, value in request_parameters.items()})
+        ]
+
+        return Response({"Contacts": contacts})
+    
+    def post(self, request):
+        serializer = AddContactSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({"message": "Contact added successfully."})
+
+    def patch(self, request):
+        contact_id = request.data.get("contact_id")
+        if not contact_id:
+            return Response({"error": "Contact ID is required."}, status=400)
+
+        try:
+            contact = Contact.objects.get(contact_id=contact_id)
+        except Contact.DoesNotExist:
+            return Response({"error": "Contact not found."}, status=404)
+
+        serializer = UpdateContactSerializer(contact, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({"message": "Contact updated successfully."})
+
+    def delete(self, request):
+        contact_id = request.data.get("contact_id")
+        if not contact_id:
+            return Response({"error": "Contact ID is required."}, status=400)
+
+        try:
+            contact = Contact.objects.get(contact_id=contact_id)
+        except Contact.DoesNotExist:
+            return Response({"error": "Contact not found."}, status=404)
+
+        contact.delete()
+        return Response({"message": "Contact deleted successfully."})
+
+class InteractionManagement(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        request_parameters = request.query_params
+
+        interactions = [
+            {
+                **interaction, 
+            } 
+            for interaction in Interaction.objects.values(
+                "interaction_id",
+                "type",
+                "subject",
+                "description",
+                "interaction_date",
+                "customer_id",
+                "employee_id"
+            ).filter(**{field:value for field, value in request_parameters.items()})
+        ]
+
+        return Response({"Interactions": interactions})
+    
+    def post(self, request):
+        serializer = AddInteractionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({"message": "Interaction added successfully."})
+
+    def patch(self, request):
+        interaction_id = request.data.get("interaction_id")
+        if not interaction_id:
+            return Response({"error": "Interaction ID is required."}, status=400)
+
+        try:
+            interaction = Interaction.objects.get(interaction_id=interaction_id)
+        except Interaction.DoesNotExist:
+            return Response({"error": "Interaction not found."}, status=404)
+
+        serializer = UpdateInteractionSerializer(interaction, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({"message": "Interaction updated successfully."})
+
+    def delete(self, request):
+        interaction_id = request.data.get("interaction_id")
+        if not interaction_id:
+            return Response({"error": "Interaction ID is required."}, status=400)
+
+        try:
+            interaction = Interaction.objects.get(interaction_id=interaction_id)
+        except Interaction.DoesNotExist:
+            return Response({"error": "Interaction not found."}, status=404)
+
+        interaction.delete()
+        return Response({"message": "Interaction deleted successfully."})

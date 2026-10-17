@@ -40,13 +40,13 @@ class LogoutView(APIView):
         try:
             refresh_token = request.data.get("refresh")
             if not refresh_token:
-                return Response({"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
             
             token = RefreshToken(refresh_token)
             token.blacklist()
-            return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
+            return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
         except Exception:
-            return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SignUP(APIView):
@@ -76,11 +76,21 @@ class GetEmployeeStatus(APIView):
             }
         })
 
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        employee = request.user
+
+        refresh = RefreshToken.for_user(employee)
+        data = get_user_permissions(employee, refresh)
+
+        return Response(data, status=status.HTTP_200_OK)
 
 @require_GET
 def sso_start(request):
     callback_url = request.build_absolute_uri(
-        "/api/auth/sso/callback"
+        "/api/auth/sso/callback/"
     )
     return oauth.google.authorize_redirect(
         request,
@@ -128,10 +138,29 @@ def sso_callback(request):
     # Login: existing active employee
     if employee:
         refresh = RefreshToken.for_user(employee)
-        return JsonResponse(
-            get_user_permissions(employee, refresh)
+
+        response = redirect(f"{FRONTEND_URL}/home")
+
+        response.set_cookie(
+            key="access_token",
+            value=str(refresh.access_token),
+            httponly=True,
+            secure=False,       #! we must change it 
+            samesite="Lax",
+            path="/",
         )
 
+        response.set_cookie(
+            key="refresh_token",
+            value=str(refresh),
+            httponly=True,  
+            secure=False,       #! we must change it
+            samesite="Lax",
+            path="/",
+        )
+
+        return response
+    
     # Do not automatically link an existing employee by email
     if Employee.objects.filter(
         work_email__iexact=email
