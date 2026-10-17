@@ -1,5 +1,6 @@
 # apps/accounts/serializers.py
 from rest_framework import serializers
+from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
@@ -44,6 +45,13 @@ class SignUPSerializer(serializers.Serializer):
         trim_whitespace=False,
         min_length=8,
     )
+
+    def validate(self, attrs):
+        if Employee.objects.filter(work_email=attrs['work_email']).exists():
+            raise serializers.ValidationError({
+                "error": "This account is already in the system."
+            })
+        return attrs
 
     def create(self, validated_data):
         validated_data["password"] = make_password(

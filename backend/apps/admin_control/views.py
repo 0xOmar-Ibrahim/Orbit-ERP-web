@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from apps.accounts.models import Employee, RegistrationRequest, Role
 from rest_framework.response import Response
 from rest_framework import status
@@ -232,3 +232,31 @@ class ApproveRegistrationView(APIView):
             status=status.HTTP_200_OK,
         )
 
+class RegistrationRequests(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]  # must be open, the user isn't logged in yet
+
+    def get(self, request):
+        parameters = request.query_params
+
+        requests = [
+                    {
+                        **registration_request,
+                    }
+                    for registration_request in RegistrationRequest.objects.values(
+                        "request_id",
+                        "sso_issuer",
+                        "sso_subject",
+                        "work_email",
+                        "first_name",
+                        "last_name",
+                        "reason",
+                        "status",
+                        "reviewed_at",
+                        "created_at",
+                        "reviewed_by_id",
+                        "registration_method",
+                    ).filter(**{field:value for field, value in parameters.items()})
+                ]
+        
+        # You can add any validation logic here if needed
+        return Response({"Requests": requests})
