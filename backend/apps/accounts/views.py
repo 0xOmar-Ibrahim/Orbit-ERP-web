@@ -52,7 +52,7 @@ class LogoutView(APIView):
 
         if not refresh_token:
             response = Response(
-                {"detail": "Refresh token cookie is missing."},
+                {"error": "Refresh token cookie is missing."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
             response.delete_cookie("access_token", path="/", samesite="Lax")
@@ -66,7 +66,7 @@ class LogoutView(APIView):
 
         except TokenError:
             response = Response(
-                {"detail": "Invalid or expired refresh token."},
+                {"error": "Invalid or expired refresh token."},
                 status=status.HTTP_200_OK,
             )
             response.delete_cookie("access_token", path="/", samesite="Lax")
@@ -75,7 +75,7 @@ class LogoutView(APIView):
             return response
 
         response = Response(
-            {"detail": "Successfully logged out."},
+            {"error": "Successfully logged out."},
             status=status.HTTP_200_OK,
         )
 
