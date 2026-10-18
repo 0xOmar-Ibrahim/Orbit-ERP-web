@@ -84,22 +84,32 @@
             {
               "name": "logout",
               "request": {
-                "method": "GET",
+                "method": "POST",
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTU2MjYyLCJpYXQiOjE3OTIxNTI2NjIsImp0aSI6ImE2MmFkODViZDg2NDQyMjhhODhjYzQ5NWYzMGUxODUxIiwidXNlcl9pZCI6IjEifQ.X_Q4Ttt_rJMeskZkoMxBtVKfIfykZbE7Yl9YiVrFj20"
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMzIxNzk1LCJpYXQiOjE3OTIzMTgxOTUsImp0aSI6IjNkZTBhODM3MzVmOTQ3YWVhYmU1MmVhMmY4ZjEwODIxIiwidXNlcl9pZCI6IjEifQ.6xU7tLvkyIDZ0SxDaRYN7K1C5Kt4OfSxHOInERA1wEo"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc5MjkyMjk5NSwiaWF0IjoxNzkyMzE4MTk1LCJqdGkiOiIzMGU2M2JhYzVjNDk0NjY5YmExZjM4Mzk2ZTI2MWE0MSIsInVzZXJfaWQiOiIxIn0.xfMzVHVaeHGtZ3X0r7znuL-DcIf-43ru_29ERCTM9Mc\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "{{base_user_url}}/api/auth/logout",
+                  "raw": "{{base_user_url}}/api/auth/logout/",
                   "host": [
                     "{{base_user_url}}"
                   ],
                   "path": [
                     "api",
                     "auth",
-                    "logout"
+                    "logout",
+                    ""
                   ]
                 }
               },
