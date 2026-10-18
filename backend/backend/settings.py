@@ -84,11 +84,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173"] #! React URL (Edit it to your React app's URL)
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"] #! React URL (Edit it to your React app's URL)
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
@@ -107,6 +106,7 @@ DATABASES = {
         "PASSWORD": "Orabit11451103",
         "HOST": "aws-0-eu-west-1.pooler.supabase.com",
         "PORT": "5432",
+        "DISABLE_SERVER_SIDE_CURSORS": True,
         "OPTIONS": {"sslmode": "require"},
     }
 }

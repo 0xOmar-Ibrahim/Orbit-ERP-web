@@ -38,7 +38,10 @@ class AddEmployeeSerializer(serializers.ModelSerializer):
             current_year = time.strftime("%Y")
             employee_code = f"EMP-{current_year}-{random_number}"
             
-            employee = Employee.objects.create(**validated_data, employee_code=employee_code)
+            employee = Employee.objects.create(
+            **validated_data,
+            employee_code=employee_code,
+            )
             employee.set_password(make_password(password))
 
             employee.save()
