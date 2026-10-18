@@ -17,6 +17,8 @@ from .models import RegistrationRequest
 from .oidc import oauth
 from ..helpers import get_user_permissions
 from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # Assuming the first allowed origin is your frontend URL
 FRONTEND_URL = "http://localhost:3000" 
@@ -25,6 +27,7 @@ class LoginThrottle(AnonRateThrottle):
     rate = "10/min"          # slows down password guessing
 
 class LoginView(APIView):
+    authentication_classes = []  # Disable authentication for login
     permission_classes = [AllowAny]      # must be open, the user isn't logged in yet
     throttle_classes = [LoginThrottle]
 
@@ -34,10 +37,18 @@ class LoginView(APIView):
         return Response(serializer.validated_data)
 
 class LogoutView(APIView):
+    authentication_classes = [
+        JWTAuthentication,
+        SessionAuthentication,
+    ]
+        
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        refresh_token = request.COOKIES.get("refresh_token")
+        refresh_token = (
+            request.COOKIES.get("refresh_token")
+            or request.data.get("refresh")
+        )
 
         if not refresh_token:
             response = Response(
@@ -46,6 +57,7 @@ class LogoutView(APIView):
             )
             response.delete_cookie("access_token", path="/", samesite="Lax")
             response.delete_cookie("refresh_token", path="/", samesite="Lax")
+            response.delete_cookie("sessionid", path="/", samesite="Lax")
             return response
 
         try:
@@ -59,6 +71,7 @@ class LogoutView(APIView):
             )
             response.delete_cookie("access_token", path="/", samesite="Lax")
             response.delete_cookie("refresh_token", path="/", samesite="Lax")
+            response.delete_cookie("sessionid", path="/", samesite="Lax")
             return response
 
         response = Response(
@@ -68,8 +81,11 @@ class LogoutView(APIView):
 
         response.delete_cookie("access_token", path="/", samesite="Lax")
         response.delete_cookie("refresh_token", path="/", samesite="Lax")
+        response.delete_cookie("sessionid", path="/", samesite="Lax")
 
         return response
+
+
 
 
 class SignUP(APIView):

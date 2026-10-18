@@ -58,15 +58,15 @@ try {
     return;
   }
 
+
   sessionStorage.setItem("orbitAuthMethod", "password");
 
-localStorage.setItem("access_token", data.access_token);
-localStorage.setItem("refresh_token", data.refresh_token);
-localStorage.setItem("orbitUser", JSON.stringify(data.user));
-
-navigate("/home");
+  localStorage.setItem("access_token", data.access_token);
+  localStorage.setItem("refresh_token", data.refresh_token);
+  localStorage.setItem("orbitUser", JSON.stringify(data.user));
 
   navigate("/home");
+
 } catch (error) {
   if (error.status === 401) {
     setServerError("Invalid email or password.");

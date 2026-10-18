@@ -32,39 +32,82 @@ const UserHome = () => {
   const [error, setError] = useState("");
 
 
+
   useEffect(() => {
     const controller = new AbortController();
 
-    const fetchCurrentUser = async () => {
+    const loadUser = async () => {
+      const authMethod = sessionStorage.getItem("orbitAuthMethod");
+
       try {
-        // get the auth data based on (refresh and access token) already saved in browser cookie 
-        const response = await fetch(
-          "http://localhost:8000/api/auth/me/",
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              Accept: "application/json",
-            },
-            signal: controller.signal,
+        // Password login: use the user data saved during login
+        if (authMethod === "password") {
+          const savedUser = localStorage.getItem("orbitUser");
+
+          if (savedUser) {
+            setUser(JSON.parse(savedUser));
+          } else {
+            setError("User information was not found. Please sign in again.");
           }
-        );
 
-        const data = await response.json();
+          return;
+        }
 
-        if (!response.ok) {
-          throw new Error(
-            data.detail || `Unable to load user (${response.status})`
+        // SSO login: fetch the current user from the backend
+        if (authMethod === "sso") {
+          const response = await fetch(
+            "http://localhost:8000/api/auth/me/",
+            {
+              method: "GET",
+              credentials: "include",
+              headers: {
+                Accept: "application/json",
+              },
+              signal: controller.signal,
+            }
           );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data.detail ||
+              data.error ||
+              `Unable to load user (${response.status})`
+            );
+          }
+
+          const currentUser = data.user ?? data;
+
+          if (
+            !currentUser ||
+            typeof currentUser !== "object" ||
+            Array.isArray(currentUser)
+          ) {
+            throw new Error("Invalid user information received.");
+          }
+
+          setUser(currentUser);
+
+          // Keep the saved user data synchronized with the API
+          localStorage.setItem(
+            "orbitUser",
+            JSON.stringify(currentUser)
+          );
+
+          // Save tokens if the backend returns them
+          if (data.access_token) {
+            localStorage.setItem("access_token", data.access_token);
+          }
+
+          if (data.refresh_token) {
+            localStorage.setItem("refresh_token", data.refresh_token);
+          }
+
+          return;
         }
 
-        const currentUser = data.user ?? data;
-
-        if (!currentUser || typeof currentUser !== "object") {
-          throw new Error("Invalid user information received.");
-        }
-
-        setUser(currentUser);
+        setError("Authentication method not found. Please sign in again.");
       } catch (err) {
         if (err.name === "AbortError") return;
 
@@ -77,10 +120,11 @@ const UserHome = () => {
       }
     };
 
-    fetchCurrentUser();
+    loadUser();
 
     return () => controller.abort();
   }, []);
+
 
   const fullName = user
     ? [user.first_name, user.last_name].filter(Boolean).join(" ")
@@ -136,26 +180,34 @@ const UserHome = () => {
 
   const handleLogout = async () => {
     try {
-      
-        const response = await fetch(
-          "http://localhost:8000/api/auth/logout/",
-          {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-          }
-        );
+      const accessToken = localStorage.getItem("access_token");
+      const refreshToken = localStorage.getItem("refresh_token");
 
-        if (!response.ok) {
-          console.error(
-            "Logout API failed:",
-            response.status,
-            await response.text()
-          );
+      const response = await fetch(
+        "http://localhost:8000/api/auth/logout/",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            ...(accessToken
+              ? { Authorization: `Bearer ${accessToken}` }
+              : {}),
+          },
+          body: JSON.stringify({
+            refresh: refreshToken,
+          }),
         }
+      );
+      
+      if (!response.ok) {
+        console.error(
+          "Logout API failed:",
+          response.status,
+          await response.text()
+        );
+      }
     } catch (error) {
       console.error("Logout request failed:", error);
     } finally {
