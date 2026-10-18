@@ -240,7 +240,7 @@ navigate("/home");
   sessionStorage.setItem("orbitAuthMethod", "sso");
 
   window.location.href =
-    "http://127.0.0.1:8000/api/auth/sso/";
+    "http://localhost:8000/api/auth/sso/";
 }}
               >
                 <img

@@ -90,6 +90,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000"] #! React URL (Edit it to your React app's URL)
+CORS_ALLOW_CREDENTIALS = True
+
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

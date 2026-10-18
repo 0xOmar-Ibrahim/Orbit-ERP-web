@@ -17,10 +17,10 @@ import moonIcon from "../../assets/moon.svg";
 import "./UserHome.css";
 
 const PASSWORD_API_URL =
-  "http://127.0.0.1:8000/api/auth/me/";
+  "http://localhost:8000/api/auth/me/";
 
 const SSO_API_URL =
-  "http://127.0.0.1:8000/api/auth/me/";
+  "http://localhost:8000/api/auth/me/";
 
 const UserHome = () => {
   const navigate = useNavigate();
@@ -31,49 +31,33 @@ const UserHome = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+
   useEffect(() => {
     const controller = new AbortController();
 
     const fetchCurrentUser = async () => {
       try {
- 
-const authMethod = sessionStorage.getItem("orbitAuthMethod");
-const isSSO = authMethod === "sso";
-
-const accessToken = isSSO
-  ? null
-  : localStorage.getItem("access_token");
-
-const apiUrl = isSSO ? SSO_API_URL : PASSWORD_API_URL;
-
-const response = await fetch(apiUrl, {
-  method: "GET",
-  credentials: "include",
-  headers: {
-    Accept: "application/json",
-    ...(accessToken
-      ? { Authorization: `Bearer ${accessToken}` }
-      : {}),
-  },
-  signal: controller.signal,
-});
-
-
-
-        if (response.status === 401 || response.status === 403) {
-          navigate("/login", { replace: true });
-          return;
-        }
-
-        if (!response.ok) {
-          throw new Error(
-            `Unable to load user information (${response.status})`
-          );
-        }
+        // get the auth data based on (refresh and access token) already saved in browser cookie 
+        const response = await fetch(
+          "http://localhost:8000/api/auth/me/",
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              Accept: "application/json",
+            },
+            signal: controller.signal,
+          }
+        );
 
         const data = await response.json();
 
-        // Supports either a direct user object or { user: {...} }.
+        if (!response.ok) {
+          throw new Error(
+            data.detail || `Unable to load user (${response.status})`
+          );
+        }
+
         const currentUser = data.user ?? data;
 
         if (!currentUser || typeof currentUser !== "object") {
@@ -83,6 +67,8 @@ const response = await fetch(apiUrl, {
         setUser(currentUser);
       } catch (err) {
         if (err.name === "AbortError") return;
+
+        console.error("Authentication error:", err);
         setError(err.message || "Failed to load user information.");
       } finally {
         if (!controller.signal.aborted) {
@@ -94,7 +80,7 @@ const response = await fetch(apiUrl, {
     fetchCurrentUser();
 
     return () => controller.abort();
-  }, [navigate]);
+  }, []);
 
   const fullName = user
     ? [user.first_name, user.last_name].filter(Boolean).join(" ")
@@ -149,53 +135,44 @@ const response = await fetch(apiUrl, {
   const openModule = (path) => navigate(path);
 
   const handleLogout = async () => {
-  const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
-
-  try {
-    if (accessToken && refreshToken) {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/auth/logout/",
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            refresh: refreshToken,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        console.error(
-          "Logout API failed:",
-          response.status,
-          await response.text()
+    try {
+      
+        const response = await fetch(
+          "http://localhost:8000/api/auth/logout/",
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+          }
         );
-      }
-    }
-  } catch (error) {
-    console.error("Logout request failed:", error);
-  } finally {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("orbitUser");
-    sessionStorage.removeItem("orbitAuthMethod");
 
-    navigate("/login", { replace: true });
-  }
-};
+        if (!response.ok) {
+          console.error(
+            "Logout API failed:",
+            response.status,
+            await response.text()
+          );
+        }
+    } catch (error) {
+      console.error("Logout request failed:", error);
+    } finally {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("orbitUser");
+      sessionStorage.removeItem("orbitAuthMethod");
+
+      navigate("/login", { replace: true });
+    }
+  };
   const renderModule = (module, isMain = false) => (
     <button
       type="button"
       key={module.path}
-      className={`module-link ${
-        isMain && module.name === "Project Management" ? "active" : ""
-      }`}
+      className={`module-link ${isMain && module.name === "Project Management" ? "active" : ""
+        }`}
       onClick={() => openModule(module.path)}
       title={collapsed ? module.name : ""}
     >

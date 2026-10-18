@@ -16,10 +16,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import RegistrationRequest
 from .oidc import oauth
 from ..helpers import get_user_permissions
-
+from rest_framework_simplejwt.exceptions import TokenError
 
 # Assuming the first allowed origin is your frontend URL
-FRONTEND_URL = settings.CORS_ALLOWED_ORIGINS[0]  
+FRONTEND_URL = "http://localhost:3000" 
 
 class LoginThrottle(AnonRateThrottle):
     rate = "10/min"          # slows down password guessing
@@ -37,16 +37,39 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        refresh_token = request.COOKIES.get("refresh_token")
+
+        if not refresh_token:
+            response = Response(
+                {"detail": "Refresh token cookie is missing."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+            response.delete_cookie("access_token", path="/", samesite="Lax")
+            response.delete_cookie("refresh_token", path="/", samesite="Lax")
+            return response
+
         try:
-            refresh_token = request.data.get("refresh")
-            if not refresh_token:
-                return Response({"message": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
-            
             token = RefreshToken(refresh_token)
             token.blacklist()
-            return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
-        except Exception:
-            return Response({"message": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+
+        except TokenError:
+            response = Response(
+                {"detail": "Invalid or expired refresh token."},
+                status=status.HTTP_200_OK,
+            )
+            response.delete_cookie("access_token", path="/", samesite="Lax")
+            response.delete_cookie("refresh_token", path="/", samesite="Lax")
+            return response
+
+        response = Response(
+            {"detail": "Successfully logged out."},
+            status=status.HTTP_200_OK,
+        )
+
+        response.delete_cookie("access_token", path="/", samesite="Lax")
+        response.delete_cookie("refresh_token", path="/", samesite="Lax")
+
+        return response
 
 
 class SignUP(APIView):
@@ -86,6 +109,21 @@ class CurrentUserView(APIView):
         data = get_user_permissions(employee, refresh)
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+class CookieDebugView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response({
+            "has_access_token": bool(
+                request.COOKIES.get("access_token")
+            ),
+            "has_refresh_token": bool(
+                request.COOKIES.get("refresh_token")
+            ),
+        })
 
 @require_GET
 def sso_start(request):
@@ -145,18 +183,20 @@ def sso_callback(request):
             key="access_token",
             value=str(refresh.access_token),
             httponly=True,
-            secure=False,       #! we must change it 
+            secure=False,
             samesite="Lax",
             path="/",
+            max_age=3600,
         )
 
         response.set_cookie(
             key="refresh_token",
             value=str(refresh),
-            httponly=True,  
-            secure=False,       #! we must change it
+            httponly=True,
+            secure=False,
             samesite="Lax",
             path="/",
+            max_age=604800,
         )
 
         return response
