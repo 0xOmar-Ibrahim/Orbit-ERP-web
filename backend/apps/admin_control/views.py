@@ -4,6 +4,7 @@ from apps.accounts.models import Employee, RegistrationRequest, Role
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 from apps.accounts.serializers import LoginSerializer
 from apps.accounts.views import LoginThrottle
 from .serializers import AddEmployeeSerializer, UpdateEmployeeSerializer
@@ -79,6 +80,7 @@ class Employees(APIView):
         employee.delete()
         return Response({"message": "Employee deleted successfully."})
 class AdminLoginView(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
     throttle_classes = [LoginThrottle]
 
@@ -87,30 +89,83 @@ class AdminLoginView(APIView):
         serializer.is_valid(raise_exception=True)
         
         email = serializer.validated_data.get("user", {}).get("email")
+        
         if email:
             try:
                 employee = Employee.objects.get(work_email=email)
                 if not employee.is_superuser:
                     return Response({"message": "You do not have permission to access the admin panel."}, status=status.HTTP_403_FORBIDDEN)
+                
+                is_mobile = request.headers.get("X-Client-Type") == "Flutter"
+
+                # Copy the dictionary to avoid modifying validated_data
+                payload = dict(serializer.validated_data)
+
+                if is_mobile:
+                    return Response(payload, status=status.HTTP_200_OK)
+        
+                refresh_token = payload.pop("refresh_token", None)
+        
+                response = Response(payload, status=status.HTTP_200_OK)
+        
+                if refresh_token:
+                    response.set_cookie(
+                        key="refresh_token",
+                        value=refresh_token,
+                        httponly=True,
+                        secure=request.is_secure(),  # HTTPS=True, HTTP=False
+                        samesite="Lax",
+                        path="/",
+                        max_age=7 * 24 * 3600,
+                    )
             except Employee.DoesNotExist:
                 return Response({"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response(serializer.validated_data)
+        return response
 
 class AdminLogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
+        refresh_token = (
+                    request.COOKIES.get("refresh_token")
+                    or request.data.get("refresh")
+                )
+        
+        if not refresh_token:
+            response = Response(
+                {"error": "Refresh token cookie is missing."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+            response.delete_cookie("access_token", path="/", samesite="Lax")
+            response.delete_cookie("refresh_token", path="/", samesite="Lax")
+            response.delete_cookie("sessionid", path="/", samesite="Lax")
+            return response
+
         try:
-            refresh_token = request.data.get("refresh")
-            if not refresh_token:
-                return Response({"message": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
-            
             token = RefreshToken(refresh_token)
             token.blacklist()
-            return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
-        except Exception:
-            return Response({"message": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+
+        except TokenError:
+            response = Response(
+                {"error": "Invalid or expired refresh token."},
+                status=status.HTTP_200_OK,
+            )
+            response.delete_cookie("access_token", path="/", samesite="Lax")
+            response.delete_cookie("refresh_token", path="/", samesite="Lax")
+            response.delete_cookie("sessionid", path="/", samesite="Lax")
+            return response
+
+        response = Response(
+            {"error": "Successfully logged out."},
+            status=status.HTTP_200_OK,
+        )
+
+        response.delete_cookie("access_token", path="/", samesite="Lax")
+        response.delete_cookie("refresh_token", path="/", samesite="Lax")
+        response.delete_cookie("sessionid", path="/", samesite="Lax")
+
+        return response
 
 
 class ApproveRegistrationView(APIView):

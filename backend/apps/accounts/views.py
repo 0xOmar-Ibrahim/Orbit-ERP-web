@@ -16,10 +16,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import RegistrationRequest
 from .oidc import oauth
 from ..helpers import get_user_permissions
-from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+from rest_framework_simplejwt.views import TokenRefreshView
+from .authentication import CookieJWTAuthentication
 # Assuming the first allowed origin is your frontend URL
 FRONTEND_URL = "http://localhost:3000" 
 
@@ -27,17 +28,47 @@ class LoginThrottle(AnonRateThrottle):
     rate = "10/min"          # slows down password guessing
 
 class LoginView(APIView):
-    authentication_classes = []  # Disable authentication for login
-    permission_classes = [AllowAny]      # must be open, the user isn't logged in yet
+    authentication_classes = []
+    permission_classes = [AllowAny]
     throttle_classes = [LoginThrottle]
 
     def post(self, request):
-        serializer = LoginSerializer(data=request.data, context={"request": request})
+        serializer = LoginSerializer(
+            data=request.data,
+            context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
-        return Response(serializer.validated_data)
+
+        is_mobile = request.headers.get("X-Client-Type") == "Flutter"
+
+        # Copy the dictionary to avoid modifying validated_data
+        payload = dict(serializer.validated_data)
+
+        if is_mobile:
+            return Response(payload, status=status.HTTP_200_OK)
+
+        refresh_token = payload.pop("refresh_token", None)
+
+        response = Response(payload, status=status.HTTP_200_OK)
+
+        if refresh_token:
+            response.set_cookie(
+                key="refresh_token",
+                value=refresh_token,
+                httponly=True,
+                secure=request.is_secure(),  # HTTPS=True, HTTP=False
+                samesite="Lax",
+                path="/",
+                max_age=7 * 24 * 3600,
+            )
+
+        return response
+
+        
 
 class LogoutView(APIView):
     authentication_classes = [
+        CookieJWTAuthentication,
         JWTAuthentication,
         SessionAuthentication,
     ]
@@ -75,7 +106,7 @@ class LogoutView(APIView):
             return response
 
         response = Response(
-            {"error": "Successfully logged out."},
+            {"message": "Successfully logged out."},
             status=status.HTTP_200_OK,
         )
 
@@ -96,7 +127,45 @@ class SignUP(APIView):
         return Response(serializer.save())
 
 
+class CustomTokenRefreshView(TokenRefreshView):
+
+    def post(self, request):
+        refresh_token = request.COOKIES.get("refresh_token") or request.data.get(
+            "refresh"
+        )
+
+        if not refresh_token:
+            return Response(
+                {"error": "Refresh token cookie is missing."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        serializer = self.get_serializer(data={"refresh": refresh_token})
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            return Response({"error": "invalid token"})
+
+        token_data = serializer.validated_data
+        response = Response(token_data, status=status.HTTP_200_OK)
+
+        if "refresh" in token_data:
+            new_refresh_token = token_data.pop("refresh")
+            response.set_cookie(
+                key="refresh_token",
+                value=str(new_refresh_token),
+                httponly=True,
+                secure=False,
+                samesite="Lax",
+                path="/",
+                max_age=7 * 24 * 3600,
+            )
+
+        return response
+
 class GetEmployeeStatus(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
     throttle_classes = [LoginThrottle]
 
@@ -118,13 +187,19 @@ class GetEmployeeStatus(APIView):
         })
 
 class CurrentUserView(APIView):
+    authentication_classes = [
+        CookieJWTAuthentication,
+        JWTAuthentication,
+    ]
     permission_classes = [IsAuthenticated]
-
+    
     def get(self, request):
         employee = request.user
 
         refresh = RefreshToken.for_user(employee)
+        
         data = get_user_permissions(employee, refresh)
+        del_refresh = data.pop("refresh_token")
 
         return Response(data, status=status.HTTP_200_OK)
 
@@ -201,20 +276,20 @@ def sso_callback(request):
             key="access_token",
             value=str(refresh.access_token),
             httponly=True,
-            secure=False,
+            secure=request.is_secure(),  # HTTPS=True, HTTP=False
             samesite="Lax",
             path="/",
-            max_age=3600,
+            max_age=7 * 24 * 3600,
         )
 
         response.set_cookie(
             key="refresh_token",
             value=str(refresh),
             httponly=True,
-            secure=False,
+            secure=request.is_secure(),  # HTTPS=True, HTTP=False
             samesite="Lax",
             path="/",
-            max_age=604800,
+            max_age=7 * 24 * 3600,
         )
 
         return response

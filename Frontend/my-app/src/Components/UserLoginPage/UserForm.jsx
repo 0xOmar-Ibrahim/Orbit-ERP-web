@@ -51,7 +51,7 @@ const UserForm = () => {
 try {
   const data = await loginUser(cleanEmail, password);
 
-  if (!data.access_token || !data.refresh_token || !data.user) {
+  if (!data.access_token || !data.user) {
     setServerError(
       "Login information is missing. Please contact the administrator."
     );
@@ -62,7 +62,6 @@ try {
   sessionStorage.setItem("orbitAuthMethod", "password");
 
   localStorage.setItem("access_token", data.access_token);
-  localStorage.setItem("refresh_token", data.refresh_token);
   localStorage.setItem("orbitUser", JSON.stringify(data.user));
 
   navigate("/home");

@@ -1,5 +1,5 @@
 
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+const API_BASE_URL = "http://localhost:8000/api";
 
 // A shared function for sending API requests
 export async function apiRequest(endpoint, options = {}) {
@@ -52,6 +52,10 @@ if (token && endpoint !== "/auth/login/") {
 export async function loginUser(email, password) {
   return apiRequest("/auth/login/", {
     method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ email, password }),
   });
 }

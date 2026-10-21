@@ -63,7 +63,6 @@ const UserHome = () => {
               headers: {
                 Accept: "application/json",
               },
-              signal: controller.signal,
             }
           );
 
@@ -98,10 +97,6 @@ const UserHome = () => {
           // Save tokens if the backend returns them
           if (data.access_token) {
             localStorage.setItem("access_token", data.access_token);
-          }
-
-          if (data.refresh_token) {
-            localStorage.setItem("refresh_token", data.refresh_token);
           }
 
           return;
@@ -181,25 +176,17 @@ const UserHome = () => {
   const handleLogout = async () => {
     try {
       const accessToken = localStorage.getItem("access_token");
-      const refreshToken = localStorage.getItem("refresh_token");
-
-      const response = await fetch(
-        "http://localhost:8000/api/auth/logout/",
-        {
+      
+      const response = await fetch("http://localhost:8000/api/auth/logout/", {
           method: "POST",
           credentials: "include",
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
-            ...(accessToken
-              ? { Authorization: `Bearer ${accessToken}` }
-              : {}),
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
           },
-          body: JSON.stringify({
-            refresh: refreshToken,
-          }),
-        }
-      );
+    
+        });
       
       if (!response.ok) {
         console.error(
@@ -212,7 +199,6 @@ const UserHome = () => {
       console.error("Logout request failed:", error);
     } finally {
       localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
       localStorage.removeItem("orbitUser");
       sessionStorage.removeItem("orbitAuthMethod");
 
