@@ -66,6 +66,7 @@ function LoginForm() {
       });
 
       const data = await response.json();
+     
 
       if (!response.ok) {
         setError(
@@ -76,13 +77,13 @@ function LoginForm() {
         return;
       }
 
-      if (!data.access || !data.user) {
+      if (!data.access_token || !data.user) {
         setError("Invalid login response from the server.");
         return;
       }
-
-      sessionStorage.setItem("access_token", data.access);
-      sessionStorage.setItem("refresh_token", data.refresh);
+      
+      sessionStorage.setItem("access_token", data.access_token);
+      sessionStorage.setItem("refresh_token", data.refresh_token);
       sessionStorage.setItem("user", JSON.stringify(data.user));
 
       if (data.user.role_name !== "Admin") {

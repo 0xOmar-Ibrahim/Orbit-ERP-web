@@ -9,9 +9,7 @@ urlpatterns = [
     path("login/", LoginView.as_view()),
     path("signup/", SignUP.as_view()),
     path("logout/", LogoutView.as_view()),
-
     path("me/", CurrentUserView.as_view()),
-
     path("sso/", sso_start, name="sso-start"),
     path("sso/callback/", sso_callback, name="sso-callback"),
 

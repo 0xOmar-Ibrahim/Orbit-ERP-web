@@ -169,7 +169,6 @@ function AddEmployeePage() {
   const roles = ROLES;
   const navigate = useNavigate();
 
-  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -191,12 +190,18 @@ function AddEmployeePage() {
     const payload = {
       first_name: form.firstName,
       last_name: form.lastName,
-      date_of_birth: `${form.dobYear}-${form.dobMonth.padStart(2, "0")}-${form.dobDay.padStart(2, "0")}`,
+      date_of_birth: `${form.dobYear}-${form.dobMonth.padStart(
+        2,
+        "0"
+      )}-${form.dobDay.padStart(2, "0")}`,
       gender: form.gender.toLowerCase(),
       national_id: form.nationalId,
       phone: form.phone,
       work_email: form.workEmail,
-      hire_date: `${form.hireYear}-${form.hireMonth.padStart(2, "0")}-${form.hireDay.padStart(2, "0")}`,
+      hire_date: `${form.hireYear}-${form.hireMonth.padStart(
+        2,
+        "0"
+      )}-${form.hireDay.padStart(2, "0")}`,
       address: form.address,
       password: form.password,
       employment_status: form.status,
@@ -205,11 +210,14 @@ function AddEmployeePage() {
     };
 
     try {
-      const response = await authFetch("http://127.0.0.1:8000/admin/employees", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await authFetch(
+        "http://127.0.0.1:8000/admin/employee/",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const text = await response.text();
       let data = null;
@@ -224,10 +232,13 @@ function AddEmployeePage() {
           data && typeof data === "object"
             ? data.detail ||
               Object.entries(data)
-                .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(", ") : msgs}`)
+                .map(
+                  ([field, msgs]) =>
+                    `${field}: ${Array.isArray(msgs) ? msgs.join(", ") : msgs}`
+                )
                 .join(" | ")
             : `Server error (${response.status}). Check the Django terminal.`;
-      
+
         setError(message);
         return;
       }
