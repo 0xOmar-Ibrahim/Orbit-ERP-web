@@ -88,12 +88,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMzIxNzk1LCJpYXQiOjE3OTIzMTgxOTUsImp0aSI6IjNkZTBhODM3MzVmOTQ3YWVhYmU1MmVhMmY4ZjEwODIxIiwidXNlcl9pZCI6IjEifQ.6xU7tLvkyIDZ0SxDaRYN7K1C5Kt4OfSxHOInERA1wEo"
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMzMwMDUwLCJpYXQiOjE3OTIzMjY0NTAsImp0aSI6IjkyNmYzZTJkZjA3ODRiZjViZTUwNGNjNTJlMzIzMTRhIiwidXNlcl9pZCI6IjEifQ.nA4OTlSjza_0BMQTukMtodQMfuVmtR-qp-i0tlWf610"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc5MjkyMjk5NSwiaWF0IjoxNzkyMzE4MTk1LCJqdGkiOiIzMGU2M2JhYzVjNDk0NjY5YmExZjM4Mzk2ZTI2MWE0MSIsInVzZXJfaWQiOiIxIn0.xfMzVHVaeHGtZ3X0r7znuL-DcIf-43ru_29ERCTM9Mc\"\r\n}",
+                  "raw": "{\r\n    \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc5MjkzMTI1MCwiaWF0IjoxNzkyMzI2NDUwLCJqdGkiOiI2ODExM2E1ZmVlYTM0ZGU2OWQ5M2QyY2RhNzIzOTE4ZCIsInVzZXJfaWQiOiIxIn0.d2fw1qnnHzeaiJ7-Y9gOwB6NjjMI5jzhcJg8xFGAm60\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -156,11 +156,51 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTg1NTI2LCJpYXQiOjE3OTIxODE5MjYsImp0aSI6IjlmY2MzMWYyMGI2MTRjMjU5NzVjNTk5ZWY3MzdhMzkwIiwidXNlcl9pZCI6IjEifQ.RYn01WUke1igjtI8jENNX0iugfPtcRyx8ZHT7B5VU3E"
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyNjk4MjAwLCJpYXQiOjE3OTI2MTE4MDEsImp0aSI6IjIyMjk3MjE0NDVjNjRhOGNhMzVkZDdkNmVjYmEwYmNjIiwidXNlcl9pZCI6IjEifQ.pSDvl1Jcg6WuUApWH7gtZSy3zY9K5eoIBHX2lbhAO9o"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"refresh\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc5MzE3MjE1MywiaWF0IjoxNzkyNTY3MzUzLCJqdGkiOiIwNGIzOWRlOTYyYmY0MDlhODA1NTdmNDNlNTUxNjRhZSIsInVzZXJfaWQiOiIxIn0.ml6G8RLLbdP_bTVmu8aXg_94zu43L4SJmphLX5BnXtY\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/api/auth/me/",
+                  "raw": "http://localhost:8000/api/auth/me/",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "me",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "refresh",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc5MzE3MjE1MywiaWF0IjoxNzkyNTY3MzUzLCJqdGkiOiIwNGIzOWRlOTYyYmY0MDlhODA1NTdmNDNlNTUxNjRhZSIsInVzZXJfaWQiOiIxIn0.ml6G8RLLbdP_bTVmu8aXg_94zu43L4SJmphLX5BnXtY\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/api/auth/refresh/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -172,7 +212,7 @@
                   "path": [
                     "api",
                     "auth",
-                    "me",
+                    "refresh",
                     ""
                   ]
                 }
@@ -234,7 +274,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/admin/login",
+                  "raw": "http://127.0.0.1:8000/admin/login/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -245,7 +285,8 @@
                   "port": "8000",
                   "path": [
                     "admin",
-                    "login"
+                    "login",
+                    ""
                   ]
                 }
               },
@@ -258,17 +299,26 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTU2MjYyLCJpYXQiOjE3OTIxNTI2NjIsImp0aSI6ImE2MmFkODViZDg2NDQyMjhhODhjYzQ5NWYzMGUxODUxIiwidXNlcl9pZCI6IjEifQ.X_Q4Ttt_rJMeskZkoMxBtVKfIfykZbE7Yl9YiVrFj20"
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyNTg2MjE0LCJpYXQiOjE3OTI1ODI2MTQsImp0aSI6IjA1MGU0Yzc5ZjU3NTRhM2NhYzhmNmMyMTU1ZGRlMGFlIiwidXNlcl9pZCI6IjEifQ.ZbusE0KcfwKr0GJfG4Td8NeWzydufRVbdLEBfPjP3vM"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"refresh\":\"\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "{{base_admin_url}}/admin/logout",
+                  "raw": "{{base_admin_url}}/logout/",
                   "host": [
                     "{{base_admin_url}}"
                   ],
                   "path": [
-                    "admin",
-                    "logout"
+                    "logout",
+                    ""
                   ]
                 }
               },
@@ -360,7 +410,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0s79}}"
+                    "value": ""
                   }
                 ],
                 "body": {
@@ -426,7 +476,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMjc4NTE4LCJpYXQiOjE3OTIyNzQ5MTksImp0aSI6ImNlMDdkMTM3NzE2ZjQ4MTQ5YmUwNGEyZDBiYmQ3NmI3IiwidXNlcl9pZCI6IjEifQ.FNsQbO0ZDhEJgOXLfafpoU0-vtHGC89f8GZqBeJ4FLY"
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyNDQyOTg0LCJpYXQiOjE3OTI0MzkzODUsImp0aSI6ImE0YzUyYjA4MDY2YjRiMjdiMDJjY2VkNGJiZjA5MWRhIiwidXNlcl9pZCI6IjEifQ.vJWaVPCMxcLHdY2edCukyS6CgCNzhAJQhpSeuL1VvvI"
                   }
                 ],
                 "url": {
@@ -461,12 +511,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTc2NTQwLCJpYXQiOjE3OTIxNzI5NDAsImp0aSI6ImE0YTY4YWNjMzlhMTRhN2E5NWY0NDQ2MDNmNmVkMjhmIiwidXNlcl9pZCI6IjEifQ.Fxz-sdBHkr8qMQICA5uvTDK0Xx0ZyiJwV2F5tT787mg"
+                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyNTQwNTY3LCJpYXQiOjE3OTI1MzY5NjcsImp0aSI6ImFlOWM2NTY3MTY2NzRmNDRiYjllMWE3NGY4MWZjZmFjIiwidXNlcl9pZCI6IjEifQ.yt0_tLNHLQNY3Z8JaG9_7qg8blc70Jyd1bJdAa9PmTw"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"request_id\":14,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"female\",\r\n    \"national_id\":\"103041100069\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\"\r\n}",
+                  "raw": "{\r\n    \"request_id\":37,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"female\",\r\n    \"national_id\":\"103041107029\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"

@@ -1,6 +1,9 @@
 
 import random
 import time
+from rest_framework.response import Response
+from rest_framework import status
+
 
 def get_user_permissions(employee, refresh):
     """
@@ -24,7 +27,7 @@ def get_user_permissions(employee, refresh):
             for rp in employee.role.role_permissions.select_related("module", "permission")
         ]
 
-    return {
+    payload = {
         "access_token": str(refresh.access_token),
         "refresh_token": str(refresh),
         "user": {
@@ -37,6 +40,8 @@ def get_user_permissions(employee, refresh):
             "permissions": permissions,
         },
     }
+
+    return payload
 
 def generate_code(account_type = 1):
     """

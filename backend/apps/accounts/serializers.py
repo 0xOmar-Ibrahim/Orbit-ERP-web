@@ -8,11 +8,12 @@ from apps.accounts.models import Employee, RegistrationRequest
 from ..helpers import get_user_permissions
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
+from rest_framework import status
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
-
+    
     def validate(self, attrs):
         try:
             employee = Employee.objects.get(work_email=attrs["email"])
