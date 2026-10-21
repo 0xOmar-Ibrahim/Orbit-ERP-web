@@ -16,7 +16,7 @@ async function refreshAccessToken() {
       .then(async (res) => {
         if (!res.ok) return null;
         const data = await res.json();
-        sessionStorage.setItem("access_token", data.access);
+        sessionStorage.setItem("access_token", data.access ?? data.access_token);
         if (data.refresh) sessionStorage.setItem("refresh_token", data.refresh);
         return data.access;
       })

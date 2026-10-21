@@ -61,9 +61,7 @@ const TYPE_OPTIONS = ["full_time", "part_time", "contract", "intern"];
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await authFetch(
-          "http://127.0.0.1:8000/admin/employees"
-        );
+        const response = await authFetch("http://127.0.0.1:8000/admin/employee/");
 
         const data = await response.json();
 
