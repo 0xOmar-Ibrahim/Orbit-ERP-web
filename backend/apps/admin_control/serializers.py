@@ -35,7 +35,10 @@ class AddEmployeeSerializer(serializers.ModelSerializer):
 
             employee_code = generate_code()
             
-            employee = Employee.objects.create(**validated_data, employee_code=employee_code)
+            employee = Employee.objects.create(
+            **validated_data,
+            employee_code=employee_code,
+            )
             employee.set_password(make_password(password))
 
             employee.save()

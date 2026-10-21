@@ -115,6 +115,7 @@ DATABASES = {
         "PASSWORD": "Orabit11451103",
         "HOST": "aws-0-eu-west-1.pooler.supabase.com",
         "PORT": "5432",
+        "DISABLE_SERVER_SIDE_CURSORS": True,
         "OPTIONS": {"sslmode": "require"},
     }
 }

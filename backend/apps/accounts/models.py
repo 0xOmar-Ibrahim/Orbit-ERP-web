@@ -12,6 +12,7 @@ class Role(models.Model):
     role_name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
 
+
     class Meta:
         # The table name
         db_table = "role"
@@ -101,7 +102,6 @@ class Employee(AbstractBaseUser, PermissionsMixin):
         related_name="employees",
         db_column="role_id",
     )
-
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
 
@@ -160,6 +160,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
 
     is_superuser = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True, blank=True)
+    sso_enabled = models.BooleanField(default=False) 
     
     USERNAME_FIELD = "work_email"
 
@@ -206,6 +207,7 @@ class RolePermission(models.Model):
                 name="unique_role_module_permission",
             )
         ]
+        
 
     # Edit the str attribute to return the role, module, and permission
     def __str__(self):
