@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-u@4ct7*mv1p9qyfqs-9_jlaj)oel3ih-xik*slzx9=lkep1*$j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["http://nonuniteable-uncontradicted-gennie.ngrok-free.dev/"]
+ALLOWED_HOSTS = ["nonuniteable-uncontradicted-gennie.ngrok-free.dev"]
 
 
 # Application definition
@@ -89,14 +89,14 @@ TEMPLATES = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://nonuniteable-uncontradicted-gennie.ngrok-free.dev/"
+    "http://nonuniteable-uncontradicted-gennie.ngrok-free.dev"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
-    "http://nonuniteable-uncontradicted-gennie.ngrok-free.dev/"
+    "http://nonuniteable-uncontradicted-gennie.ngrok-free.dev"
 ]
 
 SESSION_COOKIE_SAMESITE = "Lax"
