@@ -1,5 +1,8 @@
-.login-page{
-  min-height: 100vh;
+.login-page {
+  position: fixed;
+  inset: 0;           
+  overflow: hidden;
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: 1fr 1fr;
   place-items: center;
