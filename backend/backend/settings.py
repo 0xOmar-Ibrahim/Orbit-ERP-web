@@ -32,8 +32,7 @@ SECRET_KEY = 'django-insecure-u@4ct7*mv1p9qyfqs-9_jlaj)oel3ih-xik*slzx9=lkep1*$j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["http://nonuniteable-uncontradicted-gennie.ngrok-free.dev/"]
 
 
 # Application definition
