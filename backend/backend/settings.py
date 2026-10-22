@@ -90,12 +90,14 @@ TEMPLATES = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://nonuniteable-uncontradicted-gennie.ngrok-free.dev/"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
+    "http://nonuniteable-uncontradicted-gennie.ngrok-free.dev/"
 ]
 
 SESSION_COOKIE_SAMESITE = "Lax"
