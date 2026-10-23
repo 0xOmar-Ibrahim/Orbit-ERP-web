@@ -12,6 +12,11 @@
     background: var(--ae-bg);
     color: var(--ae-text);
     font-family: "Titillium Web", Arial, Helvetica, sans-serif;
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding-bottom: 48px;
   }
    
   .ae-header {
