@@ -48,7 +48,6 @@ class Employees(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        # You can add any validation logic here if needed
         return Response({"message": "Employee added successfully."})
 
     def patch(self, request):

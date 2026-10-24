@@ -7,7 +7,7 @@ import SideBar from "./SideBar";
 import { FiSearch, FiPlus } from "react-icons/fi";
 import { FaUsers } from "react-icons/fa";
 import banner from "../../Images/banner.jpg";
-import { authFetch } from "../../Utils/authFetch";
+import { authFetch } from "../../Services/authFetch";
 
 const STATUS_OPTIONS = ["active", "on_leave", "suspended", "terminated"];
 const TYPE_OPTIONS = ["full_time", "part_time", "contract", "intern"];

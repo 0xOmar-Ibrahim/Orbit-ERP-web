@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authFetch } from "../../Utils/authFetch";
+import { authFetch } from "../../Services/authFetch";
 import {
   FiUserPlus,
   FiPhone,
