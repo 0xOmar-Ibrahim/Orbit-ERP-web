@@ -248,6 +248,40 @@
                 }
               },
               "response": []
+            },
+            {
+              "name": "sso_mobile",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"iss\": \"https://accounts.google.com\",\r\n    \"sub\": \"110169484474386276734\",\r\n    \"email\": \"user4@gmail.com\",\r\n    \"given_name\": \"Marwan\",\r\n    \"family_name\": \"Ghareeb\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/api/auth/sso_mobile/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "sso_mobile",
+                    ""
+                  ]
+                }
+              },
+              "response": []
             }
           ]
         }
@@ -476,7 +510,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyNDQyOTg0LCJpYXQiOjE3OTI0MzkzODUsImp0aSI6ImE0YzUyYjA4MDY2YjRiMjdiMDJjY2VkNGJiZjA5MWRhIiwidXNlcl9pZCI6IjEifQ.vJWaVPCMxcLHdY2edCukyS6CgCNzhAJQhpSeuL1VvvI"
+                    "value": "{{bearer_token_0jl2}}"
                   }
                 ],
                 "url": {
@@ -511,12 +545,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyNTQwNTY3LCJpYXQiOjE3OTI1MzY5NjcsImp0aSI6ImFlOWM2NTY3MTY2NzRmNDRiYjllMWE3NGY4MWZjZmFjIiwidXNlcl9pZCI6IjEifQ.yt0_tLNHLQNY3Z8JaG9_7qg8blc70Jyd1bJdAa9PmTw"
+                    "value": "{{bearer_token_0lym}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"request_id\":37,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"female\",\r\n    \"national_id\":\"103041107029\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\"\r\n}",
+                  "raw": "{\r\n    \"request_id\":48,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"10304100729\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1081,6 +1115,18 @@
     },
     {
       "key": "json_web_token_0e9y",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0i5p",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0jl2",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0lym",
       "secret": true
     }
   ]
