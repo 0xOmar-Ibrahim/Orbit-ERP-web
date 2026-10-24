@@ -1,9 +1,18 @@
 
 import random
 import time
-from rest_framework.response import Response
-from rest_framework import status
+import re
+from rest_framework.exceptions import ValidationError
 
+EMAIL_REGEX = r"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
+
+def validate_email_regex(email):
+    if not re.fullmatch(EMAIL_REGEX, email or ""):
+        raise ValidationError({
+            "email": "Enter a valid email address."
+        })
+
+    return email
 
 def get_user_permissions(employee, refresh):
     """

@@ -10,12 +10,12 @@ from .models import Employee
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import redirect
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET
 from authlib.integrations.base_client.errors import OAuthError
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import RegistrationRequest
 from .oidc import oauth
-from ..helpers import get_user_permissions
+from ..helpers import get_user_permissions, validate_email_regex
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -63,8 +63,6 @@ class LoginView(APIView):
             )
 
         return response
-
-        
 
 class LogoutView(APIView):
     authentication_classes = [
@@ -115,9 +113,6 @@ class LogoutView(APIView):
         response.delete_cookie("sessionid", path="/", samesite="Lax")
 
         return response
-
-
-
 
 class SignUP(APIView):
     permission_classes = [AllowAny]
@@ -226,7 +221,7 @@ class sso_mobile(APIView):
 
         first_name = retrieved_data.get("given_name")
         last_name = retrieved_data.get("family_name")
-        email = retrieved_data.get("email")
+        email = validate_email_regex(retrieved_data.get("email"))
         iss = retrieved_data.get("iss")
         sub = retrieved_data.get("sub")
 

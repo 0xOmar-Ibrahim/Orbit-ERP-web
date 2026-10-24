@@ -1,14 +1,12 @@
 # apps/accounts/serializers.py
 from rest_framework import serializers
-from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
 from apps.accounts.models import Employee, RegistrationRequest
-from ..helpers import get_user_permissions
+from ..helpers import get_user_permissions, validate_email_regex
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
-from rest_framework import status
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -58,6 +56,12 @@ class SignUPSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
+        validate_email_regex(attrs['work_email'])
+        reg = RegistrationRequest.objects.filter(work_email=attrs['work_email']).order_by("-created_at").first()
+        if reg.status == "pending":
+            raise serializers.ValidationError({
+                "error": "This request registration is pending."
+            })
         if Employee.objects.filter(work_email=attrs['work_email']).exists():
             raise serializers.ValidationError({
                 "error": "This account is already in the system."
@@ -72,7 +76,6 @@ class SignUPSerializer(serializers.Serializer):
         new_user = RegistrationRequest.objects.create(
             **validated_data, registration_method="password"
         )
-
 
         return {
             "first_name": new_user.first_name,
