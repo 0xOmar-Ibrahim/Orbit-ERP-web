@@ -1,3 +1,8 @@
+html,
+body,
+#root {
+  overflow: hidden;
+}
 .app-shell {
   --bg: #eceff4;
   --card: #ffffff;
@@ -8,7 +13,9 @@
   --line: #d8dee8;
 
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   background: var(--bg);
   color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
@@ -37,6 +44,8 @@
   width: 270px;
   flex-shrink: 0;
   display: flex;
+  height: 100%;
+  overflow-y: auto;
   flex-direction: column;
   padding: 24px 14px;
   background: var(--card);
@@ -222,6 +231,9 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow: hidden;
+  box-sizing: border-box;
+  height: 100%;
 }
 
 .page-header {
@@ -233,6 +245,12 @@
   border-radius: 14px;
   overflow: hidden;
   background: linear-gradient(90deg, var(--card) 0%, var(--soft-blue) 100%);
+}
+.page-header,
+.tabs,
+.toolbar,
+.table-footer {
+  flex-shrink: 0;
 }
 
 .page-header-text {
@@ -368,6 +386,9 @@
 .table-wrap {
   overflow-x: auto;
   border-radius: 10px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .employees-table {
@@ -383,6 +404,12 @@
   padding: 12px;
   background: var(--soft-blue);
   font-weight: 700;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.dark .employees-table th {
+  background: #1e2633;
 }
 
 .employees-table th:first-child {

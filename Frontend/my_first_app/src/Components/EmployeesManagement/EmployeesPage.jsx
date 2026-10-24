@@ -9,6 +9,9 @@ import { FaUsers } from "react-icons/fa";
 import banner from "../../Images/banner.jpg";
 import { authFetch } from "../../Utils/authFetch";
 
+const STATUS_OPTIONS = ["active", "on_leave", "suspended", "terminated"];
+const TYPE_OPTIONS = ["full_time", "part_time", "contract", "intern"];
+
 function EmployeesPage() {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("view");
@@ -20,8 +23,7 @@ function EmployeesPage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState({ role: "", status: "", type: "" });
   const filterRef = useRef(null);
-  const STATUS_OPTIONS = ["active", "on_leave", "suspended", "terminated"];
-const TYPE_OPTIONS = ["full_time", "part_time", "contract", "intern"];
+
   const navigate = useNavigate();
 
   const options = useMemo(() => {

@@ -25,10 +25,26 @@ function SideBar({ collapsed, onToggle, darkMode, onToggleDark }) {
     "User";
 
   const userRole = user.role_name || user.role || "Employee";
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    sessionStorage.clear();
-    navigate("/", { replace: true });
+  const handleLogout = async () => {
+    const access = sessionStorage.getItem("access_token");
+
+    try {
+      await fetch("http://localhost:8000/admin/logout/", {
+        method: "POST",
+        credentials: "include", 
+        headers: {
+          "Content-Type": "application/json",
+          ...(access && { Authorization: `Bearer ${access}` }),
+        },
+      });
+    } catch (err) {
+      console.error("Logout request failed:", err);
+    } finally {
+
+      sessionStorage.clear();
+      localStorage.removeItem("token");
+      navigate("/", { replace: true });
+    }
   };
   return (
     <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
