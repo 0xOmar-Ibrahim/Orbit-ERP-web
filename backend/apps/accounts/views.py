@@ -274,7 +274,7 @@ class sso_mobile(APIView):
             .first()
         )
 
-        if registration is None:
+        if registration is None or registration.status == "rejected":
             registration = RegistrationRequest.objects.create(
                 sso_issuer=iss,
                 sso_subject=sub,
@@ -282,12 +282,6 @@ class sso_mobile(APIView):
                 work_email=email,
                 first_name=first_name,
                 last_name=last_name,
-            )
-
-        if registration.status == "rejected":
-            return JsonResponse(
-                {"message": "Request is Rejected"},
-                status=status.HTTP_401_UNAUTHORIZED,
             )
         
         return JsonResponse(
