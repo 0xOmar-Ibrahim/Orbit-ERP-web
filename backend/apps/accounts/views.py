@@ -284,8 +284,11 @@ class sso_mobile(APIView):
             )
         
         return JsonResponse(
-            {"message": "Request is Pending"},
-            status=status.HTTP_401_UNAUTHORIZED,
+            {
+                "first_name": registration.first_name,
+                "last_name": registration.last_name,
+                "email": registration.work_email,
+            } 
         )
 
 
