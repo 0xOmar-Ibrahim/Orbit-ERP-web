@@ -15,6 +15,16 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     
     def validate(self, attrs):
+
+        email = attrs["email"].strip().lower()
+
+        registration = RegistrationRequest.objects.filter(
+            work_email__iexact=email
+        ).first()
+
+        if registration and registration.status == "pending":
+            raise AuthenticationFailed("Registration is pending")
+        
         try:
             employee = Employee.objects.get(work_email=attrs["email"])
         except Employee.DoesNotExist:
