@@ -8,10 +8,10 @@ import EmoloyeesPage from "./EmployeesManagement/EmployeesPage";
 import AddEmployeePage from "./AddEmployee/AddEmployeePage";
 import { Navigate } from "react-router-dom";
 
-import UserForm from "./Components/UserLoginPage/UserForm";
-import SignUp from "./Components/SignUpPage/SignUp";
-import UserHome from "./Components/UserHomePage/UserHome";
-import ChangePassword from "./Components/UserLoginPage/ChangePassword";
+import UserForm from "./UserLoginPage/UserForm";
+import SignUp from "./SignUpPage/SignUp";
+import UserHome from "./UseHomePage/UserHome";
+import ChangePassword from "./UserLoginPage/ChangePassword";
 
 class App extends Component {
   render() {
