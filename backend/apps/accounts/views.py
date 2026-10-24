@@ -263,19 +263,26 @@ class sso_mobile(APIView):
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        # Signup
-        registration, created = (
-            RegistrationRequest.objects.get_or_create(
+        registration = (
+            RegistrationRequest.objects
+            .filter(
                 sso_issuer=iss,
                 sso_subject=sub,
                 registration_method="sso",
-                defaults={
-                    "work_email": email,
-                    "first_name": first_name,
-                    "last_name": last_name,
-                },
             )
+            .order_by("-created_at")
+            .first()
         )
+
+        if registration is None:
+            registration = RegistrationRequest.objects.create(
+                sso_issuer=iss,
+                sso_subject=sub,
+                registration_method="sso",
+                work_email=email,
+                first_name=first_name,
+                last_name=last_name,
+            )
 
         if registration.status == "rejected":
             return JsonResponse(
@@ -290,8 +297,7 @@ class sso_mobile(APIView):
                 "email": registration.work_email,
             } 
         )
-
-
+    
 @require_GET
 def sso_start(request):
     callback_url = request.build_absolute_uri(
