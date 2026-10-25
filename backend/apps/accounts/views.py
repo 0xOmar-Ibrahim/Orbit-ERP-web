@@ -140,7 +140,7 @@ class CustomTokenRefreshView(TokenRefreshView):
         try:
             serializer.is_valid(raise_exception=True)
         except TokenError as e:
-            return Response({"error": "invalid token"})
+            return Response({"error": "invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
 
         token_data = serializer.validated_data
         response = Response(token_data, status=status.HTTP_200_OK)

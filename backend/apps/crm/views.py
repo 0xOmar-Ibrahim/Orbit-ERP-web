@@ -153,25 +153,45 @@ class CustomerManagement(APIView):
     def get(self, request):
         request_parameters = request.query_params
 
-        customers = [
-            {
-                **customer, 
-            } 
-            for customer in Customer.objects.values(
-                "customer_id",
-                "customer_code",
-                "first_name",
-                "last_name",
-                "phone",
-                "company_name",
-                "email",
-                "address",
-                "campaign",
-                "created_at",
-                "updated_at"
-            ).filter(**{field:value for field, value in request_parameters.items()})
-        ]
+        allowed_filters = {
+            "customer_id",
+            "customer_code",
+            "first_name",
+            "last_name",
+            "phone",
+            "company_name",
+            "email",
+            "address",
+            "campaign"
+        }
 
+        filters = {
+            field: value
+            for field, value in request_parameters.items()
+            if field in allowed_filters and value
+        }
+        try: 
+            customers = [
+                {
+                    **customer, 
+                } 
+                for customer in Customer.objects.values(
+                    "customer_id",
+                    "customer_code",
+                    "first_name",
+                    "last_name",
+                    "phone",
+                    "company_name",
+                    "email",
+                    "address",
+                    "campaign",
+                    "created_at",
+                    "updated_at"
+                ).filter(**filters)
+            ]
+        except:
+            return Response({"error": "Invalid data entered."}, status=400)
+        
         return Response({"Customers": customers})
     
     def post(self, request):
@@ -217,21 +237,39 @@ class ContactManagement(APIView):
     def get(self, request):
         request_parameters = request.query_params
 
-        contacts = [
-            {
-                **contact, 
-            } 
-            for contact in Contact.objects.values(
-                "customer_id",
-                "contact_id",
-                "name",
-                "job_title",
-                "phone",
-                "email",
-                "is_primary"
-            ).filter(**{field:value for field, value in request_parameters.items()})
-        ]
+        allowed_filters = {
+            "contact_id",
+            "name",
+            "job_title",
+            "email",
+            "phone",
+            "is_primary",
+            "customer_id"
+        }
 
+        filters = {
+            field: value
+            for field, value in request_parameters.items()
+            if field in allowed_filters and value
+        }
+
+        try :
+            contacts = [
+                {
+                    **contact, 
+                } 
+                for contact in Contact.objects.values(
+                    "customer_id",
+                    "contact_id",
+                    "name",
+                    "job_title",
+                    "phone",
+                    "email",
+                    "is_primary"
+                ).filter(**filters)
+            ]
+        except:
+            return Response({"error": "Invalid data entered."}, status=400)
         return Response({"Contacts": contacts})
     
     def post(self, request):
@@ -276,21 +314,38 @@ class InteractionManagement(APIView):
     def get(self, request):
         request_parameters = request.query_params
 
-        interactions = [
-            {
-                **interaction, 
-            } 
-            for interaction in Interaction.objects.values(
-                "interaction_id",
-                "type",
-                "subject",
-                "description",
-                "interaction_date",
-                "customer_id",
-                "employee_id"
-            ).filter(**{field:value for field, value in request_parameters.items()})
-        ]
+        allowed_filters = {
+            "interaction_id",
+            "type",
+            "subject",
+            "description",
+            "customer_id",
+            "employee_id"
+        }
 
+        filters = {
+            field: value
+            for field, value in request_parameters.items()
+            if field in allowed_filters and value
+        }
+        try:
+            interactions = [
+                {
+                    **interaction, 
+                } 
+                for interaction in Interaction.objects.values(
+                    "interaction_id",
+                    "type",
+                    "subject",
+                    "description",
+                    "interaction_date",
+                    "customer_id",
+                    "employee_id"
+                ).filter(**filters)
+            ]
+        except:
+            return Response({"error": "Invalid data entered."}, status=400)
+        
         return Response({"Interactions": interactions})
     
     def post(self, request):

@@ -3,6 +3,8 @@ import random
 import time
 import re
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import BasePermission
+
 
 EMAIL_REGEX = r"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
 
@@ -71,3 +73,11 @@ def generate_code(account_type = 1):
     generated_code = f"{prefix}-{current_year}-{random_number}"
 
     return generated_code
+
+class IsAdministratorUser(BasePermission):
+    """
+    Allows access only to admin users.
+    """
+
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_superuser)

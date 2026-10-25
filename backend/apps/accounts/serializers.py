@@ -1,6 +1,6 @@
 # apps/accounts/serializers.py
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
 from apps.accounts.models import Employee, RegistrationRequest
@@ -26,15 +26,15 @@ class LoginSerializer(serializers.Serializer):
         try:
             employee = Employee.objects.get(work_email=attrs["email"])
         except Employee.DoesNotExist:
-            raise AuthenticationFailed("Invalid email or password.")
+            raise NotAuthenticated("Invalid email or password.")
 
         # Check hashed password
         if not employee.password or not check_password(attrs["password"], employee.password):
-            raise AuthenticationFailed("Invalid email or password.")
+            raise NotAuthenticated("Invalid email or password.")
 
         # Check employment status
         if employee.employment_status != Employee.EmploymentStatus.ACTIVE:
-            raise AuthenticationFailed("This account is disabled.")
+            raise NotAuthenticated("This account is disabled.")
 
         employee.last_login = timezone.now()
         employee.save(update_fields=["last_login"])
@@ -57,11 +57,20 @@ class SignUPSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         validate_email_regex(attrs['work_email'])
-        reg = RegistrationRequest.objects.filter(work_email=attrs['work_email']).order_by("-created_at").first()
-        if reg.status == "pending":
-            raise serializers.ValidationError({
-                "error": "This request registration is pending."
-            })
+        
+        reg = (
+            RegistrationRequest.objects
+            .filter(work_email=attrs["work_email"])
+            .order_by("-created_at")
+            .first()
+        )  
+
+        if reg:
+            if reg.status == "pending":
+                raise serializers.ValidationError({
+                    "error": "This registration request is pending."
+                })
+
         if Employee.objects.filter(work_email=attrs['work_email']).exists():
             raise serializers.ValidationError({
                 "error": "This account is already in the system."

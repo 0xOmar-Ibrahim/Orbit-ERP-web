@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from apps.accounts.models import Employee, RegistrationRequest, Role
 from rest_framework.response import Response
 from rest_framework import status
@@ -11,34 +11,58 @@ from .serializers import AddEmployeeSerializer, UpdateEmployeeSerializer
 from django.db import transaction
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
-from ..helpers import generate_code
+from ..helpers import generate_code, IsAdministratorUser
+
 class Employees(APIView):
-    permission_classes = [IsAuthenticated]  # must be open, the user isn't logged in yet
+    permission_classes = [IsAuthenticated, IsAdministratorUser]  # must be open, the user isn't logged in yet
 
     def get(self, request):
         parameters = request.query_params
 
-        employees = [
-                        {
-                            **employee,
-                            "gender": Employee.Gender(employee["gender"]).label,
-                            
-                        }
-                        for employee in Employee.objects.select_related("role").values(
-                            "employee_id",
-                            "first_name",
-                            "last_name",
-                            "role__role_name",
-                            "employee_code",
-                            "work_email",
-                            "phone",
-                            "national_id",
-                            "gender",
-                            "employment_status",
-                            "employment_type",
-                            "hire_date",
-                        ).filter(**{field:value for field, value in parameters.items()})
-                    ]
+        allowed_filters = {
+            "employee_id",
+            "first_name",
+            "last_name",
+            "role_id",
+            "employee_code",
+            "work_email",
+            "phone",
+            "national_id",
+            "gender",
+            "employment_status",
+            "employment_type",
+            "hire_date"
+        }
+
+        filters = {
+            field: value
+            for field, value in parameters.items()
+            if field in allowed_filters and value
+        }
+        try: 
+            employees = [
+                            {
+                                **employee,
+                                "gender": Employee.Gender(employee["gender"]).label,
+                                
+                            }
+                            for employee in Employee.objects.select_related("role").values(
+                                "employee_id",
+                                "first_name",
+                                "last_name",
+                                "role__role_name",
+                                "employee_code",
+                                "work_email",
+                                "phone",
+                                "national_id",
+                                "gender",
+                                "employment_status",
+                                "employment_type",
+                                "hire_date",
+                            ).filter(**filters)
+                        ]
+        except:
+            return Response({"error": "Invalid data entered."}, status=400)
         
         # You can add any validation logic here if needed
         return Response({"Employees": employees})
@@ -124,7 +148,7 @@ class AdminLoginView(APIView):
         return response
 
 class AdminLogoutView(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAuthenticated, IsAdministratorUser]
 
     def post(self, request):
         refresh_token = (
@@ -149,7 +173,7 @@ class AdminLogoutView(APIView):
         except TokenError:
             response = Response(
                 {"error": "Invalid or expired refresh token."},
-                status=status.HTTP_200_OK,
+                status=status.HTTP_401_UNAUTHORIZED,
             )
             response.delete_cookie("access_token", path="/", samesite="Lax")
             response.delete_cookie("refresh_token", path="/", samesite="Lax")
@@ -157,7 +181,7 @@ class AdminLogoutView(APIView):
             return response
 
         response = Response(
-            {"error": "Successfully logged out."},
+            {"message": "Successfully logged out."},
             status=status.HTTP_200_OK,
         )
 
@@ -169,7 +193,7 @@ class AdminLogoutView(APIView):
 
 
 class ApproveRegistrationView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdministratorUser]
 
     @transaction.atomic
     def post(self, request):
@@ -288,30 +312,51 @@ class ApproveRegistrationView(APIView):
         )
 
 class RegistrationRequests(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]  # must be open, the user isn't logged in yet
+    permission_classes = [IsAuthenticated, IsAdministratorUser]  # must be open, the user isn't logged in yet
 
     def get(self, request):
         parameters = request.query_params
 
-        requests = [
-                    {
-                        **registration_request,
-                    }
-                    for registration_request in RegistrationRequest.objects.values(
-                        "request_id",
-                        "sso_issuer",
-                        "sso_subject",
-                        "work_email",
-                        "first_name",
-                        "last_name",
-                        "reason",
-                        "status",
-                        "reviewed_at",
-                        "created_at",
-                        "reviewed_by_id",
-                        "registration_method",
-                    ).filter(**{field:value for field, value in parameters.items()})
-                ]
+        allowed_filters = {
+            "request_id",
+            "sso_issuer",
+            "sso_subject",
+            "work_email",
+            "first_name",
+            "last_name",
+            "reason",
+            "status",
+            "reviewed_by_id",
+            "registration_method"
+        }
+
+        filters = {
+            field: value
+            for field, value in parameters.items()
+            if field in allowed_filters and value
+        }
+        try: 
+            requests = [
+                        {
+                            **registration_request,
+                        }
+                        for registration_request in RegistrationRequest.objects.values(
+                            "request_id",
+                            "sso_issuer",
+                            "sso_subject",
+                            "work_email",
+                            "first_name",
+                            "last_name",
+                            "reason",
+                            "status",
+                            "reviewed_at",
+                            "created_at",
+                            "reviewed_by_id",
+                            "registration_method",
+                        ).filter(**filters)
+                    ]
+        except:
+            return Response({"error": "Invalid data entered."}, status=400)
         
         # You can add any validation logic here if needed
         return Response({"Requests": requests})
