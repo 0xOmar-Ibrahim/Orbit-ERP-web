@@ -54,7 +54,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"first_name\":\"Omar\",\r\n    \"last_name\":\"ahmed\",\r\n    \"work_email\":\"omar.ibrahem.0.022@gmail.com\",\r\n    \"password\":12345678\r\n}",
+                  "raw": "{\r\n    \"first_name\":\"Omar\",\r\n    \"last_name\":\"ahmed\",\r\n    \"work_email\":\"-9@gmail.com\",\r\n    \"password\":12345678\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -444,46 +444,18 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": ""
+                    "value": "{{bearer_token_1axj}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"employee_code\": \"EMP054\"\r\n}",
+                  "raw": "{\r\n    \"employee_code\": \"EMP-2026-3987\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
                     }
                   }
                 },
-                "url": {
-                  "raw": "http://127.0.0.1:8000/admin/employees",
-                  "protocol": "http",
-                  "host": [
-                    "127",
-                    "0",
-                    "0",
-                    "1"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "admin",
-                    "employees"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "employees",
-              "request": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
-                  }
-                ],
                 "url": {
                   "raw": "http://127.0.0.1:8000/admin/employee/",
                   "protocol": "http",
@@ -498,6 +470,41 @@
                     "admin",
                     "employee",
                     ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "employees",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_1axj}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/admin/employee/?first_name=omar",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "admin",
+                    "employee",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "first_name",
+                      "value": "omar"
+                    }
                   ]
                 }
               },
@@ -545,12 +552,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0lym}}"
+                    "value": "{{bearer_token_0565}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"request_id\":48,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"10304100729\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\"\r\n}",
+                  "raw": "{\r\n    \"request_id\":59,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"103001103729\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -994,7 +1001,7 @@
               "response": []
             },
             {
-              "name": "New Request",
+              "name": "delete interaction",
               "request": {
                 "method": "DELETE",
                 "header": [
@@ -1032,6 +1039,35 @@
               "response": []
             }
           ]
+        },
+        {
+          "name": "GetOpportunities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_0vko}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/crm/opportunities_view/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "crm",
+                "opportunities_view",
+                ""
+              ]
+            }
+          },
+          "response": []
         }
       ]
     }
@@ -1127,6 +1163,18 @@
     },
     {
       "key": "bearer_token_0lym",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_1axj",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0565",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0vko",
       "secret": true
     }
   ]
