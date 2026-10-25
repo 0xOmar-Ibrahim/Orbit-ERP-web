@@ -17,15 +17,18 @@ class App extends Component {
   render() {
     return (
       <Routes>
-        <Route path="/" element={<LoginForm />} />
-        <Route path="/employees" element={<EmoloyeesPage />} />
-        <Route path="/employees/add" element={<AddEmployeePage />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<UserForm />} />
-
+         <Route path="/" element={<Navigate to="/login" replace />} />
+         <Route path="/login" element={<UserForm />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/admin" element={<LoginForm />} />
         <Route path="/home" element={<UserHome />} />
         <Route path="/change-password" element={<ChangePassword />} />
+        <Route path="/employees" element={<EmoloyeesPage />} />
+        <Route path="/employees/add" element={<AddEmployeePage />} />
+       
+        
+
+        
       </Routes>
     );
   }

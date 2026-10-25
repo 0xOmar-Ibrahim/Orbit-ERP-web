@@ -1,7 +1,6 @@
 const API = "http://127.0.0.1:8000";
 const REFRESH_URL = `${API}/api/auth/refresh/`;
-const LOGIN_PATH = "/login";
-
+const LOGIN_PATH = "/admin";
 let refreshPromise = null; 
 async function refreshAccessToken() {
   const refresh = sessionStorage.getItem("refresh_token");

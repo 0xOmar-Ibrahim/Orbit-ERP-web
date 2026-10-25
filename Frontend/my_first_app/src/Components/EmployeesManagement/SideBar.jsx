@@ -43,7 +43,7 @@ function SideBar({ collapsed, onToggle, darkMode, onToggleDark }) {
 
       sessionStorage.clear();
       localStorage.removeItem("token");
-      navigate("/", { replace: true });
+      navigate("/admin", { replace: true });
     }
   };
   return (
