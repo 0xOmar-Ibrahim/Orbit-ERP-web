@@ -20,15 +20,11 @@ urlpatterns = [
     path("interactions", InteractionManagement.as_view(), name="interactions"),
     path("interactions/", InteractionManagement.as_view(), name="interactions-slash"),
 
-    # Opportunity endpoints (both singular and plural, with/without trailing slashes and ID routes)
+    # Opportunity endpoints (both singular and plural, with/without trailing slashes)
     path("opportunity", OpportunityView.as_view(), name="opportunity"),
     path("opportunity/", OpportunityView.as_view(), name="opportunity-slash"),
-    path("opportunity/<int:opportunity_id>", OpportunityView.as_view(), name="opportunity-detail"),
-    path("opportunity/<int:opportunity_id>/", OpportunityView.as_view(), name="opportunity-detail-slash"),
     path("opportunities", OpportunityView.as_view(), name="opportunities"),
     path("opportunities/", OpportunityView.as_view(), name="opportunities-slash"),
-    path("opportunities/<int:opportunity_id>", OpportunityView.as_view(), name="opportunities-detail"),
-    path("opportunities/<int:opportunity_id>/", OpportunityView.as_view(), name="opportunities-detail-slash"),
 
     # Customer Note endpoints (underscore & hyphen, singular & plural, with/without note_id and nested under customer)
     path("customer_note", CustomerNoteView.as_view(), name="customer_note"),

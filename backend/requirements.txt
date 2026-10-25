@@ -6,3 +6,4 @@ django-cors-headers
 django-extensions
 Authlib
 python-dotenv
+requests

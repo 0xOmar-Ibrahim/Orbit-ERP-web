@@ -15,12 +15,19 @@ from .serializers import (
 )
 
 
+def is_valid_id(value):
+    # IDs are positive integers; anything else would raise a ValueError in the ORM
+    return str(value).isdigit()
+
+
 class OpportunityView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, opportunity_id=None):
-        opp_id = opportunity_id or request.query_params.get("opportunity_id") or request.query_params.get("id")
+    def get(self, request):
+        opp_id = request.query_params.get("opportunity_id") or request.query_params.get("id")
         if opp_id:
+            if not is_valid_id(opp_id):
+                return Response({"error": "opportunity_id must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
             try:
                 opportunity = Opportunity.objects.select_related("customer", "employee").get(opportunity_id=opp_id)
                 serializer = OpportunitySerializer(opportunity)
@@ -55,6 +62,10 @@ class OpportunityView(APIView):
         elif "employee" in request.query_params:
             filters["employee_id"] = request.query_params["employee"]
 
+        for field in ("customer_id", "employee_id"):
+            if field in filters and not is_valid_id(filters[field]):
+                return Response({"error": f"{field} must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+
         if "stage" in request.query_params:
             filters["stage"] = request.query_params["stage"].lower()
 
@@ -85,16 +96,17 @@ class OpportunityView(APIView):
             "opportunity": OpportunitySerializer(opportunity).data,
         }, status=status.HTTP_201_CREATED)
 
-    def patch(self, request, opportunity_id=None):
+    def patch(self, request):
         opp_id = (
-            opportunity_id
-            or request.data.get("opportunity_id")
+            request.data.get("opportunity_id")
             or request.query_params.get("opportunity_id")
             or request.data.get("id")
             or request.query_params.get("id")
         )
         if not opp_id:
             return Response({"error": "opportunity_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not is_valid_id(opp_id):
+            return Response({"error": "opportunity_id must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             opportunity = Opportunity.objects.get(opportunity_id=opp_id)
@@ -109,19 +121,20 @@ class OpportunityView(APIView):
             "opportunity": OpportunitySerializer(updated_opportunity).data,
         }, status=status.HTTP_200_OK)
 
-    def put(self, request, opportunity_id=None):
-        return self.patch(request, opportunity_id)
+    def put(self, request):
+        return self.patch(request)
 
-    def delete(self, request, opportunity_id=None):
+    def delete(self, request):
         opp_id = (
-            opportunity_id
-            or request.data.get("opportunity_id")
+            request.data.get("opportunity_id")
             or request.query_params.get("opportunity_id")
             or request.data.get("id")
             or request.query_params.get("id")
         )
         if not opp_id:
             return Response({"error": "opportunity_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not is_valid_id(opp_id):
+            return Response({"error": "opportunity_id must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             opportunity = Opportunity.objects.get(opportunity_id=opp_id)
@@ -326,6 +339,8 @@ class CustomerNoteView(APIView):
             or request.query_params.get("id")
         )
         if target_note_id:
+            if not is_valid_id(target_note_id):
+                return Response({"error": "note_id must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
             try:
                 note = CustomerNote.objects.select_related("customer", "employee").get(note_id=target_note_id)
                 serializer = CustomerNoteSerializer(note)
@@ -344,6 +359,8 @@ class CustomerNoteView(APIView):
                 {"error": "customer_id is required to retrieve customer notes."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        if not is_valid_id(target_customer_id):
+            return Response({"error": "customer_id must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Verify customer exists
         if not Customer.objects.filter(customer_id=target_customer_id).exists():
@@ -389,6 +406,8 @@ class CustomerNoteView(APIView):
         )
         if not target_note_id:
             return Response({"error": "note_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not is_valid_id(target_note_id):
+            return Response({"error": "note_id must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             note = CustomerNote.objects.get(note_id=target_note_id)
@@ -416,6 +435,8 @@ class CustomerNoteView(APIView):
         )
         if not target_note_id:
             return Response({"error": "note_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not is_valid_id(target_note_id):
+            return Response({"error": "note_id must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             note = CustomerNote.objects.get(note_id=target_note_id)
