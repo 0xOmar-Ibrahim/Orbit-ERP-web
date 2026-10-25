@@ -5,6 +5,7 @@ from .views import (
     InteractionManagement,
     OpportunityView,
     CustomerNoteView,
+    GetOpportunities
 )
 
 urlpatterns = [
@@ -19,6 +20,10 @@ urlpatterns = [
     # Interaction endpoints
     path("interactions", InteractionManagement.as_view(), name="interactions"),
     path("interactions/", InteractionManagement.as_view(), name="interactions-slash"),
+
+    # Interaction endpoints
+    path("opportunities_view", GetOpportunities.as_view(), name="opportunities-view"),
+    path("opportunities_view/", GetOpportunities.as_view(), name="opportunities-view-slash"),
 
     # Opportunity endpoints (both singular and plural, with/without trailing slashes and ID routes)
     path("opportunity", OpportunityView.as_view(), name="opportunity"),

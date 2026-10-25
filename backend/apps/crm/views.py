@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
+from .pagination import PageNumberPagination
 from .models import Opportunity, Customer, Contact, Interaction, CustomerNote
 from .serializers import (
     OpportunitySerializer,
@@ -424,3 +426,128 @@ class CustomerNoteView(APIView):
 
         note.delete()
         return Response({"message": "Customer note deleted successfully."}, status=status.HTTP_200_OK)
+
+class GetOpportunities(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        request_parameters = request.query_params
+
+        allowed_filters = {
+            "title",
+            "stage",
+            "status",
+            "customer_id",
+            "employee_id",
+            "opportunity_id"
+        }
+
+        filters = {
+            field: value
+            for field, value in request_parameters.items()
+            if field in allowed_filters and value
+        }
+
+        queryset = (
+                Opportunity.objects
+                .filter(**filters)
+                .select_related("customer", "employee")
+                .prefetch_related(
+                    "customer__contacts",
+                    "customer__notes",
+                    "customer__interactions",
+                )
+            )
+
+        # Ordering
+        allowed_ordering = {
+            "opportunity_id",
+            "-opportunity_id",
+            "title",
+            "-title",
+            "estimated_value",
+            "-estimated_value",
+            "expected_close_date",
+            "-expected_close_date",
+            "probability",
+            "-probability",
+        }
+
+        ordering = request_parameters.get("ordering", "-opportunity_id")
+        if ordering in allowed_ordering:
+            queryset = queryset.order_by(ordering)
+
+
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+        paginator.page_size_query_param = "page_size"
+        paginator.max_page_size = 100
+
+        page = paginator.paginate_queryset(queryset, request)
+
+        opportunities = []
+
+        for opportunity in page:
+            customer = opportunity.customer
+            employee = opportunity.employee
+
+            opportunities.append({
+                "opportunity_id": opportunity.opportunity_id,
+                "title": opportunity.title,
+                "estimated_value": opportunity.estimated_value,
+                "stage": opportunity.stage,
+                "probability": opportunity.probability,
+                "expected_close_date": opportunity.expected_close_date,
+                "status": opportunity.status,
+
+                "customer": {
+                    "customer_id": customer.customer_id,
+                    "customer_code": customer.customer_code,
+                    "first_name": customer.first_name,
+                    "last_name": customer.last_name,
+                    "phone": customer.phone,
+                    "company_name": customer.company_name,
+                    "email": customer.email,
+                    "address": customer.address,
+                    "campaign": customer.campaign,
+                    "created_at": customer.created_at,
+                    "updated_at": customer.updated_at,
+
+                    "contacts": list(
+                        customer.contacts.values(
+                            "contact_id",
+                            "name",
+                            "job_title",
+                            "email",
+                            "phone",
+                            "is_primary",
+                        )
+                    ),
+
+                    "notes": list(
+                        customer.notes.values(
+                            "note_id",
+                            "employee_id",
+                            "note_text",
+                            "created_at",
+                        )
+                    ),
+
+                    "interactions": list(
+                        customer.interactions.values(
+                            "interaction_id",
+                            "employee_id",
+                            "type",
+                            "subject",
+                            "description",
+                            "interaction_date",
+                        )
+                    ),
+                },
+
+                "employee": {
+                    "employee_id": employee.employee_id,
+                    "employee_name": employee.first_name + " " + employee.last_name
+                },
+            })
+
+        return paginator.get_paginated_response(opportunities)    
