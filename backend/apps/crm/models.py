@@ -162,7 +162,7 @@ class Opportunity(models.Model):
             # ABO ELNOUR: prevents logical inconsistency between stage and status.
             # A deal cannot be in CLOSED stage while still marked as OPEN.
             models.CheckConstraint(
-                check=~models.Q(stage="closed", status="open"),
+                condition=~models.Q(stage="closed", status="open"),
                 name="chk_opportunity_stage_status",
             ),
         ]

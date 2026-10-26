@@ -71,7 +71,7 @@ class Department(models.Model):
             # ABO ELNOUR: prevents a department from being its own direct parent.
             # Note: deeper circular chains (A→B→A) require application-level validation.
             models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(parent_department__isnull=True) |
                     ~models.Q(parent_department=models.F("department_id"))
                 ),
@@ -170,7 +170,7 @@ class WorkScheduleLine(models.Model):
             ),
             # ABO ELNOUR: end_time must be strictly after start_time.
             models.CheckConstraint(
-                check=models.Q(end_time__gt=models.F("start_time")),
+                condition=models.Q(end_time__gt=models.F("start_time")),
                 name="chk_schedule_time_order",
             ),
         ]
@@ -334,7 +334,7 @@ class EmploymentContract(models.Model):
         constraints = [
             # ABO ELNOUR: end_date must be strictly after start_date when provided.
             models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(end_date__isnull=True) |
                     models.Q(end_date__gt=models.F("start_date"))
                 ),
@@ -401,7 +401,7 @@ class Attendance(models.Model):
             ),
             # ABO ELNOUR: check_out must be after check_in when both are set.
             models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(check_out__isnull=True) |
                     models.Q(check_out__gt=models.F("check_in"))
                 ),
@@ -519,7 +519,7 @@ class LeaveAllocation(models.Model):
         constraints = [
             # ABO ELNOUR: valid_to must be strictly after valid_from.
             models.CheckConstraint(
-                check=models.Q(valid_to__gt=models.F("valid_from")),
+                condition=models.Q(valid_to__gt=models.F("valid_from")),
                 name="chk_allocation_date_order",
             ),
         ]
@@ -588,13 +588,13 @@ class LeaveRequest(models.Model):
         constraints = [
             # ABO ELNOUR: date_to must be on or after date_from (single-day requests allowed).
             models.CheckConstraint(
-                check=models.Q(date_to__gte=models.F("date_from")),
+                condition=models.Q(date_to__gte=models.F("date_from")),
                 name="chk_leave_date_order",
             ),
             # ABO ELNOUR: the approver cannot be the same person as the requester.
             # This constraint is enforced only when an approver is set.
             models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(approver__isnull=True) |
                     ~models.Q(approver=models.F("employee"))
                 ),
@@ -748,12 +748,12 @@ class Appraisal(models.Model):
         constraints = [
             # ABO ELNOUR: an employee cannot be their own reviewer.
             models.CheckConstraint(
-                check=~models.Q(reviewer=models.F("employee")),
+                condition=~models.Q(reviewer=models.F("employee")),
                 name="chk_appraisal_no_self_review",
             ),
             # ABO ELNOUR: period_end must be after period_start.
             models.CheckConstraint(
-                check=models.Q(period_end__gt=models.F("period_start")),
+                condition=models.Q(period_end__gt=models.F("period_start")),
                 name="chk_appraisal_period_order",
             ),
             # ABO ELNOUR: only one appraisal allowed per employee per review period.
@@ -877,7 +877,7 @@ class Applicant(models.Model):
             # ABO ELNOUR: a HIRED applicant must have a linked employee record.
             # Prevents data inconsistency where stage=hired but no employee was created.
             models.CheckConstraint(
-                check=(
+                condition=(
                     ~models.Q(stage="hired") |
                     models.Q(hired_employee__isnull=False)
                 ),
@@ -957,7 +957,7 @@ class Payroll(models.Model):
             # ABO ELNOUR: net_pay integrity check — stored value must match the formula.
             # Formula: net_pay = base_salary + allowances - deductions
             models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     net_pay=models.F("base_salary") +
                     models.F("allowances") -
                     models.F("deductions")
@@ -966,7 +966,7 @@ class Payroll(models.Model):
             ),
             # ABO ELNOUR: period_end must be strictly after period_start.
             models.CheckConstraint(
-                check=models.Q(period_end__gt=models.F("period_start")),
+                condition=models.Q(period_end__gt=models.F("period_start")),
                 name="chk_payroll_period_order",
             ),
         ]
