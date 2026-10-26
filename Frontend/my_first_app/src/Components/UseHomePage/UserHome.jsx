@@ -1,8 +1,8 @@
-
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
-import logo from "../../assets/logo.svg";
+import logoDark from "../../assets/dark.png";
+import logoLight from "../../assets/light.png";
 
 import projectManagerIcon from "../../assets/projectmanager.svg";
 import crmIcon from "../../assets/crm.svg";
@@ -16,63 +16,105 @@ import moonIcon from "../../assets/moon.svg";
 
 import "./UserHome.css";
 
-const PASSWORD_API_URL =
-  "http://localhost:8000/api/auth/me/";
-
-const SSO_API_URL =
-  "http://localhost:8000/api/auth/me/";
+const API_URL = "http://localhost:8000/api/auth/me/";
+const LOGOUT_API_URL = "http://localhost:8000/api/auth/logout/";
 
 const UserHome = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [collapsed, setCollapsed] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+
+  const [darkMode, setDarkMode] = useState(
+    () => localStorage.getItem("orbitLoginTheme") === "dark"
+  );
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
-
-
+  // Keep the Home theme synchronized with the saved Login theme.
   useEffect(() => {
-    const controller = new AbortController();
+    localStorage.setItem(
+      "orbitLoginTheme",
+      darkMode ? "dark" : "light"
+    );
+  }, [darkMode]);
+
+  // Apply the saved theme when returning to Home.
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("orbitLoginTheme");
+    setDarkMode(savedTheme === "dark");
+  }, [location.key]);
+
+  // Load the authenticated user.
+  useEffect(() => {
+    let cancelled = false;
 
     const loadUser = async () => {
       const authMethod = sessionStorage.getItem("orbitAuthMethod");
+      const savedUser = localStorage.getItem("orbitUser");
 
       try {
-        // Password login: use the user data saved during login
-        if (authMethod === "password") {
-          const savedUser = localStorage.getItem("orbitUser");
+        if (!authMethod) {
+          navigate("/login", { replace: true });
+          return;
+        }
 
-          if (savedUser) {
-            setUser(JSON.parse(savedUser));
-          } else {
-            setError("User information was not found. Please sign in again.");
+        // Password login.
+        if (authMethod === "password") {
+          if (!savedUser) {
+            navigate("/login", { replace: true });
+            return;
+          }
+
+          let parsedUser;
+
+          try {
+            parsedUser = JSON.parse(savedUser);
+          } catch {
+            localStorage.removeItem("orbitUser");
+            sessionStorage.removeItem("orbitAuthMethod");
+            navigate("/login", { replace: true });
+            return;
+          }
+
+          if (!parsedUser || typeof parsedUser !== "object") {
+            localStorage.removeItem("orbitUser");
+            sessionStorage.removeItem("orbitAuthMethod");
+            navigate("/login", { replace: true });
+            return;
+          }
+
+          if (!cancelled) {
+            setUser(parsedUser);
           }
 
           return;
         }
 
-        // SSO login: fetch the current user from the backend
+        // Google / SSO login.
         if (authMethod === "sso") {
-          const response = await fetch(
-            "http://localhost:8000/api/auth/me/",
-            {
-              method: "GET",
-              credentials: "include",
-              headers: {
-                Accept: "application/json",
-              },
-            }
-          );
+          const response = await fetch(API_URL, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              Accept: "application/json",
+            },
+          });
 
-          const data = await response.json();
+          let data = {};
+
+          try {
+            data = await response.json();
+          } catch {
+            // The response may not contain JSON.
+          }
 
           if (!response.ok) {
             throw new Error(
               data.detail ||
-              data.error ||
-              `Unable to load user (${response.status})`
+                data.error ||
+                `Unable to load user (${response.status})`
             );
           }
 
@@ -86,15 +128,15 @@ const UserHome = () => {
             throw new Error("Invalid user information received.");
           }
 
+          if (cancelled) return;
+
           setUser(currentUser);
 
-          // Keep the saved user data synchronized with the API
           localStorage.setItem(
             "orbitUser",
             JSON.stringify(currentUser)
           );
 
-          // Save tokens if the backend returns them
           if (data.access_token) {
             localStorage.setItem("access_token", data.access_token);
           }
@@ -102,14 +144,20 @@ const UserHome = () => {
           return;
         }
 
-        setError("Authentication method not found. Please sign in again.");
+        // Unknown authentication method.
+        sessionStorage.removeItem("orbitAuthMethod");
+        navigate("/login", { replace: true });
       } catch (err) {
-        if (err.name === "AbortError") return;
+        if (cancelled) return;
 
         console.error("Authentication error:", err);
-        setError(err.message || "Failed to load user information.");
+
+        localStorage.removeItem("orbitUser");
+        sessionStorage.removeItem("orbitAuthMethod");
+
+        navigate("/login", { replace: true });
       } finally {
-        if (!controller.signal.aborted) {
+        if (!cancelled) {
           setLoading(false);
         }
       }
@@ -117,12 +165,16 @@ const UserHome = () => {
 
     loadUser();
 
-    return () => controller.abort();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate]);
 
-
+  // Keep the existing user name and role.
   const fullName = user
-    ? [user.first_name, user.last_name].filter(Boolean).join(" ")
+    ? [user.first_name, user.last_name]
+        .filter(Boolean)
+        .join(" ")
     : "";
 
   const mainModules = [
@@ -171,46 +223,44 @@ const UserHome = () => {
     },
   ];
 
-  const openModule = (path) => navigate(path);
+  const openModule = (path) => {
+    navigate(path);
+  };
 
   const handleLogout = async () => {
     try {
       const accessToken = localStorage.getItem("access_token");
-      
-      const response = await fetch("http://localhost:8000/api/auth/logout/", {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-          },
-    
-        });
-      
-      if (!response.ok) {
-        console.error(
-          "Logout API failed:",
-          response.status,
-          await response.text()
-        );
-      }
-    } catch (error) {
-      console.error("Logout request failed:", error);
+
+      await fetch(LOGOUT_API_URL, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          ...(accessToken
+            ? { Authorization: `Bearer ${accessToken}` }
+            : {}),
+        },
+      });
+    } catch (err) {
+      console.error("Logout request failed:", err);
     } finally {
       localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
       localStorage.removeItem("orbitUser");
       sessionStorage.removeItem("orbitAuthMethod");
 
       navigate("/login", { replace: true });
     }
   };
-  const renderModule = (module, isMain = false) => (
+
+  const renderModule = (module) => (
     <button
       type="button"
       key={module.path}
-      className={`module-link ${isMain && module.name === "Project Management" ? "active" : ""
-        }`}
+      className={`module-link ${
+        location.pathname === module.path ? "active" : ""
+      }`}
       onClick={() => openModule(module.path)}
       title={collapsed ? module.name : ""}
     >
@@ -220,58 +270,65 @@ const UserHome = () => {
         className="nav-icon"
         aria-hidden="true"
       />
+
       {!collapsed && <span>{module.name}</span>}
     </button>
   );
 
-  if (error) {
+  if (loading) {
     return (
-      <main className="home-page">
-        <p role="alert">{error}</p>
-        <button type="button" onClick={() => window.location.reload()}>
-          Try again
-        </button>
+      <main className={`home-page ${darkMode ? "dark-mode" : ""}`}>
+        <div className="home-loading">Loading...</div>
       </main>
     );
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (
     <main className={`home-page ${darkMode ? "dark-mode" : ""}`}>
       <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
-        <div className="brand-container">
-          {!collapsed && (
-            <>
-              <img className="home-logo" src={logo} alt="" />
-              <span className="brand-name">RBIT</span>
-            </>
-          )}
+       <div className="brand-container">
+  <img
+    className={`home-logo ${collapsed ? "logo-collapsed" : ""}`}
+    src={darkMode ? logoDark : logoLight}
+    alt="Orbit logo"
+  />
 
-          {collapsed && <img className="home-logo" src={logo} alt="ORBIT" />}
-
-          <button
-            className="collapse-button"
-            type="button"
-            onClick={() => setCollapsed((prev) => !prev)}
-            aria-label="Toggle sidebar"
-          >
-            {collapsed ? "»" : "«"}
-          </button>
-        </div>
+  <button
+    className="collapse-button"
+    type="button"
+    onClick={() => setCollapsed((prev) => !prev)}
+    aria-label="Toggle sidebar"
+    title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+  >
+    {collapsed ? "»" : "«"}
+  </button>
+</div>
+        
 
         <div className="sidebar-divider" />
 
         <nav className="sidebar-navigation">
           <div className="main-modules">
-            {mainModules.map((module) => renderModule(module, true))}
+            {mainModules.map(renderModule)}
           </div>
 
           <div className="secondary-modules">
-            {otherModules.map((module) => renderModule(module))}
+            {otherModules.map(renderModule)}
 
             <div className="module-link dark-mode-row">
               {!collapsed && (
                 <>
-                  <img src={moonIcon} alt="" className="nav-icon" />
+                  <img
+                    src={moonIcon}
+                    alt=""
+                    className="nav-icon"
+                    aria-hidden="true"
+                  />
+
                   <span>Dark Mode</span>
                 </>
               )}
@@ -282,6 +339,7 @@ const UserHome = () => {
                 onClick={() => setDarkMode((prev) => !prev)}
                 aria-label="Toggle dark mode"
                 aria-pressed={darkMode}
+                title="Toggle dark mode"
               >
                 <span />
               </button>
@@ -291,22 +349,15 @@ const UserHome = () => {
 
         {!collapsed && (
           <div className="sidebar-footer">
-            <button
-              type="button"
-              className="profile-card"
-              onClick={() => navigate("/settings")}
-            >
-              <div className="profile-avatar">
-                {fullName ? fullName.charAt(0).toUpperCase() : "U"}
-              </div>
-
+            <div className="profile-card">
               <div className="profile-info">
-                <strong>{fullName || "User"}</strong>
-                <span>{user?.role_name || user?.role || "Employee"}</span>
-              </div>
+                <strong>{fullName || user.username || "User"}</strong>
 
-              <span className="profile-arrow">›</span>
-            </button>
+                <span>
+                  {user.role_name || user.role || "Employee"}
+                </span>
+              </div>
+            </div>
 
             <button
               type="button"
@@ -319,36 +370,9 @@ const UserHome = () => {
         )}
       </aside>
 
-      {/* <section className="home-content">
-
-        <section className="home-content">
-  <h1>
-    Welcome{user?.first_name ? `, ${user.first_name}` : ""}
-  </h1>
-
-  <div className="user-details">
-    <p>
-      <strong>First name:</strong>{" "}
-      {user?.first_name || "—"}
-    </p>
-
-    <p>
-      <strong>Last name:</strong>{" "}
-      {user?.last_name || "—"}
-    </p>
-
-    <p>
-      <strong>Email:</strong>{" "}
-      {user?.email || "—"}
-    </p>
-
-    <p>
-      <strong>Role:</strong>{" "}
-      {user?.role_name || user?.role || "—"}
-    </p>
-  </div>
-</section>
-      </section> */}
+      <section className="home-content">
+        {/* Your page content or nested routes go here. */}
+      </section>
     </main>
   );
 };

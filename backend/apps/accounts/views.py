@@ -15,8 +15,8 @@ from authlib.integrations.base_client.errors import OAuthError
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import RegistrationRequest
 from .oidc import oauth
-from ..helpers import get_user_permissions
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from ..helpers import get_user_permissions, validate_email_regex
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -63,8 +63,6 @@ class LoginView(APIView):
             )
 
         return response
-
-        
 
 class LogoutView(APIView):
     authentication_classes = [
@@ -116,9 +114,6 @@ class LogoutView(APIView):
 
         return response
 
-
-
-
 class SignUP(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
@@ -145,7 +140,7 @@ class CustomTokenRefreshView(TokenRefreshView):
         try:
             serializer.is_valid(raise_exception=True)
         except TokenError as e:
-            return Response({"error": "invalid token"})
+            return Response({"error": "invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
 
         token_data = serializer.validated_data
         response = Response(token_data, status=status.HTTP_200_OK)
@@ -218,6 +213,80 @@ class CookieDebugView(APIView):
             ),
         })
 
+
+class sso_mobile(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        retrieved_data = request.data
+
+        first_name = retrieved_data.get("given_name")
+        last_name = retrieved_data.get("family_name")
+        email = validate_email_regex(retrieved_data.get("email"))
+        iss = retrieved_data.get("iss")
+        sub = retrieved_data.get("sub")
+
+        if(
+            not first_name 
+            or not last_name
+            or not email
+            or not iss
+            or not sub
+        ):
+            return JsonResponse(
+                {"error": "A verified SSO identity is required"},
+                status=403,
+            )
+
+        employee = Employee.objects.filter(
+                sso_issuer=iss,
+                sso_subject=sub,
+                sso_enabled=True,
+                employment_status="active",
+            ).select_related("role").first()
+
+        if employee:
+            refresh = RefreshToken.for_user(employee)
+            employee_data = get_user_permissions(employee, refresh)
+            return Response(employee_data, status=status.HTTP_200_OK)
+
+        # Do not automatically link an existing employee by email if employee (in 'database' and 'inactive') --> redirect it to admin
+        if Employee.objects.filter(
+            work_email__iexact=email
+        ).exists():
+            return JsonResponse(
+                {"message": "Contact admin"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        registration = (
+            RegistrationRequest.objects
+            .filter(
+                sso_issuer=iss,
+                sso_subject=sub,
+                registration_method="sso",
+            )
+            .order_by("-created_at")
+            .first()
+        )
+
+        if registration is None or registration.status == "rejected":
+            registration = RegistrationRequest.objects.create(
+                sso_issuer=iss,
+                sso_subject=sub,
+                registration_method="sso",
+                work_email=email,
+                first_name=first_name,
+                last_name=last_name,
+            )
+        
+        return JsonResponse(
+            {
+                "first_name": registration.first_name,
+                "last_name": registration.last_name,
+                "email": registration.work_email,
+            } 
+        )
+    
 @require_GET
 def sso_start(request):
     callback_url = request.build_absolute_uri(
@@ -294,7 +363,7 @@ def sso_callback(request):
 
         return response
     
-    # Do not automatically link an existing employee by email
+    # Do not automatically link an existing employee by email (in 'database' and 'inactive')
     if Employee.objects.filter(
         work_email__iexact=email
     ).exists():
@@ -321,11 +390,8 @@ def sso_callback(request):
             f"{FRONTEND_URL}/login?message=registration_rejected"
         )
 
-    if registration.status == "approved":
-        return redirect(
-            f"{FRONTEND_URL}/login?message=account_not_approved"
-        )
-
     return redirect(
         f"{FRONTEND_URL}/login?message=registration_pending"
     )
+
+
