@@ -16,7 +16,9 @@ function EmployeesPage() {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("view");
   const [collapsed, setCollapsed] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("orbitLoginTheme") === "dark";
+  });
   const [employees, setEmployees] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -27,7 +29,9 @@ function EmployeesPage() {
   const navigate = useNavigate();
 
   const options = useMemo(() => {
-    const roles = [...new Set(employees.map((e) => e.role).filter(Boolean))].sort();
+    const roles = [
+      ...new Set(employees.map((e) => e.role).filter(Boolean)),
+    ].sort();
     return {
       role: roles,
       status: STATUS_OPTIONS,
@@ -63,7 +67,9 @@ function EmployeesPage() {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await authFetch("http://127.0.0.1:8000/admin/employee/");
+        const response = await authFetch(
+          "http://127.0.0.1:8000/admin/employee/"
+        );
 
         const data = await response.json();
 
@@ -113,7 +119,13 @@ function EmployeesPage() {
         collapsed={collapsed}
         onToggle={() => setCollapsed(!collapsed)}
         darkMode={darkMode}
-        onToggleDark={() => setDarkMode(!darkMode)}
+        onToggleDark={() => {
+          setDarkMode((prev) => {
+            const next = !prev;
+            localStorage.setItem("orbitLoginTheme", next ? "dark" : "light");
+            return next;
+          });
+        }}
       />
 
       <main className="main-content">
@@ -149,8 +161,7 @@ function EmployeesPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          
-          
+
           <div className="filter-wrap" ref={filterRef}>
             <button
               type="button"
