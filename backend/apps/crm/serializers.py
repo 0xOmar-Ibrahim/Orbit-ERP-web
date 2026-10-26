@@ -228,7 +228,7 @@ class AddCustomerSerializer(serializers.ModelSerializer):
             "company_name",
             "email",
             "address",
-            "campaign",
+            "lead_source_id",
         ]
 
     def validate(self, attrs):
@@ -255,7 +255,7 @@ class UpdateCustomerSerializer(serializers.ModelSerializer):
             "company_name",
             "email",
             "address",
-            "campaign",
+            "lead_source_id",
         ]
 
     def validate(self, data):
@@ -319,6 +319,16 @@ class AddInteractionSerializer(serializers.ModelSerializer):
         source="employee",
     )
 
+    contact_id = serializers.PrimaryKeyRelatedField(
+        queryset=Contact.objects.all(),
+        source="contact",
+    )
+    
+    opportunity_id = serializers.PrimaryKeyRelatedField(
+        queryset=Opportunity.objects.all(),
+        source="opportunity",
+    )
+
     class Meta:
         model = Interaction
         fields = [
@@ -329,6 +339,8 @@ class AddInteractionSerializer(serializers.ModelSerializer):
             "interaction_date",
             "customer_id",
             "employee_id",
+            "contact_id",
+            "opportunity_id"
         ]
         read_only_fields = ["interaction_id"]
 
@@ -354,6 +366,8 @@ class UpdateInteractionSerializer(serializers.ModelSerializer):
             "interaction_date",
             "customer_id",
             "employee_id",
+            "contact_id",
+            "opportunity_id"
         ]
 
     def validate(self, data):

@@ -162,7 +162,7 @@ class CustomerManagement(APIView):
             "company_name",
             "email",
             "address",
-            "campaign"
+            "lead_source_id"
         }
 
         filters = {
@@ -184,7 +184,7 @@ class CustomerManagement(APIView):
                     "company_name",
                     "email",
                     "address",
-                    "campaign",
+                    "lead_source_id",
                     "created_at",
                     "updated_at"
                 ).filter(**filters)
@@ -320,7 +320,9 @@ class InteractionManagement(APIView):
             "subject",
             "description",
             "customer_id",
-            "employee_id"
+            "employee_id",
+            "contact_id",
+            "opportunity_id"
         }
 
         filters = {
@@ -340,7 +342,9 @@ class InteractionManagement(APIView):
                     "description",
                     "interaction_date",
                     "customer_id",
-                    "employee_id"
+                    "employee_id",
+                    "contact_id",
+                    "opportunity_id"
                 ).filter(**filters)
             ]
         except:
@@ -506,33 +510,40 @@ class CustomerNoteView(APIView):
 class GetOpportunities(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        request_parameters = request.query_params
+        params = request.query_params
 
+        # Filtering
         allowed_filters = {
             "title",
             "stage",
             "status",
             "customer_id",
             "employee_id",
-            "opportunity_id"
+            "opportunity_id",
         }
 
         filters = {
             field: value
-            for field, value in request_parameters.items()
+            for field, value in params.items()
             if field in allowed_filters and value
         }
 
         queryset = (
-                Opportunity.objects
-                .filter(**filters)
-                .select_related("customer", "employee")
-                .prefetch_related(
-                    "customer__contacts",
-                    "customer__notes",
-                    "customer__interactions",
-                )
+            Opportunity.objects
+            .filter(**filters)
+            .select_related(
+                "customer",
+                "customer__lead_source",
+                "employee",
             )
+            .prefetch_related(
+                "customer__contacts",
+                "customer__notes",
+                "customer__notes__employee",
+                "customer__interactions",
+                "customer__interactions__employee",
+            )
+        )
 
         # Ordering
         allowed_ordering = {
@@ -546,34 +557,44 @@ class GetOpportunities(APIView):
             "-expected_close_date",
             "probability",
             "-probability",
+            "created_at",
+            "-created_at",
         }
 
-        ordering = request_parameters.get("ordering", "-opportunity_id")
+        ordering = params.get("ordering", "-created_at")
+
         if ordering in allowed_ordering:
             queryset = queryset.order_by(ordering)
 
-
+        # Pagination
         paginator = PageNumberPagination()
         paginator.page_size = 10
         paginator.page_size_query_param = "page_size"
         paginator.max_page_size = 100
 
-        page = paginator.paginate_queryset(queryset, request)
+        page = paginator.paginate_queryset(
+            queryset, request, view=self
+        )
 
         opportunities = []
 
         for opportunity in page:
             customer = opportunity.customer
             employee = opportunity.employee
+            lead_source = customer.lead_source
 
             opportunities.append({
                 "opportunity_id": opportunity.opportunity_id,
                 "title": opportunity.title,
                 "estimated_value": opportunity.estimated_value,
+                "currency": opportunity.currency,
                 "stage": opportunity.stage,
                 "probability": opportunity.probability,
                 "expected_close_date": opportunity.expected_close_date,
                 "status": opportunity.status,
+                "lost_reason": opportunity.lost_reason,
+                "created_at": opportunity.created_at,
+                "closed_at": opportunity.closed_at,
 
                 "customer": {
                     "customer_id": customer.customer_id,
@@ -584,46 +605,71 @@ class GetOpportunities(APIView):
                     "company_name": customer.company_name,
                     "email": customer.email,
                     "address": customer.address,
-                    "campaign": customer.campaign,
+
+                    "lead_source": (
+                        {
+                            "source_id": lead_source.source_id,
+                            "name": lead_source.name,
+                        }
+                        if lead_source else None
+                    ),
+
                     "created_at": customer.created_at,
                     "updated_at": customer.updated_at,
 
-                    "contacts": list(
-                        customer.contacts.values(
-                            "contact_id",
-                            "name",
-                            "job_title",
-                            "email",
-                            "phone",
-                            "is_primary",
-                        )
-                    ),
+                    "contacts": [
+                        {
+                            "contact_id": contact.contact_id,
+                            "name": contact.name,
+                            "job_title": contact.job_title,
+                            "email": contact.email,
+                            "phone": contact.phone,
+                            "is_primary": contact.is_primary,
+                        }
+                        for contact in customer.contacts.all()
+                    ],
 
-                    "notes": list(
-                        customer.notes.values(
-                            "note_id",
-                            "employee_id",
-                            "note_text",
-                            "created_at",
-                        )
-                    ),
+                    "notes": [
+                        {
+                            "note_id": note.note_id,
+                            "employee_id": note.employee_id,
+                            "employee_name": (
+                                f"{note.employee.first_name} "
+                                f"{note.employee.last_name}"
+                            ),
+                            "note_text": note.note_text,
+                            "created_at": note.created_at,
+                        }
+                        for note in customer.notes.all()
+                    ],
 
-                    "interactions": list(
-                        customer.interactions.values(
-                            "interaction_id",
-                            "employee_id",
-                            "type",
-                            "subject",
-                            "description",
-                            "interaction_date",
-                        )
-                    ),
+                    "interactions": [
+                        {
+                            "interaction_id": interaction.interaction_id,
+                            "employee_id": interaction.employee_id,
+                            "employee_name": (
+                                f"{interaction.employee.first_name} "
+                                f"{interaction.employee.last_name}"
+                            ),
+                            "type": interaction.type,
+                            "subject": interaction.subject,
+                            "description": interaction.description,
+                            "interaction_date": interaction.interaction_date,
+                            "contact_id": interaction.contact_id,
+                            "opportunity_id": interaction.opportunity_id,
+                        }
+                        for interaction in opportunity.interactions.select_related(
+                            "employee", "contact"
+                        ).all()
+                    ],
                 },
 
                 "employee": {
                     "employee_id": employee.employee_id,
-                    "employee_name": employee.first_name + " " + employee.last_name
+                    "employee_name": (
+                        f"{employee.first_name} {employee.last_name}"
+                    ),
                 },
             })
 
-        return paginator.get_paginated_response(opportunities)    
+        return paginator.get_paginated_response(opportunities)   
