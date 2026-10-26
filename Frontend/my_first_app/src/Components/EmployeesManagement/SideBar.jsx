@@ -99,7 +99,6 @@ function SideBar({ collapsed, onToggle, darkMode, onToggleDark }) {
       </nav>
 
       <div className="profile-card">
-        <img src={avatar} alt={userName} />
 
         <div className="profile-info">
           <strong>{userName}</strong>
