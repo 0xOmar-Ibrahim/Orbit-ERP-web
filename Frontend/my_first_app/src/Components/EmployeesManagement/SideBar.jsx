@@ -9,7 +9,6 @@ import {
 } from "react-icons/fi";
 import { FaUsers } from "react-icons/fa";
 import logo from "../../Images/Logo.jpg";
-import avatar from "../../Images/avatar.jpg";
 import "./EmployeesPage.css";
 import { useNavigate } from "react-router-dom";
 
@@ -99,7 +98,6 @@ function SideBar({ collapsed, onToggle, darkMode, onToggleDark }) {
       </nav>
 
       <div className="profile-card">
-        <img src={avatar} alt={userName} />
 
         <div className="profile-info">
           <strong>{userName}</strong>
