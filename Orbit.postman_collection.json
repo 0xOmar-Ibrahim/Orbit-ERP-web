@@ -370,12 +370,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_18za}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"first_name\":\"Abdo\",\r\n    \"last_name\":\"Mostafa\",\r\n    \"role\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"10340056789\",\r\n    \"phone\":\"01000000000\",\r\n    \"work_email\":\"o6ma__r@example.com\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\",\r\n    \"password\":\"123456\",\r\n    \"department_id\": 1,\r\n    \"manager_id\":1,\r\n    \"position_id\":1,\r\n    \"schedule_id\":1,\r\n    \"branch_id\":1\r\n}",
+                  "raw": "{\r\n    \"first_name\":\"Abdo\",\r\n    \"last_name\":\"Mostafa\",\r\n    \"role\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"103400500789\",\r\n    \"phone\":\"01000000000\",\r\n    \"work_email\":\"o6ma_r@example.com\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\",\r\n    \"password\":\"123456\",\r\n    \"department_id\": 1,\r\n    \"manager_id\":1,\r\n    \"position_id\":1,\r\n    \"schedule_id\":1,\r\n    \"branch_id\":1\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -483,7 +483,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_13vd}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "url": {
@@ -512,7 +512,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0jl2}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "url": {
@@ -547,12 +547,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_18za}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"request_id\":60,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"103066900729\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\",\r\n    \"department_id\": 1,\r\n    \"manager_id\":1,\r\n    \"position_id\":1,\r\n    \"schedule_id\":1,\r\n    \"branch_id\":1\r\n}",
+                  "raw": "{\r\n    \"request_id\":65,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"1030699900729\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\",\r\n    \"department_id\": 1,\r\n    \"manager_id\":1,\r\n    \"position_id\":1,\r\n    \"schedule_id\":1,\r\n    \"branch_id\":1\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -596,12 +596,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0a52}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"email\":\"omaribrahimtbdc@gmail.com\"\r\n}",
+                  "raw": "",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -633,12 +633,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0a52}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"first_name\": \"Abdelrahman\",\r\n    \"last_name\": \"Mostafa\",\r\n    \"phone\": \"1000245\",\r\n    \"company_name\": \"Teleperformance\",\r\n    \"email\": \"Abdo@gmail.com\",\r\n    \"address\":\"Cairo\",\r\n    \"lead_source_id\": \"UnKnown\"\r\n}",
+                  "raw": "{\r\n    \"first_name\": \"Abdelrahman_3\",\r\n    \"last_name\": \"Mostafa\",\r\n    \"phone\": \"1000245\",\r\n    \"company_name\": \"Teleperformance\",\r\n    \"email\": \"Abdo@gmail.com\",\r\n    \"address\":\"Cairo\",\r\n    \"lead_source_id\": 1\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -749,7 +749,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0a52}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "url": {
@@ -778,12 +778,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"customer_id\": 1,\r\n    \"name\":\"phone\",\r\n    \"job_title\": \"HR Manager\",\r\n    \"email\": \"omar@example.com\",\r\n    \"phone\": \"01144130977\",\r\n    \"is_primary\": true\r\n}",
+                  "raw": "{\r\n    \"customer_id\": 1,\r\n    \"name\":\"phone\",\r\n    \"job_title\": \"HR Manager\",\r\n    \"email\": \"omar@example.com\",\r\n    \"phone\": \"01144130977\",\r\n    \"is_primary\": false\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -897,7 +897,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0a52}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "url": {
@@ -926,12 +926,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0a52}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"type\": \"meeting\",\r\n    \"subject\": \"Requirements analysis\",\r\n    \"description\": \"To fetch the reqs\",\r\n    \"interaction_date\": \"2006-10-14\",\r\n    \"customer_id\": 1,\r\n    \"employee_id\": 22,\r\n    \"contact_id\": 7,\r\n    \"opportunity_id\": 2\r\n    \r\n}",
+                  "raw": "{\r\n    \"type\": \"meeting\",\r\n    \"subject\": \"Requirements analysis By Omar\",\r\n    \"description\": \"To fetch the reqs\",\r\n    \"interaction_date\": \"2006-10-14\",\r\n    \"customer_id\": 1,\r\n    \"employee_id\": 22,\r\n    \"contact_id\": 7,\r\n    \"opportunity_id\": 1\r\n    \r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1036,13 +1036,161 @@
           ]
         },
         {
+          "name": "Lead-Source",
+          "item": [
+            {
+              "name": "get Lead-Sources",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_0zk8}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/lead-sources/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "lead-sources",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "add Lead-Source",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_0zk8}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Website\",\r\n    \"description\": \"Leads acquired through the company website\",\r\n    \"is_active\": true\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/lead-sources/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "lead-sources",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Edit Lead-Source",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_0zk8}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"source_id\": 1,\r\n    \"name\": \"Full-Stack\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/lead-sources/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "lead-sources",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Del Lead-Source",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_0zk8}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"source_id\": 1\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/lead-sources/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "lead-sources",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
           "name": "GetOpportunities",
           "request": {
             "method": "GET",
             "header": [
               {
                 "key": "Authorization",
-                "value": "{{bearer_token_0a52}}"
+                "value": "{{bearer_token_0zk8}}"
               }
             ],
             "url": {
@@ -1186,6 +1334,18 @@
     },
     {
       "key": "bearer_token_18za",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0zk8",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_14xz",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0iwq",
       "secret": true
     }
   ]

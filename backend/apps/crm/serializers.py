@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Customer, Contact, Interaction, Opportunity, CustomerNote
+from .models import Customer, Contact, Interaction, Opportunity, CustomerNote, LeadSource
 from apps.accounts.models import Employee
 from apps.helpers import generate_code
 
@@ -218,6 +218,10 @@ class CustomerNoteSerializer(serializers.ModelSerializer):
 
 
 class AddCustomerSerializer(serializers.ModelSerializer):
+    lead_source_id = serializers.PrimaryKeyRelatedField(
+        queryset=LeadSource.objects.all(),
+        source="lead_source",
+    )
     class Meta:
         model = Customer
         fields = [
@@ -372,3 +376,24 @@ class UpdateInteractionSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         return data
+
+class AddLeadSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeadSource
+        fields = [
+            "name",
+            "description",
+            "is_active",
+        ]
+
+
+class UpdateLeadSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeadSource
+        fields = [
+            "source_id",
+            "name",
+            "description",
+            "is_active",
+        ]
+        read_only_fields = ["source_id"]
