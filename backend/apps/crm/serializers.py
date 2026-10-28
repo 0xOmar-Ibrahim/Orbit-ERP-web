@@ -307,7 +307,7 @@ class AddCustomerSerializer(serializers.ModelSerializer):
         return new_customer
 
 
-class UpdateCustomerSerializer(CustomerRelationsMixin, serializers.ModelSerializer):
+class UpdateCustomerSerializer(serializers.ModelSerializer):
     customer_code = serializers.CharField(read_only=True)
 
     class Meta:
