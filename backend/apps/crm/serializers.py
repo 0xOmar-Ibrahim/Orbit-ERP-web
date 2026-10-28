@@ -1,6 +1,6 @@
 from django.utils import timezone
 from rest_framework import serializers
-from .models import LeadSource, Customer, Contact, Interaction, Opportunity, CustomerNote
+from .models import Customer, Contact, Interaction, Opportunity, CustomerNote, LeadSource
 from apps.accounts.models import Employee
 from apps.helpers import generate_code
 
@@ -278,23 +278,11 @@ class CustomerNoteSerializer(serializers.ModelSerializer):
         return rep
 
 
-class CustomerRelationsMixin(serializers.Serializer):
-    # Only active lead sources can be assigned to a customer
+class AddCustomerSerializer(serializers.ModelSerializer):
     lead_source_id = serializers.PrimaryKeyRelatedField(
-        queryset=LeadSource.objects.filter(is_active=True),
+        queryset=LeadSource.objects.all(),
         source="lead_source",
-        required=False,
-        allow_null=True,
     )
-    assigned_employee_id = serializers.PrimaryKeyRelatedField(
-        queryset=Employee.objects.all(),
-        source="assigned_employee",
-        required=False,
-        allow_null=True,
-    )
-
-
-class AddCustomerSerializer(CustomerRelationsMixin, serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = [
@@ -474,3 +462,27 @@ class UpdateInteractionSerializer(InteractionRelationsMixin, serializers.ModelSe
             "contact_id",
             "opportunity_id"
         ]
+
+    def validate(self, data):
+        return data
+
+class AddLeadSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeadSource
+        fields = [
+            "name",
+            "description",
+            "is_active",
+        ]
+
+
+class UpdateLeadSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeadSource
+        fields = [
+            "source_id",
+            "name",
+            "description",
+            "is_active",
+        ]
+        read_only_fields = ["source_id"]

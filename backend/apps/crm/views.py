@@ -5,7 +5,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view
 from .pagination import PageNumberPagination
-from .models import LeadSource, Opportunity, Customer, Contact, Interaction, CustomerNote
+from .models import Opportunity, Customer, Contact, Interaction, CustomerNote, LeadSource
+
 from .serializers import (
     LeadSourceSerializer,
     OpportunitySerializer,
@@ -16,6 +17,8 @@ from .serializers import (
     UpdateContactSerializer,
     AddInteractionSerializer,
     UpdateInteractionSerializer,
+    AddLeadSourceSerializer,
+    UpdateLeadSourceSerializer
 )
 
 
@@ -741,3 +744,107 @@ class GetOpportunities(APIView):
             })
 
         return paginator.get_paginated_response(opportunities)   
+
+
+class LeadSourceManagement(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        request_parameters = request.query_params
+
+        allowed_filters = {
+            "source_id",
+            "name",
+            "description",
+            "is_active",
+        }
+
+        filters = {
+            field: value
+            for field, value in request_parameters.items()
+            if field in allowed_filters and value
+        }
+
+        try:
+            lead_sources = [
+                {
+                    **source,
+                }
+                for source in LeadSource.objects.values(
+                    "source_id",
+                    "name",
+                    "description",
+                    "is_active",
+                ).filter(**filters)
+            ]
+        except Exception:
+            return Response(
+                {"error": "Invalid data entered."},
+                status=400,
+            )
+
+        return Response({"LeadSources": lead_sources})
+
+    def post(self, request):
+        serializer = AddLeadSourceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            {"message": "Lead source added successfully."},
+            status=201,
+        )
+
+    def patch(self, request):
+        source_id = request.data.get("source_id")
+
+        if not source_id:
+            return Response(
+                {"error": "Lead source ID is required."},
+                status=400,
+            )
+
+        try:
+            lead_source = LeadSource.objects.get(source_id=source_id)
+        except LeadSource.DoesNotExist:
+            return Response(
+                {"error": "Lead source not found."},
+                status=404,
+            )
+
+        serializer = UpdateLeadSourceSerializer(
+            lead_source,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            {"message": "Lead source updated successfully."},
+            status=200,
+        )
+
+    def delete(self, request):
+        source_id = request.data.get("source_id")
+
+        if not source_id:
+            return Response(
+                {"error": "Lead source ID is required."},
+                status=400,
+            )
+
+        try:
+            lead_source = LeadSource.objects.get(source_id=source_id)
+        except LeadSource.DoesNotExist:
+            return Response(
+                {"error": "Lead source not found."},
+                status=404,
+            )
+
+        lead_source.delete()
+
+        return Response(
+            {"message": "Lead source deleted successfully."},
+            status=200,
+        )
