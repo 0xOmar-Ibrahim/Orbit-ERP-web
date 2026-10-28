@@ -599,6 +599,15 @@ class GetOpportunities(APIView):
             if field in allowed_filters and value
         }
 
+        for field in ("opportunity_id", "customer_id", "employee_id"):
+            if field in filters and not is_valid_id(filters[field]):
+                return Response({"error": f"{field} must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Stored stage/status values are lowercase
+        for field in ("stage", "status"):
+            if field in filters:
+                filters[field] = filters[field].lower()
+
         queryset = (
             Opportunity.objects
             .filter(**filters)

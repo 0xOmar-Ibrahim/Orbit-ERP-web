@@ -69,12 +69,12 @@ class AddEmployeeSerializer(serializers.ModelSerializer):
                     employee_code = generate_code()
                 else:
                     break
-            print(employee_code)
             employee = Employee.objects.create(
             **validated_data,
             employee_code=employee_code,
             )
-            employee.set_password(make_password(password))
+            # set_password hashes it; passing an already-hashed value would hash it twice
+            employee.set_password(password)
 
             employee.save()
 
