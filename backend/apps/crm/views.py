@@ -1,3 +1,4 @@
+from django.db.models import ProtectedError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -5,7 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view
 from .pagination import PageNumberPagination
 from .models import Opportunity, Customer, Contact, Interaction, CustomerNote, LeadSource
+
 from .serializers import (
+    LeadSourceSerializer,
     OpportunitySerializer,
     CustomerNoteSerializer,
     AddCustomerSerializer,
@@ -149,6 +152,63 @@ class OpportunityView(APIView):
         return Response({"message": "Opportunity deleted successfully."}, status=status.HTTP_200_OK)
 
 
+class LeadSourceManagement(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        queryset = LeadSource.objects.order_by("name")
+
+        is_active = request.query_params.get("is_active")
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() in ("true", "1"))
+
+        return Response({"LeadSources": LeadSourceSerializer(queryset, many=True).data})
+
+    def post(self, request):
+        serializer = LeadSourceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        lead_source = serializer.save()
+
+        return Response({
+            "message": "Lead source added successfully.",
+            "lead_source": LeadSourceSerializer(lead_source).data,
+        }, status=status.HTTP_201_CREATED)
+
+    def patch(self, request):
+        source_id = request.data.get("source_id")
+        if not source_id:
+            return Response({"error": "source_id is required."}, status=400)
+        if not is_valid_id(source_id):
+            return Response({"error": "source_id must be an integer."}, status=400)
+
+        try:
+            lead_source = LeadSource.objects.get(source_id=source_id)
+        except LeadSource.DoesNotExist:
+            return Response({"error": "Lead source not found."}, status=404)
+
+        serializer = LeadSourceSerializer(lead_source, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({"message": "Lead source updated successfully."})
+
+    def delete(self, request):
+        # Prefer PATCH is_active=false to retire a source; deleting it clears it from its customers
+        source_id = request.data.get("source_id")
+        if not source_id:
+            return Response({"error": "source_id is required."}, status=400)
+        if not is_valid_id(source_id):
+            return Response({"error": "source_id must be an integer."}, status=400)
+
+        try:
+            lead_source = LeadSource.objects.get(source_id=source_id)
+        except LeadSource.DoesNotExist:
+            return Response({"error": "Lead source not found."}, status=404)
+
+        lead_source.delete()
+        return Response({"message": "Lead source deleted successfully."})
+
+
 class CustomerManagement(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -164,7 +224,8 @@ class CustomerManagement(APIView):
             "company_name",
             "email",
             "address",
-            "lead_source_id"
+            "lead_source_id",
+            "assigned_employee_id"
         }
 
         filters = {
@@ -187,6 +248,7 @@ class CustomerManagement(APIView):
                     "email",
                     "address",
                     "lead_source_id",
+                    "assigned_employee_id",
                     "created_at",
                     "updated_at"
                 ).filter(**filters)
@@ -229,7 +291,14 @@ class CustomerManagement(APIView):
         except Customer.DoesNotExist:
             return Response({"error": "Customer not found."}, status=404)
 
-        customer.delete()
+        try:
+            customer.delete()
+        except ProtectedError:
+            # Opportunity.customer is PROTECT: deals must be handled before the customer is removed
+            return Response(
+                {"error": "Customer has opportunities. Delete or reassign them before deleting the customer."},
+                status=409,
+            )
         return Response({"message": "Customer deleted successfully."})
 
 
