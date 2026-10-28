@@ -43,18 +43,6 @@ class Customer(models.Model):
         db_column="lead_source_id",
     )
 
-    # ABO ELNOUR: assigned_employee links a responsible sales representative to the customer.
-    # Required for commission calculation and rep-level data filtering.
-    # SET_NULL so that removing an employee does not delete customer records.
-    assigned_employee = models.ForeignKey(
-        "accounts.Employee",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="assigned_customers",
-        db_column="assigned_employee_id",
-    )
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

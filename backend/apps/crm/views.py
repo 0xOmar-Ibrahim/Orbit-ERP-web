@@ -225,7 +225,6 @@ class CustomerManagement(APIView):
             "email",
             "address",
             "lead_source_id",
-            "assigned_employee_id"
         }
 
         filters = {
@@ -248,7 +247,6 @@ class CustomerManagement(APIView):
                     "email",
                     "address",
                     "lead_source_id",
-                    "assigned_employee_id",
                     "created_at",
                     "updated_at"
                 ).filter(**filters)
