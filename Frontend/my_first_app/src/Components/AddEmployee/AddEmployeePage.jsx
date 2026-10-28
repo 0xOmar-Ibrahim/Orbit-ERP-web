@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState} from "react";
 import { useNavigate } from "react-router-dom";
-import { authFetch } from "../../Utils/authFetch";
+import { authFetch } from "../../Services/authFetch";
 import {
   FiUserPlus,
   FiPhone,
@@ -14,6 +14,7 @@ import {
 } from "react-icons/fi";
 import { FaVenusMars, FaRegIdCard } from "react-icons/fa";
 import "./AddEmployeePage.css";
+
 
 const THIS_YEAR = new Date().getFullYear();
 const range = (from, to) =>
@@ -166,6 +167,10 @@ function AddEmployeePage() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [darkMode] = useState(
+    () => localStorage.getItem("orbitLoginTheme") === "dark"
+  );
+  
   const roles = ROLES;
   const navigate = useNavigate();
 
@@ -173,6 +178,8 @@ function AddEmployeePage() {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
+
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -257,7 +264,8 @@ function AddEmployeePage() {
   };
 
   return (
-    <div className="ae-page">
+      <div className={`app-shell ${darkMode ? "dark" : ""}`}>
+        <main className={`ae-page ${darkMode ? "dark" : ""}`}>
       <header className="ae-header">
         <FiUserPlus className="ae-header-icon" />
         <div>
@@ -490,7 +498,9 @@ function AddEmployeePage() {
           </button>
         </div>
       </form>
-    </div>
+      </main>
+  </div>
   );
 }
+
 export default AddEmployeePage;

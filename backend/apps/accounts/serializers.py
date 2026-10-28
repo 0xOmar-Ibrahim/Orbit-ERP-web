@@ -26,7 +26,7 @@ class LoginSerializer(serializers.Serializer):
         try:
             employee = Employee.objects.get(work_email=attrs["email"])
         except Employee.DoesNotExist:
-            raise NotAuthenticated("Invalid email or password.")
+            raise NotAuthenticated("Account not Found.")
 
         # Check hashed password
         if not employee.password or not check_password(attrs["password"], employee.password):
