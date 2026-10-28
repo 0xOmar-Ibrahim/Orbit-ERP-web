@@ -54,7 +54,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"first_name\":\"Omar\",\r\n    \"last_name\":\"ahmed\",\r\n    \"work_email\":\"-9@gmail.com\",\r\n    \"password\":12345678\r\n}",
+                  "raw": "{\r\n    \"first_name\":\"Omar\",\r\n    \"last_name\":\"ahmed\",\r\n    \"work_email\":\"omar1222_122@gmail.com\",\r\n    \"password\":12345678\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -370,12 +370,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0219}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"first_name\":\"Rana\",\r\n    \"last_name\":\"Ibrahim\",\r\n    \"role\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"1034456789\",\r\n    \"phone\":\"01000000000\",\r\n    \"work_email\":\"o6ma4r@example.com\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\",\r\n    \"password\":\"123456\"\r\n}",
+                  "raw": "{\r\n    \"first_name\":\"Abdo\",\r\n    \"last_name\":\"Mostafa\",\r\n    \"role\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"103400500789\",\r\n    \"phone\":\"01000000000\",\r\n    \"work_email\":\"o6ma_r@example.com\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\",\r\n    \"password\":\"123456\",\r\n    \"department_id\": 1,\r\n    \"manager_id\":1,\r\n    \"position_id\":1,\r\n    \"schedule_id\":1,\r\n    \"branch_id\":1\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -383,7 +383,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/admin/employees",
+                  "raw": "http://127.0.0.1:8000/admin/employee/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -394,7 +394,8 @@
                   "port": "8000",
                   "path": [
                     "admin",
-                    "employees"
+                    "employee",
+                    ""
                   ]
                 }
               },
@@ -482,11 +483,11 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_1axj}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/admin/employee/?first_name=omar",
+                  "raw": "http://127.0.0.1:8000/admin/employee/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -499,12 +500,6 @@
                     "admin",
                     "employee",
                     ""
-                  ],
-                  "query": [
-                    {
-                      "key": "first_name",
-                      "value": "omar"
-                    }
                   ]
                 }
               },
@@ -517,7 +512,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0jl2}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "url": {
@@ -552,12 +547,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0565}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"request_id\":59,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"103001103729\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\"\r\n}",
+                  "raw": "{\r\n    \"request_id\":65,\r\n    \"role_id\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"1030699900729\",\r\n    \"phone\":\"01000000000\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\",\r\n    \"department_id\": 1,\r\n    \"manager_id\":1,\r\n    \"position_id\":1,\r\n    \"schedule_id\":1,\r\n    \"branch_id\":1\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -601,20 +596,11 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTU2MjYyLCJpYXQiOjE3OTIxNTI2NjIsImp0aSI6ImE2MmFkODViZDg2NDQyMjhhODhjYzQ5NWYzMGUxODUxIiwidXNlcl9pZCI6IjEifQ.X_Q4Ttt_rJMeskZkoMxBtVKfIfykZbE7Yl9YiVrFj20"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"email\":\"omaribrahimtbdc@gmail.com\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customers",
+                  "raw": "http://127.0.0.1:8000/crm/customers/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -625,7 +611,8 @@
                   "port": "8000",
                   "path": [
                     "crm",
-                    "customers"
+                    "customers",
+                    ""
                   ]
                 }
               },
@@ -638,12 +625,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_109l}}"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"first_name\": \"Ahmed\",\r\n    \"last_name\": \"Nasser\",\r\n    \"phone\": \"1000245\",\r\n    \"company_name\": \"PWC\",\r\n    \"email\": \"ahmed@gmail.com\",\r\n    \"address\":\"Cairo\",\r\n    \"campaign\": \"UnKnown\"\r\n}",
+                  "raw": "{\r\n    \"first_name\": \"Abdelrahman_3\",\r\n    \"last_name\": \"Mostafa\",\r\n    \"phone\": \"1000245\",\r\n    \"company_name\": \"Teleperformance\",\r\n    \"email\": \"Abdo@gmail.com\",\r\n    \"address\":\"Cairo\",\r\n    \"lead_source_id\": 1\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -675,12 +662,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_109l}}"
+                    "value": "{{bearer_token_0a52}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"customer_code\": \"CUS-2026-5107\",\r\n    \"first_name\": \"Mostafa\"\r\n}",
+                  "raw": "{\r\n    \"customer_code\": \"CUS-2026-8371\",\r\n    \"first_name\": \"Ali\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -754,7 +741,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "url": {
@@ -783,12 +770,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"customer_id\": 1,\r\n    \"name\":\"phone\",\r\n    \"job_title\": \"HR Manager\",\r\n    \"email\": \"omar@example.com\",\r\n    \"phone\": \"01144130977\",\r\n    \"is_primary\": true\r\n}",
+                  "raw": "{\r\n    \"customer_id\": 1,\r\n    \"name\":\"phone\",\r\n    \"job_title\": \"HR Manager\",\r\n    \"email\": \"omar@example.com\",\r\n    \"phone\": \"01144130977\",\r\n    \"is_primary\": false\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -902,7 +889,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "url": {
@@ -931,12 +918,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                    "value": "{{bearer_token_0zk8}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"type\": \"meeting\",\r\n    \"subject\": \"Requirements analysis\",\r\n    \"description\": \"To fetch the reqs\",\r\n    \"interaction_date\": \"2006-10-14\",\r\n    \"customer_id\": 1,\r\n    \"employee_id\": 22\r\n}",
+                  "raw": "{\r\n    \"type\": \"meeting\",\r\n    \"subject\": \"Requirements analysis By Omar\",\r\n    \"description\": \"To fetch the reqs\",\r\n    \"interaction_date\": \"2006-10-14\",\r\n    \"customer_id\": 1,\r\n    \"employee_id\": 22,\r\n    \"contact_id\": 7,\r\n    \"opportunity_id\": 1\r\n    \r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -969,12 +956,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                    "value": "{{bearer_token_0a52}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"interaction_id\": 1,\r\n    \"type\": \"call\"\r\n}\r\n",
+                  "raw": "{\r\n    \"interaction_id\": 8,\r\n    \"type\": \"call\"\r\n}\r\n",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1007,12 +994,12 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTY5NjYxLCJpYXQiOjE3OTIxNjYwNjEsImp0aSI6IjEwMTdjNjJiZDUzYjQ4NTRiY2NjYWMzNTNhZDRhNTAwIiwidXNlcl9pZCI6IjEifQ.Bj6jxyAbTDsXV0RwD3arCM3KNJZcCMiTXK22W2K1rP0"
+                    "value": "{{bearer_token_0a52}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n\r\n    \"interaction_id\": 1\r\n    \r\n}",
+                  "raw": "{\r\n\r\n    \"interaction_id\": 8\r\n    \r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1041,13 +1028,161 @@
           ]
         },
         {
+          "name": "Lead-Source",
+          "item": [
+            {
+              "name": "get Lead-Sources",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_0zk8}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/lead-sources/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "lead-sources",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "add Lead-Source",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_0zk8}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Website\",\r\n    \"description\": \"Leads acquired through the company website\",\r\n    \"is_active\": true\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/lead-sources/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "lead-sources",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Edit Lead-Source",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_0zk8}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"source_id\": 1,\r\n    \"name\": \"Full-Stack\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/lead-sources/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "lead-sources",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Del Lead-Source",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{bearer_token_0zk8}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"source_id\": 1\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/lead-sources/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "lead-sources",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
           "name": "GetOpportunities",
           "request": {
             "method": "GET",
             "header": [
               {
                 "key": "Authorization",
-                "value": "{{bearer_token_0vko}}"
+                "value": "{{bearer_token_0zk8}}"
               }
             ],
             "url": {
@@ -1175,6 +1310,34 @@
     },
     {
       "key": "bearer_token_0vko",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_13vd",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0a52",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0uxq",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_18za",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0zk8",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_14xz",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_0iwq",
       "secret": true
     }
   ]

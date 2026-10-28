@@ -7,11 +7,14 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from apps.accounts.serializers import LoginSerializer
 from apps.accounts.views import LoginThrottle
+from apps.accounts.models import Branch
+from apps.hr.models import Department, JobPosition, WorkSchedule
 from .serializers import AddEmployeeSerializer, UpdateEmployeeSerializer
 from django.db import transaction
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from ..helpers import generate_code, IsAdministratorUser
+from rest_framework.exceptions import APIException
 
 class Employees(APIView):
     permission_classes = [IsAuthenticated, IsAdministratorUser]  # must be open, the user isn't logged in yet
@@ -31,7 +34,12 @@ class Employees(APIView):
             "gender",
             "employment_status",
             "employment_type",
-            "hire_date"
+            "hire_date",
+            "department_id",
+            "manager_id",
+            "position_id",
+            "schedule_id",
+            "branch_id"
         }
 
         filters = {
@@ -59,6 +67,11 @@ class Employees(APIView):
                                 "employment_status",
                                 "employment_type",
                                 "hire_date",
+                                "department_id",
+                                "manager_id",
+                                "position_id",
+                                "schedule_id",
+                                "branch_id"
                             ).filter(**filters)
                         ]
         except:
@@ -224,7 +237,11 @@ class ApproveRegistrationView(APIView):
         address = request.data.get("address")
         hire_date = request.data.get("hire_date")
         employee_type = request.data.get("employment_type")
-
+        department_id = request.data.get("department_id")
+        manager_id = request.data.get("manager_id")
+        position_id = request.data.get("position_id")
+        schedule_id = request.data.get("schedule_id")
+        branch_id = request.data.get("branch_id")
         
         employee_code = generate_code()
 
@@ -261,33 +278,105 @@ class ApproveRegistrationView(APIView):
                     status=status.HTTP_409_CONFLICT,
                 )
 
-        # Add any other required Employee fields from your model here.
-        employee = Employee(
-            employee_code=employee_code,
-            first_name=registration.first_name,
-            last_name=registration.last_name,
-            work_email=registration.work_email,
-            role=role,
-            sso_issuer=registration.sso_issuer,
-            sso_subject=registration.sso_subject,
-            sso_enabled=True if registration.registration_method == "sso" else False,
-            employment_status="active",
-            date_of_birth=date_of_birth,
-            gender=gender,
-            national_id=national_id,
-            phone=phone,
-            address=address,
-            hire_date=hire_date,
-            employment_type=employee_type
-        )
+        if national_id:
+            if Employee.objects.filter(
+                national_id=national_id
+            ).exists():
+                return Response(
+                    {
+                        "message": "Employee with same national ID is already exist.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-        if registration.registration_method == "sso":
-            # SSO users do not need a local password.
-            employee.set_unusable_password()
-        else: 
-           employee.password = registration.password
+        if department_id:
+            if not Department.objects.filter(
+                department_id=department_id
+            ).exists():
+                return Response(
+                    {
+                        "message": "The selected department does not exist.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        if manager_id:
+            if not Employee.objects.filter(
+                employee_id=manager_id
+            ).exists():
+                return Response(
+                    {
+                        "message": "The selected Manager does not exist.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        if position_id:
+            if not JobPosition.objects.filter(
+                position_id=position_id
+            ).exists():
+                return Response(
+                    {
+                        "message": "The selected Position does not exist.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-        employee.save()
+        if schedule_id:
+            if not WorkSchedule.objects.filter(
+                schedule_id=schedule_id
+            ).exists():
+                return Response(
+                    {
+                        "message": "The selected Schedule does not exist.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        if branch_id:
+            if not Branch.objects.filter(
+                branch_id=branch_id
+            ).exists():
+                return Response(
+                    {
+                        "message": "The selected Branch does not exist.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        try:
+            # Add any other required Employee fields from your model here.
+            employee = Employee(
+                employee_code=employee_code,
+                first_name=registration.first_name,
+                last_name=registration.last_name,
+                work_email=registration.work_email,
+                role=role,
+                sso_issuer=registration.sso_issuer,
+                sso_subject=registration.sso_subject,
+                sso_enabled=True if registration.registration_method == "sso" else False,
+                employment_status="active",
+                date_of_birth=date_of_birth,
+                gender=gender,
+                national_id=national_id,
+                phone=phone,
+                address=address,
+                hire_date=hire_date,
+                employment_type=employee_type,
+                department_id=department_id,
+                manager_id=manager_id,
+                position_id=position_id,
+                schedule_id=schedule_id,
+                branch_id=branch_id
+            )
+
+            if registration.registration_method == "sso":
+                # SSO users do not need a local password.
+                employee.set_unusable_password()
+            else: 
+                employee.password = registration.password
+
+            employee.save()
+        except:
+            raise APIException(
+                "Employee could not be created because of a data constraint."
+            )
 
         registration.status = "approved"
         registration.reviewed_by = request.user

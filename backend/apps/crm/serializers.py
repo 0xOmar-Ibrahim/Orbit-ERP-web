@@ -1,7 +1,21 @@
+from django.utils import timezone
 from rest_framework import serializers
-from .models import Customer, Contact, Interaction, Opportunity, CustomerNote
+from .models import Customer, Contact, Interaction, Opportunity, CustomerNote, LeadSource
 from apps.accounts.models import Employee
 from apps.helpers import generate_code
+
+
+class LeadSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeadSource
+        fields = ["source_id", "name", "description", "is_active"]
+        read_only_fields = ["source_id"]
+
+    def validate_name(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("Name cannot be blank.")
+        return value
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -30,24 +44,21 @@ class OpportunitySerializer(serializers.ModelSerializer):
         required=False,
         default=0.00,
     )
+    # probability, stage and status have no serializer defaults so validate() can tell
+    # which ones the client actually sent; the model defaults apply otherwise
     probability = serializers.IntegerField(
         min_value=0,
         max_value=100,
         required=False,
-        default=0,
     )
     expected_close_date = serializers.DateField(
         required=False,
         allow_null=True,
     )
-    stage = serializers.CharField(
-        required=False,
-        default=Opportunity.Stage.LEAD,
-    )
-    status = serializers.CharField(
-        required=False,
-        default=Opportunity.Status.OPEN,
-    )
+    stage = serializers.CharField(required=False)
+    status = serializers.CharField(required=False)
+    currency = serializers.CharField(required=False, max_length=3)
+    lost_reason = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = Opportunity
@@ -55,10 +66,14 @@ class OpportunitySerializer(serializers.ModelSerializer):
             "opportunity_id",
             "title",
             "estimated_value",
+            "currency",
             "stage",
             "probability",
             "expected_close_date",
             "status",
+            "lost_reason",
+            "created_at",
+            "closed_at",
             "customer_id",
             "employee_id",
             "customer",
@@ -66,7 +81,7 @@ class OpportunitySerializer(serializers.ModelSerializer):
             "customer_details",
             "employee_details",
         ]
-        read_only_fields = ["opportunity_id", "customer", "employee"]
+        read_only_fields = ["opportunity_id", "customer", "employee", "created_at", "closed_at"]
 
     def get_customer_details(self, obj):
         try:
@@ -107,10 +122,12 @@ class OpportunitySerializer(serializers.ModelSerializer):
         # Handle empty string inputs from forms for nullable/default fields
         if data.get("expected_close_date") == "":
             data["expected_close_date"] = None
-        if data.get("estimated_value") == "" or data.get("estimated_value") is None:
+        # Only touch keys that were sent, so a partial update doesn't reset them
+        if "estimated_value" in data and data["estimated_value"] in ("", None):
             data["estimated_value"] = 0
-        if data.get("probability") == "" or data.get("probability") is None:
-            data["probability"] = 0
+        if "probability" in data and data["probability"] in ("", None):
+            # Blank probability means "use the stage default"
+            data.pop("probability")
 
         # Normalize string choices
         if "stage" in data and isinstance(data["stage"], str):
@@ -137,6 +154,50 @@ class OpportunitySerializer(serializers.ModelSerializer):
                 f"Invalid status '{value}'. Valid choices are: {', '.join(valid_statuses)}."
             )
         return val
+
+    def validate_currency(self, value):
+        value = value.strip().upper()
+        if len(value) != 3 or not value.isalpha():
+            raise serializers.ValidationError("Currency must be a 3-letter code, e.g. EGP or USD.")
+        return value
+
+    def validate(self, attrs):
+        instance = self.instance
+        Stage, Status = Opportunity.Stage, Opportunity.Status
+
+        # Winning or losing a deal moves it to the closed stage
+        if attrs.get("status") in (Status.WON, Status.LOST) and "stage" not in attrs:
+            attrs["stage"] = Stage.CLOSED
+
+        stage = attrs.get("stage", instance.stage if instance else Stage.LEAD)
+        status_ = attrs.get("status", instance.status if instance else Status.OPEN)
+
+        # Mirrors the chk_opportunity_stage_status constraint, plus its converse
+        if stage == Stage.CLOSED and status_ == Status.OPEN:
+            raise serializers.ValidationError({"status": "A closed opportunity must be marked won or lost."})
+        if stage != Stage.CLOSED and status_ != Status.OPEN:
+            raise serializers.ValidationError({"stage": "A won or lost opportunity must be in the closed stage."})
+
+        if status_ == Status.LOST:
+            lost_reason = attrs.get("lost_reason", instance.lost_reason if instance else "")
+            if not lost_reason.strip():
+                raise serializers.ValidationError({"lost_reason": "A reason is required when an opportunity is lost."})
+
+        # Auto-set probability from the stage unless the client overrides it
+        stage_changed = instance is None or stage != instance.stage or status_ != instance.status
+        if "probability" not in attrs and stage_changed:
+            if status_ == Status.LOST:
+                attrs["probability"] = 0
+            else:
+                attrs["probability"] = Opportunity.STAGE_PROBABILITY[stage]
+
+        # Stamp closed_at when the deal is won/lost, clear it if it's reopened
+        if status_ == Status.OPEN:
+            attrs["closed_at"] = None
+        elif instance is None or instance.status == Status.OPEN:
+            attrs["closed_at"] = timezone.now()
+
+        return attrs
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -218,6 +279,10 @@ class CustomerNoteSerializer(serializers.ModelSerializer):
 
 
 class AddCustomerSerializer(serializers.ModelSerializer):
+    lead_source_id = serializers.PrimaryKeyRelatedField(
+        queryset=LeadSource.objects.all(),
+        source="lead_source",
+    )
     class Meta:
         model = Customer
         fields = [
@@ -228,7 +293,8 @@ class AddCustomerSerializer(serializers.ModelSerializer):
             "company_name",
             "email",
             "address",
-            "campaign",
+            "lead_source_id",
+            "assigned_employee_id",
         ]
 
     def validate(self, attrs):
@@ -255,7 +321,8 @@ class UpdateCustomerSerializer(serializers.ModelSerializer):
             "company_name",
             "email",
             "address",
-            "campaign",
+            "lead_source_id",
+            "assigned_employee_id",
         ]
 
     def validate(self, data):
@@ -309,7 +376,36 @@ class UpdateContactSerializer(serializers.ModelSerializer):
         return data
 
 
-class AddInteractionSerializer(serializers.ModelSerializer):
+class InteractionRelationsMixin(serializers.Serializer):
+    # contact and opportunity are optional: an interaction can be at company level
+    # and not every interaction is tied to a deal
+    contact_id = serializers.PrimaryKeyRelatedField(
+        queryset=Contact.objects.all(),
+        source="contact",
+        required=False,
+        allow_null=True,
+    )
+    opportunity_id = serializers.PrimaryKeyRelatedField(
+        queryset=Opportunity.objects.all(),
+        source="opportunity",
+        required=False,
+        allow_null=True,
+    )
+
+    def validate(self, attrs):
+        instance = getattr(self, "instance", None)
+        customer = attrs.get("customer", instance.customer if instance else None)
+        contact = attrs.get("contact", instance.contact if instance else None)
+        opportunity = attrs.get("opportunity", instance.opportunity if instance else None)
+
+        if contact and contact.customer_id != customer.customer_id:
+            raise serializers.ValidationError({"contact_id": "Contact does not belong to this customer."})
+        if opportunity and opportunity.customer_id != customer.customer_id:
+            raise serializers.ValidationError({"opportunity_id": "Opportunity does not belong to this customer."})
+        return attrs
+
+
+class AddInteractionSerializer(InteractionRelationsMixin, serializers.ModelSerializer):
     customer_id = serializers.PrimaryKeyRelatedField(
         queryset=Customer.objects.all(),
         source="customer",
@@ -329,11 +425,10 @@ class AddInteractionSerializer(serializers.ModelSerializer):
             "interaction_date",
             "customer_id",
             "employee_id",
+            "contact_id",
+            "opportunity_id"
         ]
         read_only_fields = ["interaction_id"]
-
-    def validate(self, attrs):
-        return super().validate(attrs)
 
     def create(self, validated_data):
         new_interaction = Interaction.objects.create(**validated_data)
@@ -341,8 +436,18 @@ class AddInteractionSerializer(serializers.ModelSerializer):
         return new_interaction
 
 
-class UpdateInteractionSerializer(serializers.ModelSerializer):
+class UpdateInteractionSerializer(InteractionRelationsMixin, serializers.ModelSerializer):
     interaction_id = serializers.CharField(read_only=True)
+    customer_id = serializers.PrimaryKeyRelatedField(
+        queryset=Customer.objects.all(),
+        source="customer",
+        required=False,
+    )
+    employee_id = serializers.PrimaryKeyRelatedField(
+        queryset=Employee.objects.all(),
+        source="employee",
+        required=False,
+    )
 
     class Meta:
         model = Interaction
@@ -354,7 +459,30 @@ class UpdateInteractionSerializer(serializers.ModelSerializer):
             "interaction_date",
             "customer_id",
             "employee_id",
+            "contact_id",
+            "opportunity_id"
         ]
 
     def validate(self, data):
         return data
+
+class AddLeadSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeadSource
+        fields = [
+            "name",
+            "description",
+            "is_active",
+        ]
+
+
+class UpdateLeadSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeadSource
+        fields = [
+            "source_id",
+            "name",
+            "description",
+            "is_active",
+        ]
+        read_only_fields = ["source_id"]

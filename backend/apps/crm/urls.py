@@ -1,14 +1,20 @@
 from django.urls import path
 from .views import (
+    LeadSourceManagement,
     CustomerManagement,
     ContactManagement,
     InteractionManagement,
     OpportunityView,
     CustomerNoteView,
-    GetOpportunities
+    GetOpportunities,
+    LeadSourceManagement
 )
 
 urlpatterns = [
+    # Lead source endpoints
+    path("lead_sources", LeadSourceManagement.as_view(), name="lead-sources"),
+    path("lead_sources/", LeadSourceManagement.as_view(), name="lead-sources-slash"),
+
     # Customer endpoints
     path("customers", CustomerManagement.as_view(), name="customers"),
     path("customers/", CustomerManagement.as_view(), name="customers-slash"),
@@ -24,6 +30,9 @@ urlpatterns = [
     # Interaction endpoints
     path("opportunities_view", GetOpportunities.as_view(), name="opportunities-view"),
     path("opportunities_view/", GetOpportunities.as_view(), name="opportunities-view-slash"),
+
+    path("lead-sources", LeadSourceManagement.as_view(), name="lead-source-management"),
+    path("lead-sources/", LeadSourceManagement.as_view(), name="lead-source-management-slash"),
 
     # Opportunity endpoints (both singular and plural, with/without trailing slashes and ID routes)
     path("opportunity", OpportunityView.as_view(), name="opportunity"),

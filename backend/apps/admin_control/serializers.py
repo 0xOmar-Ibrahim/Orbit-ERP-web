@@ -1,8 +1,33 @@
 from rest_framework import serializers
-from apps.accounts.models import Employee
+from apps.accounts.models import Employee, Branch
+from apps.hr.models import Department, JobPosition, WorkSchedule
 from ..helpers import generate_code
 from django.contrib.auth.hashers import make_password
 class AddEmployeeSerializer(serializers.ModelSerializer):
+    department_id = serializers.PrimaryKeyRelatedField(
+        queryset=Department.objects.all(),
+        source="department",
+    )
+    manager_id = serializers.PrimaryKeyRelatedField(
+    queryset=Employee.objects.all(),
+    source="manager",
+    )
+
+    position_id = serializers.PrimaryKeyRelatedField(
+        queryset=JobPosition.objects.all(),
+        source="position",
+    )
+
+    schedule_id = serializers.PrimaryKeyRelatedField(
+        queryset=WorkSchedule.objects.all(),
+        source="schedule",
+    )
+
+    branch_id = serializers.PrimaryKeyRelatedField(
+        queryset=Branch.objects.all(),
+        source="branch",
+    )
+    
     class Meta:
         model = Employee
         fields = [
@@ -19,6 +44,11 @@ class AddEmployeeSerializer(serializers.ModelSerializer):
             "employment_type",
             "hire_date",
             "address",
+            "department_id",
+            "manager_id",
+            "position_id",
+            "schedule_id",
+            "branch_id"
         ]
 
 
@@ -34,12 +64,16 @@ class AddEmployeeSerializer(serializers.ModelSerializer):
             password = validated_data.pop("password")
 
             employee_code = generate_code()
-            
+            while True:
+                if Employee.objects.filter(employee_code=employee_code).exists():
+                    employee_code = generate_code()
+                else:
+                    break
             employee = Employee.objects.create(
             **validated_data,
             employee_code=employee_code,
             )
-            
+            # set_password hashes it; passing an already-hashed value would hash it twice
             employee.set_password(password)
 
             employee.save()
@@ -68,6 +102,11 @@ class UpdateEmployeeSerializer(serializers.ModelSerializer):
                     "employment_type",
                     "hire_date",
                     "address",
+                    "department_id",
+                    "manager_id",
+                    "position_id",
+                    "schedule_id",
+                    "branch_id"
                 ]
 
     
