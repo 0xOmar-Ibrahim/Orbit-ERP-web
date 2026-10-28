@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    LeadSourceManagement,
     CustomerManagement,
     ContactManagement,
     InteractionManagement,
@@ -9,6 +10,10 @@ from .views import (
 )
 
 urlpatterns = [
+    # Lead source endpoints
+    path("lead_sources", LeadSourceManagement.as_view(), name="lead-sources"),
+    path("lead_sources/", LeadSourceManagement.as_view(), name="lead-sources-slash"),
+
     # Customer endpoints
     path("customers", CustomerManagement.as_view(), name="customers"),
     path("customers/", CustomerManagement.as_view(), name="customers-slash"),
