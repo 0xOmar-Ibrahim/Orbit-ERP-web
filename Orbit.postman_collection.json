@@ -599,17 +599,8 @@
                     "value": "{{bearer_token_0zk8}}"
                   }
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customers",
+                  "raw": "http://127.0.0.1:8000/crm/customers/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -620,7 +611,8 @@
                   "port": "8000",
                   "path": [
                     "crm",
-                    "customers"
+                    "customers",
+                    ""
                   ]
                 }
               },
