@@ -1,0 +1,548 @@
+
+/* ==============================
+   CRM Forms - Overlay
+============================== */
+
+.crm-form-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+/* ==============================
+   Modal
+============================== */
+
+.crm-form-modal {
+  --form-bg: var(--sidebar-bg);
+  --form-text: var(--text-color);
+  --form-muted: var(--muted-color);
+  --form-border: var(--border-color);
+  --form-accent: var(--accent-color);
+  --form-hover: var(--accent-hover);
+  --form-input-bg: var(--home-bg);
+  --form-input-text: var(--text-color);
+
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 600px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 24px;
+  background: var(--form-bg);
+  color: var(--form-text);
+  border: 1px solid var(--form-accent);
+  border-radius: 10px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+}
+
+/* ==============================
+   Dark Mode
+============================== */
+
+.home-page.dark-mode .crm-form-modal {
+  --form-bg: var(--sidebar-bg);
+  --form-text: var(--text-color);
+  --form-muted: var(--muted-color);
+  --form-border: var(--border-color);
+  --form-input-bg: var(--home-bg);
+  --form-input-text: var(--text-color);
+}
+
+/* ==============================
+   Header
+============================== */
+
+.crm-form-modal .crm-form-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.crm-form-modal .crm-form-header h2 {
+  margin: 0 0 8px;
+  color: var(--form-text);
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.crm-form-modal .crm-form-header p {
+  margin: 0;
+  color: var(--form-accent);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-transform: none;
+}
+
+/* Close Button */
+
+.crm-form-modal .crm-form-close {
+  display: grid;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--form-border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--form-text);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.crm-form-modal .crm-form-close:hover {
+  background: var(--form-accent);
+  border-color: var(--form-accent);
+  color: #fff;
+}
+
+/* ==============================
+   Form Grid
+============================== */
+
+.crm-form-modal .crm-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+  row-gap: 20px;
+}
+
+.crm-form-modal .crm-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--form-text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.crm-form-modal .crm-field-full {
+  grid-column: 1 / -1;
+}
+
+/* ==============================
+   Labels
+============================== */
+
+.crm-form-modal .crm-field-label,
+.crm-form-modal .crm-status-field legend,
+.crm-form-modal .crm-primary-field legend {
+  display: block;
+  margin: 0 0 2px;
+  padding: 0;
+  color: var(--form-accent);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: none;
+}
+
+.home-page.dark-mode .crm-form-modal .crm-field-label,
+.home-page.dark-mode .crm-form-modal .crm-status-field legend,
+.home-page.dark-mode .crm-form-modal .crm-primary-field legend {
+  color: var(--form-text);
+}
+
+.crm-form-modal .required-mark {
+  color: #e05252 !important;
+  font-weight: 600;
+}
+
+.crm-form-modal .optional-label {
+  color: var(--form-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* ==============================
+   Inputs, Selects & Textarea
+============================== */
+
+.crm-form-modal .crm-field input:not([type="radio"]),
+.crm-form-modal .crm-field select,
+.crm-form-modal .crm-field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 11px 12px;
+  border: 1px solid var(--form-border);
+  border-radius: 4px;
+  outline: none;
+  background: var(--form-input-bg);
+  color: var(--form-input-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  transition: border-color 0.2s ease;
+}
+
+.crm-form-modal .crm-field textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.crm-form-modal .crm-field input::placeholder,
+.crm-form-modal .crm-field textarea::placeholder {
+  color: var(--form-muted);
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+.crm-form-modal .crm-field select {
+  cursor: pointer;
+}
+
+.crm-form-modal .crm-field select option {
+  background: var(--form-input-bg);
+  color: var(--form-input-text);
+}
+
+.crm-form-modal .crm-field input:focus,
+.crm-form-modal .crm-field select:focus,
+.crm-form-modal .crm-field textarea:focus {
+  border-color: var(--form-accent);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+
+/* Date Picker */
+
+.crm-form-modal .crm-field input[type="date"] {
+  color-scheme: light;
+}
+
+.home-page.dark-mode .crm-form-modal .crm-field input[type="date"] {
+  color-scheme: dark;
+}
+
+.crm-form-modal .crm-field input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+/* ==============================
+   Status Options
+============================== */
+
+.crm-form-modal .crm-status-field,
+.crm-form-modal .crm-primary-field {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.crm-form-modal .crm-status-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.crm-form-modal .crm-status-option {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border: 1px solid var(--form-border);
+  border-radius: 5px;
+  background: var(--form-input-bg);
+  color: var(--form-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.crm-form-modal .crm-status-option:hover {
+  border-color: var(--form-accent);
+}
+
+/* Hide native radio */
+
+.crm-form-modal .crm-status-option input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+/* Status square */
+
+.crm-form-modal .crm-status-square,
+.crm-form-modal .crm-status-check {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--form-muted);
+  border-radius: 4px;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+}
+
+/* Selected - Light Mode */
+
+.crm-form-modal .crm-status-option.selected {
+  border-color: var(--form-accent);
+  background: var(--active-bg);
+  color: var(--form-accent);
+}
+
+.crm-form-modal .crm-status-option.selected .crm-status-square,
+.crm-form-modal .crm-status-option.selected .crm-status-check {
+  border-color: var(--form-accent);
+  background: var(--form-accent);
+}
+
+/* Check mark */
+
+.crm-form-modal .crm-status-option.selected .crm-status-square::after {
+  content: "";
+  width: 5px;
+  height: 9px;
+  margin-top: -3px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Selected - Dark Mode */
+
+.home-page.dark-mode .crm-form-modal .crm-status-option {
+  color: var(--form-text);
+}
+
+.home-page.dark-mode .crm-form-modal .crm-status-option.selected {
+  border-color: var(--form-accent);
+  background: var(--active-bg);
+  color: var(--form-text);
+}
+
+.home-page.dark-mode .crm-form-modal .crm-status-option.selected .crm-status-square,
+.home-page.dark-mode .crm-form-modal .crm-status-option.selected .crm-status-check {
+  border-color: var(--form-accent);
+  background: var(--form-accent);
+}
+
+.home-page.dark-mode .crm-form-modal .crm-status-option.selected .crm-status-square::after {
+  border-color: #fff;
+}
+
+.crm-form-modal .crm-status-option:focus-within {
+  outline: 2px solid var(--form-accent);
+  outline-offset: 3px;
+}
+
+/* ==============================
+   Primary Contact - Yes / No
+============================== */
+
+.crm-form-modal .crm-primary-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.crm-form-modal .crm-primary-option {
+  position: relative;
+  display: inline-flex;
+  min-width: 90px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 10px 15px;
+  border: 1px solid var(--form-border);
+  border-radius: 5px;
+  background: var(--form-input-bg);
+  color: var(--form-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.crm-form-modal .crm-primary-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.crm-form-modal .crm-primary-dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--form-muted);
+}
+
+.crm-form-modal .crm-primary-option.yes .crm-primary-dot {
+  background: #2563eb;
+}
+
+.crm-form-modal .crm-primary-option.no .crm-primary-dot {
+  background: #e05252;
+}
+
+.crm-form-modal .crm-primary-option.selected.yes {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.crm-form-modal .crm-primary-option.selected.no {
+  border-color: #e05252;
+  background: rgba(224, 82, 82, 0.1);
+  color: #e05252;
+}
+
+.home-page.dark-mode .crm-form-modal .crm-primary-option {
+  color: var(--form-text);
+}
+
+.home-page.dark-mode .crm-form-modal .crm-primary-option.selected.yes {
+  background: var(--active-bg);
+  border-color: var(--form-accent);
+  color: var(--form-text);
+}
+
+.home-page.dark-mode .crm-form-modal .crm-primary-option.selected.no {
+  background: rgba(224, 82, 82, 0.15);
+  border-color: #e05252;
+  color: #ff8585;
+}
+
+.crm-form-modal .crm-primary-option:focus-within {
+  outline: 2px solid var(--form-accent);
+  outline-offset: 3px;
+}
+
+/* ==============================
+   Validation
+============================== */
+
+.crm-form-modal .crm-error-message {
+  display: block;
+  margin-top: 5px;
+  color: #e05252;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.crm-form-modal .crm-input-error,
+.crm-form-modal input[aria-invalid="true"],
+.crm-form-modal select[aria-invalid="true"],
+.crm-form-modal textarea[aria-invalid="true"] {
+  border-color: #e05252 !important;
+}
+
+/* ==============================
+   Form Actions
+============================== */
+
+.crm-form-modal .crm-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--form-border);
+}
+
+.crm-form-modal .crm-form-actions button {
+  min-width: 100px;
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--form-accent);
+  border-radius: 7px;
+  background: var(--form-accent);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.crm-form-modal .crm-form-actions button:hover {
+  background: var(--form-hover);
+  border-color: var(--form-hover);
+}
+
+.crm-form-modal .crm-form-actions button:active {
+  transform: scale(0.98);
+}
+
+.crm-form-modal .crm-form-actions button:focus-visible,
+.crm-form-modal .crm-form-close:focus-visible {
+  outline: 2px solid var(--form-accent);
+  outline-offset: 3px;
+}
+
+/* ==============================
+   Responsive
+============================== */
+
+@media (max-width: 600px) {
+  .crm-form-overlay {
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .crm-form-modal {
+    width: 100%;
+    max-height: calc(100vh - 24px);
+    padding: 18px;
+  }
+
+  .crm-form-modal .crm-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 17px;
+  }
+
+  .crm-form-modal .crm-field-full {
+    grid-column: auto;
+  }
+
+  .crm-form-modal .crm-form-header h2 {
+    font-size: 19px;
+  }
+
+  .crm-form-modal .crm-status-options {
+    gap: 6px;
+  }
+
+  .crm-form-modal .crm-status-option {
+    gap: 6px;
+    padding: 8px 5px;
+    font-size: 12px;
+  }
+
+  .crm-form-modal .crm-form-actions button {
+    flex: 1;
+    min-width: 0;
+  }
+}

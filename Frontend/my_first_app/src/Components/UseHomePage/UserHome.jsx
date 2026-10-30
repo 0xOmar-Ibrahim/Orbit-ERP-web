@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import {
+  useNavigate,
+  useLocation,
+  Outlet,
+} from "react-router-dom";
 
 import logoDark from "../../assets/dark.png";
 import logoLight from "../../assets/light.png";
@@ -292,10 +296,10 @@ const UserHome = () => {
       <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
        <div className="brand-container">
   <img
-    className={`home-logo ${collapsed ? "logo-collapsed" : ""}`}
-    src={darkMode ? logoDark : logoLight}
-    alt="Orbit logo"
-  />
+  className={`home-logo ${collapsed ? "logo-collapsed" : ""}`}
+  src={darkMode ? logoDark : logoLight}
+  alt="Orbit logo"
+/>
 
   <button
     className="collapse-button"
@@ -349,15 +353,25 @@ const UserHome = () => {
 
         {!collapsed && (
           <div className="sidebar-footer">
-            <div className="profile-card">
-              <div className="profile-info">
-                <strong>{fullName || user.username || "User"}</strong>
+  <div
+    className="profile-card"
+    onClick={() => navigate("/")}
+    role="button"
+    tabIndex={0}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        navigate("/");
+      }
+    }}
+  >
+    <div className="profile-info">
+      <strong>{fullName || user.username || "User"}</strong>
 
-                <span>
-                  {user.role_name || user.role || "Employee"}
-                </span>
-              </div>
-            </div>
+      <span>
+        {user.role_name || user.role || "Employee"}
+      </span>
+    </div>
+  </div>
 
             <button
               type="button"
@@ -370,9 +384,95 @@ const UserHome = () => {
         )}
       </aside>
 
-      <section className="home-content">
-        {/* Your page content or nested routes go here. */}
-      </section>
+     <section className="home-content">
+  {location.pathname === "/home" && (
+    <div className="home-dashboard">
+      <p className="welcome-subtitle">ORBIT ERP</p>
+
+      <h1>Welcome to Orbit</h1>
+
+      <p className="welcome-message">
+        Hello,{" "}
+        {[
+          user?.first_name,
+          user?.last_name,
+        ]
+          .filter(Boolean)
+          .join(" ") ||
+          user?.full_name ||
+          user?.username ||
+          "User"}
+        ! We're glad to have you here.
+      </p>
+
+      <div className="user-details-card">
+        <div className="user-details-header">
+          <div>
+            <h2>
+              {[
+                user?.first_name,
+                user?.last_name,
+              ]
+                .filter(Boolean)
+                .join(" ") ||
+                user?.full_name ||
+                user?.username ||
+                "User"}
+            </h2>
+
+            <p className="user-role">
+              {user?.role_name ||
+                (typeof user?.role === "string"
+                  ? user.role
+                  : null) ||
+                user?.user_type ||
+                "Employee"}
+            </p>
+          </div>
+        </div>
+
+        <div className="details-divider" />
+
+        <h3>Account Details</h3>
+
+        <div className="user-details-grid">
+          {Object.entries(user || {})
+            .filter(
+              ([key, value]) =>
+                !/password|token|secret|cookie|authorization|session|csrf/i.test(
+                  key
+                ) &&
+                value !== null &&
+                value !== undefined &&
+                typeof value !== "object" &&
+                value !== ""
+            )
+            .map(([key, value]) => (
+              <div className="detail-item" key={key}>
+                <span className="detail-label">
+                  {key
+                    .replace(/_/g, " ")
+                    .replace(
+                      /([a-z])([A-Z])/g,
+                      "$1 $2"
+                    )
+                    .replace(/\b\w/g, (letter) =>
+                      letter.toUpperCase()
+                    )}
+                </span>
+
+                <span className="detail-value">
+                  {String(value)}
+                </span>
+              </div>
+            ))}
+        </div>
+      </div>
+    </div>
+  )}
+
+  <Outlet context={{ user }} />
+</section>
     </main>
   );
 };

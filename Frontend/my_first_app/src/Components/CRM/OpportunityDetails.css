@@ -1,0 +1,985 @@
+
+/* =====================================
+   OPPORTUNITY DETAILS PAGE
+===================================== */
+
+.opportunity-details-page {
+  --crm-card-bg: var(--sidebar-bg);
+  --crm-bg: var(--home-bg);
+  --crm-text: var(--text-color);
+  --crm-muted: var(--muted-color);
+  --crm-border: var(--border-color);
+  --crm-accent: var(--accent-color);
+  --crm-accent-hover: var(--accent-hover);
+  --crm-hover: var(--hover-bg);
+  --crm-active: var(--active-bg);
+
+  --crm-info-blue: #3985d6;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  padding: 30px;
+  box-sizing: border-box;
+
+  background: var(--crm-bg);
+  color: var(--crm-text);
+
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* =====================================
+   BACK BUTTON
+===================================== */
+
+.opportunity-back-row {
+  margin-bottom: 24px;
+}
+
+.opportunity-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--crm-muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.opportunity-back-button:hover {
+  color: var(--crm-accent);
+}
+
+.opportunity-back-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--crm-border);
+  border-radius: 50%;
+  background: var(--crm-card-bg);
+  color: var(--crm-accent);
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.opportunity-back-button:hover .opportunity-back-icon {
+  background: var(--crm-hover);
+  border-color: var(--crm-accent);
+  transform: translateX(-2px);
+}
+
+/* =====================================
+   HEADING AND ACTIONS
+===================================== */
+
+.opportunity-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 28px;
+}
+
+.opportunity-details-heading {
+  min-width: 0;
+}
+
+.opportunity-details-heading h1 {
+  margin: 0;
+  color: var(--crm-text);
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.8px;
+}
+
+.opportunity-details-heading p {
+  margin: 8px 0 0;
+  color: var(--crm-muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.opportunity-details-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  padding-top: 8px;
+}
+
+.opportunity-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 125px;
+  min-height: 40px;
+  padding: 9px 17px;
+  border: 1px solid var(--crm-accent);
+  border-radius: 8px;
+  background: var(--crm-accent);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.opportunity-action-button:hover,
+.opportunity-action-button.active {
+  background: var(--crm-accent-hover);
+  border-color: var(--crm-accent-hover);
+}
+
+.opportunity-action-button:active {
+  transform: scale(0.98);
+}
+
+/* =====================================
+   CONTENT LAYOUT
+===================================== */
+
+.opportunity-content-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+  transition: grid-template-columns 0.25s ease;
+}
+
+.opportunity-content-layout.note-open {
+  grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.9fr);
+}
+
+/* =====================================
+   OPPORTUNITY INFORMATION CARD
+===================================== */
+
+.opportunity-overview-card {
+  width: 100%;
+  min-width: 0;
+  padding: 24px;
+  box-sizing: border-box;
+  border: 1px solid var(--crm-border);
+  border-radius: 12px;
+  background: var(--crm-card-bg);
+  color: var(--crm-text);
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    width 0.25s ease;
+}
+
+/* =====================================
+   INFORMATION GRID
+===================================== */
+
+.opportunity-information-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.opportunity-info-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 9px;
+  min-width: 0;
+  min-height: 84px;
+  padding: 18px 20px;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--crm-border);
+}
+
+.opportunity-info-item:nth-child(odd) {
+  border-right: 1px solid var(--crm-border);
+}
+
+.opportunity-info-item:nth-child(even) {
+  padding-left: 24px;
+}
+
+.opportunity-info-item:nth-last-child(-n + 2) {
+  border-bottom: none;
+}
+
+/* Labels */
+
+.opportunity-info-label {
+  color: var(--crm-muted);
+  font-size: 12px;
+  font-weight: 450;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Values */
+
+.opportunity-info-item strong {
+  color: var(--crm-info-blue);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* Revenue */
+
+.opportunity-info-item .opportunity-revenue {
+  color: var(--crm-info-blue);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* =====================================
+   STATUS
+===================================== */
+
+.opportunity-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-width: 65px;
+  padding: 6px 13px;
+  border-radius: 20px;
+  color: #ffffff !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+}
+
+.opportunity-status.status-open {
+  background: var(--crm-accent);
+}
+
+.opportunity-status.status-won {
+  background: #16a34a;
+}
+
+.opportunity-status.status-lost {
+  background: #dc5555;
+}
+
+.opportunity-status.status-closed {
+  background: #64748b;
+}
+
+/* =====================================
+   ADD NOTE SIDE PANEL
+===================================== */
+
+.opportunity-note-panel {
+  width: 100%;
+  min-width: 0;
+  padding: 20px;
+  box-sizing: border-box;
+  border: 1px solid var(--crm-border);
+  border-radius: 12px;
+  background: var(--crm-card-bg);
+  color: var(--crm-text);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+  animation: notePanelIn 0.25s ease;
+}
+
+@keyframes notePanelIn {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.opportunity-note-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.opportunity-note-header h3 {
+  margin: 0;
+  color: var(--crm-text);
+  font-size: 16px;
+  font-weight: 550;
+}
+
+.opportunity-note-header p {
+  margin: 6px 0 0;
+  color: var(--crm-muted);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.opportunity-note-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--crm-muted);
+  font-size: 22px;
+  font-weight: 400;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.opportunity-note-close:hover {
+  background: var(--crm-hover);
+  color: var(--crm-text);
+}
+
+/* Note textarea */
+
+.opportunity-note-panel textarea {
+  display: block;
+  width: 100%;
+  min-height: 170px;
+  padding: 12px;
+  box-sizing: border-box;
+  resize: vertical;
+  outline: none;
+  border: 1px solid var(--crm-border);
+  border-radius: 8px;
+  background: var(--crm-bg);
+  color: var(--crm-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.7;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.opportunity-note-panel textarea::placeholder {
+  color: var(--crm-muted);
+}
+
+.opportunity-note-panel textarea:focus {
+  border-color: var(--crm-accent);
+  box-shadow: 0 0 0 3px var(--crm-active);
+}
+
+.opportunity-note-error {
+  display: block;
+  margin-top: 8px;
+  color: #dc5555;
+  font-size: 11px;
+}
+
+/* Note Actions */
+
+.opportunity-note-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.opportunity-note-actions button {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.opportunity-note-cancel {
+  border: 1px solid var(--crm-border);
+  background: var(--crm-card-bg);
+  color: var(--crm-text);
+}
+
+.opportunity-note-cancel:hover {
+  background: var(--crm-hover);
+}
+
+.opportunity-note-save {
+  border: 1px solid var(--crm-accent);
+  background: var(--crm-accent);
+  color: #ffffff;
+}
+
+.opportunity-note-save:hover {
+  background: var(--crm-accent-hover);
+}
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 1000px) {
+  .opportunity-content-layout.note-open {
+    grid-template-columns: minmax(0, 1.3fr) minmax(250px, 0.9fr);
+  }
+
+  .opportunity-overview-card {
+    padding: 18px;
+  }
+
+  .opportunity-info-item {
+    padding: 16px 12px;
+  }
+}
+
+@media (max-width: 750px) {
+  .opportunity-details-page {
+    padding: 24px;
+  }
+
+  .opportunity-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .opportunity-details-actions {
+    width: 100%;
+    padding-top: 0;
+  }
+
+  .opportunity-action-button {
+    flex: 1;
+  }
+
+  .opportunity-content-layout.note-open {
+    grid-template-columns: 1fr;
+  }
+
+  .opportunity-note-panel {
+    animation: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .opportunity-details-page {
+    padding: 18px 14px;
+  }
+
+  .opportunity-back-row {
+    margin-bottom: 20px;
+  }
+
+  .opportunity-details-heading h1 {
+    font-size: 25px;
+  }
+
+  .opportunity-details-heading p {
+    font-size: 12px;
+  }
+
+  .opportunity-details-actions {
+    gap: 8px;
+  }
+
+  .opportunity-action-button {
+    min-width: 0;
+    padding: 10px;
+    font-size: 11px;
+  }
+
+  .opportunity-overview-card {
+    padding: 15px;
+  }
+
+  .opportunity-information-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .opportunity-info-item,
+  .opportunity-info-item:nth-child(odd),
+  .opportunity-info-item:nth-child(even) {
+    min-height: 72px;
+    padding: 15px 8px;
+    border-right: none;
+    border-bottom: 1px solid var(--crm-border);
+  }
+
+  .opportunity-info-item:last-child {
+    border-bottom: none;
+  }
+
+  .opportunity-note-panel {
+    padding: 16px;
+  }
+}
+
+/* =====================================
+   MAIN CARD
+===================================== */
+
+.opportunity-main-card {
+  width: 100%;
+  margin-top: 22px;
+  background: var(--sidebar-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Tabs Header */
+
+.opportunity-main-tabs {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  min-height: 55px;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.opportunity-main-tab {
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--muted-color);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.opportunity-main-tab:hover {
+  color: var(--text-color);
+}
+
+.opportunity-main-tab.active {
+  color: var(--text-color);
+}
+
+.opportunity-main-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--accent-color);
+}
+
+.opportunity-main-tab span {
+  display: grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 20px;
+  background: var(--active-bg);
+  color: var(--accent-color);
+  font-size: 11px;
+}
+
+/* Tab Content */
+
+.opportunity-tab-content {
+  padding: 24px;
+  min-height: 180px;
+}
+
+/* =====================================
+   NOTES AND ACTIVITY LOGS
+===================================== */
+
+.opportunity-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.opportunity-log-item {
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  background: var(--home-bg);
+}
+
+.opportunity-log-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.opportunity-log-item-top strong {
+  color: var(--text-color);
+  font-size: 13px;
+}
+
+.opportunity-log-item-top span {
+  color: var(--muted-color);
+  font-size: 11px;
+}
+
+.opportunity-log-item p {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.opportunity-log-item h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.opportunity-log-empty {
+  padding: 35px 15px;
+  text-align: center;
+  color: var(--muted-color);
+  font-size: 13px;
+}
+
+/* =====================================
+   ADD NOTE
+===================================== */
+
+.opportunity-add-note {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.opportunity-add-note textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  resize: vertical;
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  outline: none;
+  background: var(--home-bg);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.opportunity-add-note textarea:focus {
+  border-color: var(--accent-color);
+}
+
+.opportunity-add-note-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.opportunity-note-save {
+  min-height: 38px;
+  padding: 0 20px;
+  border: 1px solid var(--accent-color);
+  border-radius: 8px;
+  background: var(--accent-color);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.opportunity-note-save:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.opportunity-note-save:active {
+  transform: scale(0.98);
+}
+
+/* =====================================
+   UPDATED NOTES INPUT
+===================================== */
+
+.opportunity-add-note {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.opportunity-note-input-wrapper {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--home-bg);
+  transition: border-color 0.2s ease;
+}
+
+.opportunity-note-input-wrapper:focus-within {
+  border-color: var(--accent-color);
+}
+
+.opportunity-note-input-wrapper textarea {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 12px;
+  box-sizing: border-box;
+  resize: vertical;
+  outline: none;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.opportunity-note-input-wrapper textarea::placeholder {
+  color: var(--muted-color);
+}
+
+.opportunity-note-send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 43px;
+  min-height: 42px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: var(--accent-color);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.opportunity-note-send:hover {
+  background: var(--accent-hover);
+}
+
+.opportunity-note-send svg {
+  width: 17px;
+  height: 17px;
+}
+
+.opportunity-note-error {
+  color: #dc5555;
+  font-size: 11px;
+}
+
+
+/* =====================================
+   NOTES AND ACTIVITIES DISPLAY
+===================================== */
+
+/* Add Note input with attached send button */
+.opportunity-note-input-wrapper {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 48px;
+  overflow: hidden;
+  border: 1px solid var(--crm-border);
+  border-radius: 7px;
+  background: var(--crm-bg);
+}
+
+.opportunity-note-input-wrapper textarea {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  max-height: 120px;
+  padding: 13px 15px;
+  box-sizing: border-box;
+  resize: vertical;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--crm-text);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.opportunity-note-input-wrapper textarea::placeholder {
+  color: var(--crm-muted);
+}
+
+.opportunity-note-input-wrapper textarea:focus {
+  border: none;
+  box-shadow: none;
+}
+
+/* Send Button */
+.opportunity-note-send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  min-height: 48px;
+  border: none;
+  border-radius: 0;
+  background: var(--crm-accent);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.opportunity-note-send:hover {
+  background: var(--crm-accent-hover);
+}
+
+.opportunity-note-send svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* Note Text and Date */
+.opportunity-note-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.opportunity-note-text {
+  margin: 0;
+  color: var(--crm-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.opportunity-log-date {
+  display: block;
+  color: var(--crm-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Activity Layout */
+.opportunity-activity-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.opportunity-activity-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+/* Activity Title */
+.opportunity-activity-title {
+  color: var(--crm-text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* Activity Description */
+.opportunity-activity-description {
+  margin: 0;
+  color: var(--crm-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* Date and Activity Type on the Right */
+.opportunity-activity-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+/* Call / Meeting / Email - Plain Text Without Border */
+.opportunity-activity-type {
+  display: block;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--crm-accent);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .opportunity-activity-item {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .opportunity-activity-meta {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
