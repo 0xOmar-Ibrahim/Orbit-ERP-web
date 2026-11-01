@@ -42,6 +42,7 @@ def get_user_permissions(employee, refresh):
         "access_token": str(refresh.access_token),
         "refresh_token": str(refresh),
         "user": {
+            "id": employee.employee_id,
             "first_name": employee.first_name,
             "last_name": employee.last_name,
             "code": employee.employee_code,
