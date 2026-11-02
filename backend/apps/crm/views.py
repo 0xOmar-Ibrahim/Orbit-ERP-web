@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view
 from .pagination import PageNumberPagination
+from .exchange_rates import usd_value_expression
 from .models import Opportunity, Customer, Contact, Interaction, CustomerNote, LeadSource
 
 from .serializers import (
@@ -879,21 +880,24 @@ class CrmDashboardView(APIView):
 
     def get(self, request):
         today = timezone.localdate()
+        # Deals are stored in mixed currencies; every amount is summed after converting to USD
+        currencies = Opportunity.objects.order_by().values_list("currency", flat=True).distinct()
+        usd_value = usd_value_expression(currencies)
         weighted = ExpressionWrapper(
-            F("estimated_value") * F("probability") / 100,
-            output_field=DecimalField(max_digits=14, decimal_places=2),
+            usd_value * F("probability") / 100,
+            output_field=DecimalField(max_digits=20, decimal_places=2),
         )
         open_deals = Opportunity.objects.filter(status=Opportunity.Status.OPEN)
         won_deals = Opportunity.objects.filter(status=Opportunity.Status.WON)
 
         # KPI cards
         open_totals = open_deals.aggregate(
-            value=Sum("estimated_value"),
+            value=Sum(usd_value),
             count=Count("opportunity_id"),
             weighted=Sum(weighted),
             past_due=Count("opportunity_id", filter=Q(expected_close_date__lt=today)),
         )
-        won_totals = won_deals.aggregate(value=Sum("estimated_value"), count=Count("opportunity_id"))
+        won_totals = won_deals.aggregate(value=Sum(usd_value), count=Count("opportunity_id"))
         lost_count = Opportunity.objects.filter(status=Opportunity.Status.LOST).count()
         closed_count = won_totals["count"] + lost_count
         win_percentage = round(won_totals["count"] / closed_count * 100, 1) if closed_count else 0
@@ -902,7 +906,7 @@ class CrmDashboardView(APIView):
         stage_rows = {
             row["stage"]: row
             for row in open_deals.values("stage").annotate(
-                value=Sum("estimated_value"), count=Count("opportunity_id")
+                value=Sum(usd_value), count=Count("opportunity_id")
             )
         }
         pipeline_by_stage = [
@@ -931,7 +935,7 @@ class CrmDashboardView(APIView):
             )
             .annotate(month=TruncMonth("expected_close_date"))
             .values("month")
-            .annotate(deal_value=Sum("estimated_value"), weighted_value=Sum(weighted))
+            .annotate(deal_value=Sum(usd_value), weighted_value=Sum(weighted))
         }
         expected_closings_by_month = [
             {
@@ -952,12 +956,12 @@ class CrmDashboardView(APIView):
                 "won_count": row["won_count"],
             }
             for row in won_deals.values("employee_id", "employee__first_name", "employee__last_name")
-            .annotate(won_value=Sum("estimated_value"), won_count=Count("opportunity_id"))
+            .annotate(won_value=Sum(usd_value), won_count=Count("opportunity_id"))
             .order_by("-won_value")[: self.TOP_EMPLOYEES]
         ]
 
         return Response({
-            "currency": "EGP",
+            "currency": "USD",
             "open_pipeline": {"value": to_amount(open_totals["value"]), "count": open_totals["count"]},
             "weighted_forecast": {"value": to_amount(open_totals["weighted"])},
             "won": {"value": to_amount(won_totals["value"]), "count": won_totals["count"]},
