@@ -12,9 +12,9 @@ from .views import (
 )
 
 urlpatterns = [
-    # Dashboard endpoints
-    path("dashboard", CrmDashboardView.as_view(), name="dashboard"),
-    path("dashboard/", CrmDashboardView.as_view(), name="dashboard-slash"),
+    # Dashboard overview endpoints
+    path("overview", CrmDashboardView.as_view(), name="overview"),
+    path("overview/", CrmDashboardView.as_view(), name="overview-slash"),
 
     # Lead source endpoints
     path("lead_sources", LeadSourceManagement.as_view(), name="lead-sources"),
