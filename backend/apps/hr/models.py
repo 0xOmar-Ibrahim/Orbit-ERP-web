@@ -329,10 +329,33 @@ class EmploymentContract(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # class Meta:
+    #     db_table = "employment_contract"
+    #     constraints = [
+    #         # ABO ELNOUR: end_date must be strictly after start_date when provided.
+    #         models.CheckConstraint(
+    #             condition=(
+    #                 models.Q(end_date__isnull=True) |
+    #                 models.Q(end_date__gt=models.F("start_date"))
+    #             ),
+    #             name="chk_contract_date_order",
+    #         ),
+    #     ]
+    #     indexes = [
+    #         # ABO ELNOUR: partial unique index — only one RUNNING contract allowed per employee.
+    #         # Prevents duplicate active contracts for the same person.
+    #         models.UniqueConstraint(
+    #             fields=["employee"],
+    #             condition=models.Q(status="running"),
+    #             name="uq_one_running_contract_per_employee",
+    #         ),
+    #         models.Index(fields=["employee"], name="idx_contract_employee"),
+    #     ]
     class Meta:
         db_table = "employment_contract"
+
         constraints = [
-            # ABO ELNOUR: end_date must be strictly after start_date when provided.
+            # End date must be after start date.
             models.CheckConstraint(
                 condition=(
                     models.Q(end_date__isnull=True) |
@@ -340,17 +363,21 @@ class EmploymentContract(models.Model):
                 ),
                 name="chk_contract_date_order",
             ),
-        ]
-        indexes = [
-            # ABO ELNOUR: partial unique index — only one RUNNING contract allowed per employee.
-            # Prevents duplicate active contracts for the same person.
+
+            # Only one running contract per employee.
             models.UniqueConstraint(
                 fields=["employee"],
                 condition=models.Q(status="running"),
                 name="uq_one_running_contract_per_employee",
             ),
-            models.Index(fields=["employee"], name="idx_contract_employee"),
         ]
+
+    indexes = [
+        models.Index(
+            fields=["employee"],
+            name="idx_contract_employee",
+        ),
+    ]
 
     def __str__(self):
         return f"{self.contract_number} — {self.employee}"
