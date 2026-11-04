@@ -1,10 +1,15 @@
-from django.db.models import ProtectedError
+import datetime
+
+from django.db.models import ProtectedError, Sum, Count, Q, F, ExpressionWrapper, DecimalField
+from django.db.models.functions import TruncMonth
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view
 from .pagination import PageNumberPagination
+from .exchange_rates import usd_value_expression
 from .models import Opportunity, Customer, Contact, Interaction, CustomerNote, LeadSource
 
 from .serializers import (
@@ -855,3 +860,118 @@ class LeadSourceManagement(APIView):
             {"message": "Lead source deleted successfully."},
             status=200,
         )
+
+def to_amount(value):
+    return round(float(value or 0), 2)
+
+
+class CrmDashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    # Open stages shown on the dashboard, in pipeline order, with their display labels.
+    PIPELINE_STAGES = [
+        (Opportunity.Stage.LEAD, "Prospecting"),
+        (Opportunity.Stage.QUALIFIED, "Qualification"),
+        (Opportunity.Stage.PROPOSAL, "Proposal"),
+        (Opportunity.Stage.NEGOTIATION, "Negotiation"),
+    ]
+    MONTHS_BACK = 6
+    TOP_EMPLOYEES = 4
+
+    def get(self, request):
+        today = timezone.localdate()
+        # Deals are stored in mixed currencies; every amount is summed after converting to USD
+        currencies = Opportunity.objects.order_by().values_list("currency", flat=True).distinct()
+        usd_value = usd_value_expression(currencies)
+        weighted = ExpressionWrapper(
+            usd_value * F("probability") / 100,
+            output_field=DecimalField(max_digits=20, decimal_places=2),
+        )
+        open_deals = Opportunity.objects.filter(status=Opportunity.Status.OPEN)
+        won_deals = Opportunity.objects.filter(status=Opportunity.Status.WON)
+
+        # KPI cards
+        open_totals = open_deals.aggregate(
+            value=Sum(usd_value),
+            count=Count("opportunity_id"),
+            weighted=Sum(weighted),
+            past_due=Count("opportunity_id", filter=Q(expected_close_date__lt=today)),
+        )
+        won_totals = won_deals.aggregate(value=Sum(usd_value), count=Count("opportunity_id"))
+        lost_count = Opportunity.objects.filter(status=Opportunity.Status.LOST).count()
+        closed_count = won_totals["count"] + lost_count
+        win_percentage = round(won_totals["count"] / closed_count * 100, 1) if closed_count else 0
+
+        # Open pipeline by stage
+        stage_rows = {
+            row["stage"]: row
+            for row in open_deals.values("stage").annotate(
+                value=Sum(usd_value), count=Count("opportunity_id")
+            )
+        }
+        pipeline_by_stage = [
+            {
+                "stage": stage,
+                "label": label,
+                "value": to_amount(stage_rows.get(stage, {}).get("value")),
+                "count": stage_rows.get(stage, {}).get("count", 0),
+            }
+            for stage, label in self.PIPELINE_STAGES
+        ]
+
+        # Expected closings over the last 6 months, current month included
+        months = []
+        year, month = today.year, today.month
+        for _ in range(self.MONTHS_BACK):
+            months.insert(0, datetime.date(year, month, 1))
+            year, month = (year - 1, 12) if month == 1 else (year, month - 1)
+
+        next_month_start = (today.replace(day=28) + datetime.timedelta(days=4)).replace(day=1)
+        month_rows = {
+            row["month"]: row
+            for row in open_deals.filter(
+                expected_close_date__gte=months[0],
+                expected_close_date__lt=next_month_start,
+            )
+            .annotate(month=TruncMonth("expected_close_date"))
+            .values("month")
+            .annotate(deal_value=Sum(usd_value), weighted_value=Sum(weighted))
+        }
+        expected_closings_by_month = [
+            {
+                "month": month_start.strftime("%Y-%m"),
+                "label": month_start.strftime("%b"),
+                "deal_value": to_amount(month_rows.get(month_start, {}).get("deal_value")),
+                "weighted_value": to_amount(month_rows.get(month_start, {}).get("weighted_value")),
+            }
+            for month_start in months
+        ]
+
+        # Sales team: top employees by won value
+        sales_team = [
+            {
+                "employee_id": row["employee_id"],
+                "employee_name": f"{row['employee__first_name']} {row['employee__last_name']}",
+                "won_value": to_amount(row["won_value"]),
+                "won_count": row["won_count"],
+            }
+            for row in won_deals.values("employee_id", "employee__first_name", "employee__last_name")
+            .annotate(won_value=Sum(usd_value), won_count=Count("opportunity_id"))
+            .order_by("-won_value")[: self.TOP_EMPLOYEES]
+        ]
+
+        return Response({
+            "currency": "USD",
+            "open_pipeline": {"value": to_amount(open_totals["value"]), "count": open_totals["count"]},
+            "weighted_forecast": {"value": to_amount(open_totals["weighted"])},
+            "won": {"value": to_amount(won_totals["value"]), "count": won_totals["count"]},
+            "win_ratio": {
+                "percentage": win_percentage,
+                "won_count": won_totals["count"],
+                "lost_count": lost_count,
+            },
+            "past_expected_close": {"count": open_totals["past_due"]},
+            "pipeline_by_stage": pipeline_by_stage,
+            "expected_closings_by_month": expected_closings_by_month,
+            "sales_team": sales_team,
+        }, status=status.HTTP_200_OK)
