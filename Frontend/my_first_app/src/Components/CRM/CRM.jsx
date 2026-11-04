@@ -6,7 +6,7 @@ import NewCustomer from "./NewCustomer";
 import NewContact from "./NewContact";
 import NewLeadSource from "./NewLeadSource";
 import OpportunityDetails from "./OpportunityDetails";
-import { authFetch, API } from "../../Utils/authFetch";
+import { authFetch, API } from "../../Services/authFetch";
 
 const CRM_URL = `${API}/crm`;
 
