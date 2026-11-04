@@ -1,9 +1,10 @@
+
 import React, { useState } from "react";
 import "./CRMForms.css";
 
 const INITIAL_FORM = {
   name: "",
-  customer: "",
+  customerId: "",
   jobTitle: "",
   email: "",
   phone: "",
@@ -13,37 +14,49 @@ const INITIAL_FORM = {
 export default function NewContact({ onClose, onSave, customers = [] }) {
   const [form, setForm] = useState({ ...INITIAL_FORM });
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const updateField = (event) => {
     const { name, value } = event.target;
 
-    setForm((previous) => ({ ...previous, [name]: value }));
-    setErrors((previous) => ({ ...previous, [name]: "" }));
+    setForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+
+    setErrors((previous) => ({
+      ...previous,
+      [name]: "",
+    }));
+
+    setSubmitError("");
   };
 
   const handleReset = () => {
     setForm({ ...INITIAL_FORM });
     setErrors({});
+    setSubmitError("");
   };
 
   const validateForm = () => {
     const newErrors = {};
 
-   if (!form.name.trim()) {
-  newErrors.name = "Please enter contact name.";
-} else if (!/^[\p{L}\s]+$/u.test(form.name.trim())) {
-  newErrors.name = "Contact name must contain letters only.";
-}
+    if (!form.name.trim()) {
+      newErrors.name = "Please enter contact name.";
+    } else if (!/^[\p{L}\s]+$/u.test(form.name.trim())) {
+      newErrors.name = "Contact name must contain letters only.";
+    }
 
-    if (!form.customer) {
-      newErrors.customer = "Please select a customer.";
+    if (!form.customerId) {
+      newErrors.customerId = "Please select a customer.";
     }
 
     if (!form.jobTitle.trim()) {
-  newErrors.jobTitle = "Please enter job title.";
-} else if (!/^[\p{L}\s]+$/u.test(form.jobTitle.trim())) {
-  newErrors.jobTitle = "Job title must contain letters only.";
-}
+      newErrors.jobTitle = "Please enter job title.";
+    } else if (!/^[\p{L}\s]+$/u.test(form.jobTitle.trim())) {
+      newErrors.jobTitle = "Job title must contain letters only.";
+    }
 
     if (!form.email.trim()) {
       newErrors.email = "Please enter email address.";
@@ -68,40 +81,56 @@ export default function NewContact({ onClose, onSave, customers = [] }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!validateForm()) return;
+    if (saving || !validateForm()) return;
 
-    onSave({
-      ...form,
-      name: form.name.trim(),
-      jobTitle: form.jobTitle.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim(),
-      isPrimary: form.isPrimary === "true",
-      id: Date.now(),
-    });
+    setSaving(true);
+    setSubmitError("");
+
+    try {
+      await onSave({
+        customerId: Number(form.customerId),
+        name: form.name.trim(),
+        jobTitle: form.jobTitle.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        isPrimary: form.isPrimary === "true",
+      });
+
+      onClose();
+    } catch (error) {
+      setSubmitError(
+        error.message || "Unable to create contact. Please try again."
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const customerNames = [
-    ...new Set(
-      [
-        ...customers.map(
-          (customer) =>
-            customer.companyName || customer.firstName || customer.name
-        ),
-        "Acme Corp.",
-        "Global Tech",
-      ].filter(Boolean)
-    ),
-  ];
+  const getCustomerId = (customer) =>
+    customer.customer_id ?? customer.id;
+
+  const getCustomerName = (customer) =>
+    customer.company_name ||
+    customer.companyName ||
+    customer.name ||
+    `${customer.first_name || customer.firstName || ""} ${
+      customer.last_name || customer.lastName || ""
+    }`.trim() ||
+    `Customer ${getCustomerId(customer)}`;
 
   return (
     <div
       className="crm-form-overlay"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (
+          event.target === event.currentTarget &&
+          !saving
+        ) {
+          onClose();
+        }
       }}
     >
       <section
@@ -120,6 +149,7 @@ export default function NewContact({ onClose, onSave, customers = [] }) {
             type="button"
             className="crm-form-close"
             onClick={onClose}
+            disabled={saving}
             aria-label="Close form"
           >
             ×
@@ -132,15 +162,20 @@ export default function NewContact({ onClose, onSave, customers = [] }) {
               <span className="crm-field-label">
                 Name <span className="required-mark">*</span>
               </span>
+
               <input
                 name="name"
                 value={form.name}
                 onChange={updateField}
                 placeholder="Enter contact name"
                 aria-invalid={!!errors.name}
+                disabled={saving}
               />
+
               {errors.name && (
-                <span className="crm-error-message">{errors.name}</span>
+                <span className="crm-error-message">
+                  {errors.name}
+                </span>
               )}
             </label>
 
@@ -148,24 +183,42 @@ export default function NewContact({ onClose, onSave, customers = [] }) {
               <span className="crm-field-label">
                 Select Customer <span className="required-mark">*</span>
               </span>
+
               <select
-                name="customer"
-                value={form.customer}
+                name="customerId"
+                value={form.customerId}
                 onChange={updateField}
-                aria-invalid={!!errors.customer}
+                aria-invalid={!!errors.customerId}
+                disabled={saving}
               >
                 <option value="">Select customer</option>
-                {customerNames.map((customerName) => (
-                  <option key={customerName} value={customerName}>
-                    {customerName}
-                    {["Acme Corp.", "Global Tech"].includes(customerName)
-                      ? " (Sample)"
-                      : ""}
-                  </option>
-                ))}
+
+                {customers.map((customer) => {
+                  const customerId = getCustomerId(customer);
+
+                  if (customerId == null) return null;
+
+                  return (
+                    <option
+                      key={customerId}
+                      value={String(customerId)}
+                    >
+                      {getCustomerName(customer)}
+                    </option>
+                  );
+                })}
               </select>
-              {errors.customer && (
-                <span className="crm-error-message">{errors.customer}</span>
+
+              {errors.customerId && (
+                <span className="crm-error-message">
+                  {errors.customerId}
+                </span>
+              )}
+
+              {customers.length === 0 && (
+                <span className="crm-error-message">
+                  No customers available. Please create a customer first.
+                </span>
               )}
             </label>
 
@@ -173,15 +226,20 @@ export default function NewContact({ onClose, onSave, customers = [] }) {
               <span className="crm-field-label">
                 Job Title <span className="required-mark">*</span>
               </span>
+
               <input
                 name="jobTitle"
                 value={form.jobTitle}
                 onChange={updateField}
                 placeholder="e.g. Sales Manager"
                 aria-invalid={!!errors.jobTitle}
+                disabled={saving}
               />
+
               {errors.jobTitle && (
-                <span className="crm-error-message">{errors.jobTitle}</span>
+                <span className="crm-error-message">
+                  {errors.jobTitle}
+                </span>
               )}
             </label>
 
@@ -189,6 +247,7 @@ export default function NewContact({ onClose, onSave, customers = [] }) {
               <span className="crm-field-label">
                 Email <span className="required-mark">*</span>
               </span>
+
               <input
                 type="email"
                 name="email"
@@ -196,9 +255,13 @@ export default function NewContact({ onClose, onSave, customers = [] }) {
                 onChange={updateField}
                 placeholder="name@example.com"
                 aria-invalid={!!errors.email}
+                disabled={saving}
               />
+
               {errors.email && (
-                <span className="crm-error-message">{errors.email}</span>
+                <span className="crm-error-message">
+                  {errors.email}
+                </span>
               )}
             </label>
 
@@ -206,6 +269,7 @@ export default function NewContact({ onClose, onSave, customers = [] }) {
               <span className="crm-field-label">
                 Phone <span className="required-mark">*</span>
               </span>
+
               <input
                 type="tel"
                 name="phone"
@@ -215,9 +279,13 @@ export default function NewContact({ onClose, onSave, customers = [] }) {
                 maxLength={11}
                 inputMode="numeric"
                 aria-invalid={!!errors.phone}
+                disabled={saving}
               />
+
               {errors.phone && (
-                <span className="crm-error-message">{errors.phone}</span>
+                <span className="crm-error-message">
+                  {errors.phone}
+                </span>
               )}
             </label>
 
@@ -238,7 +306,9 @@ export default function NewContact({ onClose, onSave, customers = [] }) {
                     value="true"
                     checked={form.isPrimary === "true"}
                     onChange={updateField}
+                    disabled={saving}
                   />
+
                   <span className="crm-primary-dot" />
                   <span>Yes</span>
                 </label>
@@ -254,23 +324,42 @@ export default function NewContact({ onClose, onSave, customers = [] }) {
                     value="false"
                     checked={form.isPrimary === "false"}
                     onChange={updateField}
+                    disabled={saving}
                   />
+
                   <span className="crm-primary-dot" />
                   <span>No</span>
                 </label>
               </div>
 
               {errors.isPrimary && (
-                <span className="crm-error-message">{errors.isPrimary}</span>
+                <span className="crm-error-message">
+                  {errors.isPrimary}
+                </span>
               )}
             </fieldset>
           </div>
 
+          {submitError && (
+            <p className="crm-error-message" role="alert">
+              {submitError}
+            </p>
+          )}
+
           <footer className="crm-form-actions">
-            <button type="submit" className="crm-form-save">
-              Save Contact
+            <button
+              type="submit"
+              className="crm-form-save"
+              disabled={saving || customers.length === 0}
+            >
+              {saving ? "Saving..." : "Save Contact"}
             </button>
-            <button type="reset" className="crm-form-reset">
+
+            <button
+              type="reset"
+              className="crm-form-reset"
+              disabled={saving}
+            >
               Reset
             </button>
           </footer>

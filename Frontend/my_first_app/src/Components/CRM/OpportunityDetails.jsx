@@ -62,31 +62,33 @@ export default function OpportunityDetails({
   };
 
   // Add Note
-  const handleSaveNote = () => {
+  const handleSaveNote = async () => {
     const note = noteText.trim();
-
+  
     if (!note) {
       setNoteError("Please enter a note.");
       return;
     }
-
-    onAddNote?.({
-      opportunity,
-      note,
-    });
-
-    setNoteText("");
-    setNoteError("");
+  
+    try {
+      await onAddNote?.({
+        opportunity,
+        note,
+      });
+  
+      setNoteText("");
+      setNoteError("");
+    } catch (error) {
+      setNoteError(error.message || "Unable to save note.");
+    }
   };
 
   // Add Activity
-  const handleSaveActivity = (activity) => {
-    onAddActivity?.({
+  const handleSaveActivity = async (activity) => {
+    await onAddActivity?.({
       opportunity,
       ...activity,
     });
-
-    setShowActivityForm(false);
   };
 
   return (

@@ -1,6 +1,5 @@
-
 import React, { useState } from "react";
- import "./NewActivity.css";
+import "./NewActivity.css";
 
 const INITIAL_FORM = {
   type: "Call",
@@ -13,9 +12,7 @@ const getLocalDateTime = () => {
   const now = new Date();
   const offset = now.getTimezoneOffset() * 60000;
 
-  return new Date(now.getTime() - offset)
-    .toISOString()
-    .slice(0, 16);
+  return new Date(now.getTime() - offset).toISOString().slice(0, 16);
 };
 
 export default function NewActivity({ onClose, onSave }) {
@@ -61,19 +58,33 @@ export default function NewActivity({ onClose, onSave }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (event) => {
+  const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!validateForm()) return;
 
-    onSave?.({
-      type: form.type,
-      subject: form.subject.trim(),
-      description: form.description.trim(),
-      dateTime: new Date(form.dateTime).toISOString(),
-    });
+    setSaving(true);
+    setSubmitError("");
 
-    onClose();
+    try {
+      await onSave?.({
+        type: form.type,
+        subject: form.subject.trim(),
+        description: form.description.trim(),
+        dateTime: new Date(form.dateTime).toISOString(),
+      });
+
+      onClose();
+    } catch (error) {
+      setSubmitError(
+        error.message || "Unable to save activity. Please try again."
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   const actionLabel = {
@@ -164,9 +175,7 @@ export default function NewActivity({ onClose, onSave }) {
             <input
               type="text"
               value={form.subject}
-              onChange={(event) =>
-                updateField("subject", event.target.value)
-              }
+              onChange={(event) => updateField("subject", event.target.value)}
               placeholder={`Subject of the ${form.type.toLowerCase()}`}
               aria-invalid={!!errors.subject}
               className={errors.subject ? "activity-input-error" : ""}
@@ -207,9 +216,7 @@ export default function NewActivity({ onClose, onSave }) {
               type="datetime-local"
               value={form.dateTime}
               min={getLocalDateTime()}
-              onChange={(event) =>
-                updateField("dateTime", event.target.value)
-              }
+              onChange={(event) => updateField("dateTime", event.target.value)}
               aria-invalid={!!errors.dateTime}
               className={errors.dateTime ? "activity-input-error" : ""}
             />
@@ -220,11 +227,7 @@ export default function NewActivity({ onClose, onSave }) {
           </label>
 
           <footer className="activity-actions">
-            <button
-              type="button"
-              className="activity-cancel"
-              onClick={onClose}
-            >
+            <button type="button" className="activity-cancel" onClick={onClose}>
               Cancel
             </button>
 
