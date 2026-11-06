@@ -11,6 +11,7 @@ from rest_framework.decorators import api_view
 from .pagination import PageNumberPagination
 from .exchange_rates import usd_value_expression
 from .models import Opportunity, Customer, Contact, Interaction, CustomerNote, LeadSource
+from apps.accounts.models import Employee
 
 from .serializers import (
     LeadSourceSerializer,
@@ -31,6 +32,20 @@ def is_valid_id(value):
     # IDs are positive integers; anything else would raise a ValueError in the ORM
     return str(value).isdigit()
 
+class CrmEmployeeList(APIView):
+    """Employee list for CRM assignee pickers (db_table: employee)."""
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        employees = (
+            Employee.objects.exclude(
+                employment_status=Employee.EmploymentStatus.TERMINATED
+            )
+            .order_by("first_name", "last_name")
+            .values("employee_id", "first_name", "last_name", "employee_code")
+        )
+        return Response({"Employees": list(employees)}, status=status.HTTP_200_OK)
+
+        
 
 class OpportunityView(APIView):
     permission_classes = [IsAuthenticated]

@@ -587,6 +587,35 @@
       "name": "CRM",
       "item": [
         {
+          "name": "employees",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_0zk8}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/crm/employees/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "crm",
+                "employees",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Customer",
           "item": [
             {
@@ -1167,35 +1196,6 @@
                   "path": [
                     "crm",
                     "lead-sources",
-                    ""
-                  ]
-                }
-              },
-              "response": []
-            }
-          ]
-        },
-        {
-          "name": "Dashboard",
-          "item": [
-            {
-              "name": "get dashboard overview",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "http://127.0.0.1:8000/crm/overview/",
-                  "protocol": "http",
-                  "host": [
-                    "127",
-                    "0",
-                    "0",
-                    "1"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "crm",
-                    "overview",
                     ""
                   ]
                 }

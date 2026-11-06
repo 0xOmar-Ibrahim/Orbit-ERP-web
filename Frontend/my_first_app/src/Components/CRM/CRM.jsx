@@ -75,19 +75,6 @@ async function call(path, { method = "GET", body } = {}) {
 
   return data;
 }
-async function callAuth(path) {
-  const res = await authFetch(`${API}/admin/${path}`);
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(
-      data?.detail || data?.error || "Unable to load employees."
-    );
-  }
-
-  return data;
-}
 
 const toUiOpportunity = (o) => ({
   id: o.opportunity_id,
@@ -199,7 +186,7 @@ function CRM() {
         call("customers/"),
         call("contacts/"),
         call("lead-sources/"),
-        callAuth("employee/"),
+        call("employees/"),
       ]);
 
       const opportunityList = Array.isArray(opps?.opportunities)
