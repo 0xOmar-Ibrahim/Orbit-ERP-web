@@ -341,14 +341,20 @@ class EmploymentContract(models.Model):
                 name="chk_contract_date_order",
             ),
         ]
-        indexes = [
-            # ABO ELNOUR: partial unique index — only one RUNNING contract allowed per employee.
-            # Prevents duplicate active contracts for the same person.
-            models.UniqueConstraint(
-                fields=["employee"],
-                condition=models.Q(status="running"),
-                name="uq_one_running_contract_per_employee",
-            ),
+        # indexes = [
+        #     # ABO ELNOUR: partial unique index — only one RUNNING contract allowed per employee.
+        #     # Prevents duplicate active contracts for the same person.
+        #     models.UniqueConstraint(
+        #         fields=["employee"],
+        #         condition=models.Q(status="running"),
+        #         name="uq_one_running_contract_per_employee",
+        #     ),
+        constraints = [
+        models.UniqueConstraint(
+            fields=["employee"],
+            condition=models.Q(status="running"),
+            name="uq_one_running_contract_per_employee",
+        ),
             models.Index(fields=["employee"], name="idx_contract_employee"),
         ]
 
