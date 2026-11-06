@@ -25,6 +25,8 @@ import ReportsAnalytics from "./ReportsAnalytics/ReportsAnalytics";
 import Notifications from "./Notifications/Notifications";
 import Tasks from "./Tasks/Tasks";
 import Settings from "./Settings/Settings";
+import ViewEditCRM from "./CRM/ViewEditCRM/ViewEdit";
+import CRMDashboard from "./CRM/Dashboard/Dashboard";
 
 // Protect pages that require login
 function ProtectedRoute() {
@@ -76,7 +78,10 @@ class App extends Component {
               path="project-management"
               element={<ProjectManagement />}
             />
-            <Route path="crm" element={<CRM />} />
+{/* CRM Module */}
+<Route path="crm" element={<CRM />} />
+<Route path="crm/view-edit" element={<ViewEditCRM />} />
+<Route path="crm/dashboard" element={<CRMDashboard />} />
             <Route
               path="accounting-finance"
               element={<AccountingFinance />}

@@ -7,10 +7,15 @@ from .views import (
     OpportunityView,
     CustomerNoteView,
     GetOpportunities,
-    LeadSourceManagement
+    LeadSourceManagement,
+    CrmDashboardView,
 )
 
 urlpatterns = [
+    # Dashboard overview endpoints
+    path("overview", CrmDashboardView.as_view(), name="overview"),
+    path("overview/", CrmDashboardView.as_view(), name="overview-slash"),
+
     # Lead source endpoints
     path("lead_sources", LeadSourceManagement.as_view(), name="lead-sources"),
     path("lead_sources/", LeadSourceManagement.as_view(), name="lead-sources-slash"),

@@ -1,0 +1,251 @@
+/* =========================
+   VIEW CRM PAGE
+========================= */
+
+.view-crm-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 30px 35px;
+  background: var(--home-bg);
+  color: var(--text-color);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.view-crm-header {
+  margin-bottom: 30px;
+}
+
+.view-crm-breadcrumb {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--accent-color);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+}
+
+.view-crm-header h1 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: -1.5px;
+}
+
+.view-crm-header p {
+  margin: 8px 0 0;
+  color: var(--muted-color);
+  font-size: 13px;
+}
+
+/* =========================
+   TABS
+========================= */
+
+.view-crm-tabs {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  margin-bottom: 25px;
+  border-bottom: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.view-crm-tab {
+  position: relative;
+  flex-shrink: 0;
+  padding: 12px 2px 14px;
+
+  border: none;
+  background: transparent;
+
+  color: var(--muted-color);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.view-crm-tab:hover {
+  color: var(--accent-color);
+}
+
+.view-crm-tab.active {
+  color: var(--accent-color);
+}
+
+.view-crm-tab.active::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--accent-color);
+  content: "";
+}
+
+/* =========================
+   TABLE SECTION
+========================= */
+
+.crm-table-section {
+  width: 100%;
+}
+
+.crm-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.crm-table-header h2 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.crm-table-header p {
+  margin: 6px 0 0;
+  color: var(--muted-color);
+  font-size: 12px;
+}
+
+.crm-record-count {
+  padding: 7px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--muted-color);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.crm-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--sidebar-bg);
+}
+
+.crm-data-table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.crm-data-table thead {
+  background: var(--hover-bg);
+}
+
+.crm-data-table th {
+  padding: 15px 16px;
+  border-bottom: 1px solid var(--border-color);
+
+  color: var(--muted-color);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.crm-data-table td {
+  padding: 15px 16px;
+  border-bottom: 1px solid var(--border-color);
+
+  color: var(--text-color);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.crm-data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.crm-data-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.crm-data-table tbody tr:hover {
+  background: var(--hover-bg);
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.crm-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: var(--active-bg);
+  color: var(--accent-color);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.crm-empty-state {
+  height: 150px;
+  color: var(--muted-color) !important;
+  text-align: center;
+  font-size: 13px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+  .view-crm-page {
+    padding: 25px 18px;
+  }
+
+  .view-crm-header h1 {
+    font-size: 30px;
+  }
+
+  .view-crm-tabs {
+    gap: 22px;
+  }
+
+  .crm-table-header h2 {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 480px) {
+  .view-crm-page {
+    padding: 20px 12px;
+  }
+
+  .view-crm-header h1 {
+    font-size: 27px;
+  }
+
+  .view-crm-tabs {
+    gap: 18px;
+  }
+
+  .view-crm-tab {
+    font-size: 12px;
+  }
+}

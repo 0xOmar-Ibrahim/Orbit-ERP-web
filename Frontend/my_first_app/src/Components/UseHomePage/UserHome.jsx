@@ -28,6 +28,20 @@ const UserHome = () => {
   const location = useLocation();
 
   const [collapsed, setCollapsed] = useState(false);
+  const [crmMenuOpen, setCrmMenuOpen] = useState(
+  location.pathname.startsWith("/crm")
+);
+
+const crmSubModules = [
+  {
+    name: "View & Edit",
+    path: "/crm/view-edit",
+  },
+  {
+    name: "Dashboard",
+    path: "/crm/dashboard",
+  },
+];
 
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("orbitLoginTheme") === "dark"
@@ -35,6 +49,15 @@ const UserHome = () => {
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+ useEffect(() => {
+  if (
+    location.pathname.startsWith("/crm") &&
+    location.pathname !== "/crm"
+  ) {
+    setCrmMenuOpen(true);
+  }
+}, [location.pathname]);
 
   // Keep the Home theme synchronized with the saved Login theme.
   useEffect(() => {
@@ -258,27 +281,89 @@ const UserHome = () => {
     }
   };
 
-  const renderModule = (module) => (
-    <button
-      type="button"
-      key={module.path}
-      className={`module-link ${
-        location.pathname === module.path ? "active" : ""
-      }`}
-      onClick={() => openModule(module.path)}
-      title={collapsed ? module.name : ""}
-    >
-      <img
-        src={module.icon}
-        alt=""
-        className="nav-icon"
-        aria-hidden="true"
-      />
+  const renderModule = (module) => {
+  // باقي عناصر الـ Sidebar
+  if (module.name !== "CRM") {
+    return (
+      <button
+        type="button"
+        key={module.path}
+        className={`module-link ${
+          location.pathname === module.path ? "active" : ""
+        }`}
+        onClick={() => openModule(module.path)}
+        title={collapsed ? module.name : ""}
+      >
+        <img
+          src={module.icon}
+          alt=""
+          className="nav-icon"
+          aria-hidden="true"
+        />
+        {!collapsed && <span>{module.name}</span>}
+      </button>
+    );
+  }
 
-      {!collapsed && <span>{module.name}</span>}
-    </button>
+  // CRM مع القائمة الفرعية
+  return (
+    <div className="crm-module-wrapper" key={module.path}>
+      <button
+        type="button"
+        className={`module-link crm-main-link ${
+          location.pathname.startsWith("/crm") ? "active" : ""
+        }`}
+        onClick={() => {
+          navigate("/crm");
+          setCrmMenuOpen((prev) => !prev);
+        }}
+        title={collapsed ? module.name : ""}
+      >
+        <img
+          src={module.icon}
+          alt=""
+          className="nav-icon"
+          aria-hidden="true"
+        />
+        {!collapsed && <span>CRM</span>}
+      </button>
+
+      {crmMenuOpen && !collapsed && (
+        <div className="crm-submenu">
+          {crmSubModules.map((subModule) => (
+            <button
+              type="button"
+              key={subModule.path}
+              className={`crm-submenu-link ${
+                location.pathname === subModule.path ? "active" : ""
+              }`}
+              onClick={() => navigate(subModule.path)}
+            >
+              {subModule.name === "View & Edit" && (
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L9 17l-4 1 1-4Z" />
+  </svg>
+)}
+
+              {subModule.name === "Dashboard" && (
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="3" y="3" width="8" height="8" rx="1.5" />
+                  <rect x="13" y="3" width="8" height="5" rx="1.5" />
+                  <rect x="13" y="10" width="8" height="11" rx="1.5" />
+                  <rect x="3" y="13" width="8" height="8" rx="1.5" />
+                </svg>
+              )}
+
+              <span>{subModule.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
-
+};
+  
   if (loading) {
     return (
       <main className={`home-page ${darkMode ? "dark-mode" : ""}`}>

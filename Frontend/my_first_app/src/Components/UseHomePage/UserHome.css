@@ -64,6 +64,69 @@ body,
 }
 
 /* Sidebar */
+/* Sidebar */
+
+.sidebar {
+  position: sticky;
+  top: 0;
+
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+
+  width: 235px;
+  height: 100vh;
+  min-height: 0;
+
+  padding: 10px;
+
+  background: var(--sidebar-bg);
+  color: var(--text-color);
+
+  border-right: 1px solid var(--border-color);
+  border-radius: 0 20px 20px 0;
+
+  transition:
+    width 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease;
+
+  overflow: hidden;
+}
+
+/* Sidebar Scroll */
+
+.sidebar-navigation {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-color) transparent;
+}
+
+/* Chrome, Edge, Safari */
+
+.sidebar-navigation::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-navigation::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-navigation::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+.sidebar-navigation::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-color);
+}
 
 .sidebar {
   position: sticky;
@@ -598,4 +661,79 @@ body,
   .home-content {
     min-width: 0;
   }
+}
+
+/* CRM Submenu */
+
+.crm-module-wrapper {
+  width: 100%;
+}
+
+.crm-main-link {
+  font-family: inherit;
+}
+
+.crm-submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 4px 0 6px 22px;
+  padding-left: 9px;
+  border-left: 1px solid var(--border-color);
+}
+
+.crm-submenu-link {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 30px;
+  padding: 0 8px;
+
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* Small submenu icons */
+
+.crm-submenu-link svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Hover */
+
+.crm-submenu-link:hover {
+  background: var(--hover-bg);
+  color: var(--accent-color);
+}
+
+/* Active submenu */
+
+.crm-submenu-link.active {
+  background: var(--active-bg);
+  color: var(--accent-color);
+  box-shadow: inset 2px 0 var(--accent-color);
+}
+
+/* Collapsed sidebar */
+
+.sidebar.collapsed .crm-submenu {
+  display: none;
 }

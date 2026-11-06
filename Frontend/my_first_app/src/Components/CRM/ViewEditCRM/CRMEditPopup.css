@@ -1,0 +1,351 @@
+
+/* ==============================
+   CRM Edit Popup - Overlay
+============================== */
+
+.crm-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+/* ==============================
+   Modal
+============================== */
+
+.crm-edit-popup {
+  --form-bg: var(--sidebar-bg);
+  --form-text: var(--text-color);
+  --form-muted: var(--muted-color);
+  --form-border: var(--border-color);
+  --form-accent: var(--accent-color);
+  --form-hover: var(--accent-hover);
+  --form-input-bg: var(--home-bg);
+  --form-input-text: var(--text-color);
+
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 600px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 24px;
+  background: var(--form-bg);
+  color: var(--form-text);
+  border: 1px solid var(--form-accent);
+  border-radius: 10px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+}
+
+/* ==============================
+   Dark Mode
+============================== */
+
+.home-page.dark-mode .crm-edit-popup {
+  --form-bg: var(--sidebar-bg);
+  --form-text: var(--text-color);
+  --form-muted: var(--muted-color);
+  --form-border: var(--border-color);
+  --form-input-bg: var(--home-bg);
+  --form-input-text: var(--text-color);
+}
+
+/* ==============================
+   Header
+============================== */
+
+.crm-popup-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.crm-popup-header h2 {
+  margin: 0 0 8px;
+  color: var(--form-text);
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: normal;
+}
+
+.crm-popup-header p {
+  margin: 0;
+  color: var(--form-accent);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.crm-popup-close {
+  display: grid;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--form-border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--form-text);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.crm-popup-close:hover {
+  background: var(--form-accent);
+  border-color: var(--form-accent);
+  color: #fff;
+}
+
+/* ==============================
+   Form Grid
+============================== */
+
+.crm-popup-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+  row-gap: 20px;
+}
+
+.crm-popup-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--form-text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* ==============================
+   Labels
+============================== */
+
+.crm-popup-field label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 2px;
+  color: var(--form-accent);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.home-page.dark-mode .crm-popup-field label {
+  color: var(--form-text);
+}
+
+.crm-required {
+  color: #e05252 !important;
+  font-weight: 600;
+}
+
+.crm-readonly-label {
+  margin-left: auto;
+  color: var(--form-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* ==============================
+   Inputs, Selects & Textarea
+============================== */
+
+.crm-popup-field input,
+.crm-popup-field select,
+.crm-popup-field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 11px 12px;
+  border: 1px solid var(--form-border);
+  border-radius: 4px;
+  outline: none;
+  background: var(--form-input-bg);
+  color: var(--form-input-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  transition: border-color 0.2s ease;
+}
+
+.crm-popup-field textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.crm-popup-field input:focus,
+.crm-popup-field select:focus,
+.crm-popup-field textarea:focus {
+  border-color: var(--form-accent);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+
+.crm-popup-field input::placeholder,
+.crm-popup-field textarea::placeholder {
+  color: var(--form-muted);
+  opacity: 0.8;
+}
+
+.crm-popup-field select {
+  cursor: pointer;
+}
+
+.crm-popup-field select option {
+  background: var(--form-input-bg);
+  color: var(--form-input-text);
+}
+
+/* Date Picker */
+
+.crm-popup-field input[type="date"] {
+  color-scheme: light;
+}
+
+.home-page.dark-mode .crm-popup-field input[type="date"] {
+  color-scheme: dark;
+}
+
+.crm-popup-field input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+/* Read Only */
+
+.crm-popup-field .crm-readonly-input {
+  background: var(--hover-bg);
+  color: var(--form-muted);
+  cursor: not-allowed;
+}
+
+/* Disabled Fields */
+
+.crm-popup-field input:disabled,
+.crm-popup-field select:disabled,
+.crm-popup-field textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==============================
+   Form Actions
+============================== */
+
+.crm-popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--form-border);
+}
+
+.crm-popup-actions button {
+  min-width: 100px;
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--form-accent);
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.crm-popup-cancel {
+  background: transparent;
+  color: var(--form-text);
+}
+
+.crm-popup-cancel:hover {
+  background: var(--hover-bg);
+}
+
+.crm-popup-save {
+  background: var(--form-accent);
+  color: #fff;
+}
+
+.crm-popup-save:hover {
+  background: var(--form-hover);
+  border-color: var(--form-hover);
+}
+
+.crm-popup-actions button:active {
+  transform: scale(0.98);
+}
+
+.crm-popup-actions button:focus-visible,
+.crm-popup-close:focus-visible {
+  outline: 2px solid var(--form-accent);
+  outline-offset: 3px;
+}
+
+/* ==============================
+   Responsive
+============================== */
+
+@media (max-width: 600px) {
+  .crm-popup-overlay {
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .crm-edit-popup {
+    max-height: calc(100vh - 24px);
+    padding: 18px;
+  }
+
+  .crm-popup-fields {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 17px;
+  }
+
+  .crm-popup-header h2 {
+    font-size: 19px;
+  }
+
+  .crm-popup-actions button {
+    flex: 1;
+    min-width: 0;
+  }
+}
+.crm-popup-field-full {
+  grid-column: 1 / -1;
+}
+
+.crm-popup-delete {
+  min-width: 100px;
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--form-accent);
+  border-radius: 7px;
+  background: var(--form-accent);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.crm-popup-delete:hover {
+  background: #dc5555;
+  border-color: #dc5555;
+  color: #ffffff;
+}
+
+
