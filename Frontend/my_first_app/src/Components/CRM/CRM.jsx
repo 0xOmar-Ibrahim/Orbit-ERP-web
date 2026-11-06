@@ -77,7 +77,6 @@ async function call(path, { method = "GET", body } = {}) {
 }
 async function callAuth(path) {
   const res = await authFetch(`${API}/api/auth/${path}`);
-
   const data = await res.json();
 
   if (!res.ok) {
