@@ -76,7 +76,7 @@ async function call(path, { method = "GET", body } = {}) {
   return data;
 }
 async function callAuth(path) {
-  const res = await authFetch(`${API}/api/auth/${path}`);
+  const res = await authFetch(`${API}/admin/${path}`);
 
   const data = await res.json();
 
@@ -199,7 +199,7 @@ function CRM() {
         call("customers/"),
         call("contacts/"),
         call("lead-sources/"),
-        callAuth("employees/"),
+        callAuth("employee/"),
       ]);
 
       const opportunityList = Array.isArray(opps?.opportunities)
@@ -210,13 +210,14 @@ function CRM() {
 
       // Extract unique employees from opportunity data
       setSalespeople(
-        (employeeResponse?.employees || []).map((employee) => ({
-          ...employee,
-          name: `${employee.first_name || ""} ${
-            employee.last_name || ""
-          }`.trim(),
-        }))
-      );
+  (employeeResponse?.Employees || []).map((employee) => ({
+    ...employee,
+    id: employee.employee_id,
+    name: `${employee.first_name || ""} ${
+      employee.last_name || ""
+    }`.trim(),
+  }))
+);
 
       setOpportunities(opportunityList.map(toUiOpportunity));
 

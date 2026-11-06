@@ -1721,25 +1721,24 @@
 
 .crm-confirm-backdrop {
   position: fixed;
-  z-index: 1200;
+  z-index: 2100;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.48);
-  backdrop-filter: blur(4px);
-  animation: crm-confirm-fade 0.18s ease;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: none;
 }
 
 .crm-confirm-dialog {
   width: 100%;
   max-width: 390px;
   padding: 28px;
-  border: 1px solid var(--crm-border);
+  border: 1px solid #e2e8f0;
   border-radius: 16px;
-  background: var(--crm-card-bg);
-  color: var(--crm-text);
+  background: #ffffff;
+  color: #0b1220;
   text-align: center;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
   animation: crm-confirm-appear 0.2s ease;
@@ -1768,6 +1767,8 @@
   color: var(--crm-text);
   font-size: 19px;
   font-weight: 700;
+    color: #0b1220;
+
 }
 
 .crm-confirm-dialog p {
@@ -1776,6 +1777,8 @@
   font-size: 12px;
   line-height: 1.7;
   overflow-wrap: anywhere;
+    color: #64748b;
+
 }
 
 .crm-confirm-dialog p strong {
@@ -1903,4 +1906,27 @@
 
 .crm-create-menu button:hover {
   background: var(--hover-bg);
+}
+
+
+/* Delete button - same CRM primary blue */
+
+.crm-popup-delete {
+  min-width: 100px;
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--form-accent);
+  border-radius: 7px;
+  background: var(--form-accent);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.crm-popup-delete:hover {
+  background: #dc5555;
+  border-color: #dc5555;
 }
