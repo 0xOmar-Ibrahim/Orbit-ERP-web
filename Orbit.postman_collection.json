@@ -1176,6 +1176,35 @@
           ]
         },
         {
+          "name": "Dashboard",
+          "item": [
+            {
+              "name": "get dashboard overview",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/crm/overview/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "crm",
+                    "overview",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
           "name": "Opportunity",
           "item": [
             {
