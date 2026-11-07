@@ -1,7 +1,5 @@
-
 import React from "react";
 import CRMDataTable from "./CRMDataTable";
-import { customersData } from "./crmMockData";
 
 const columns = [
   { key: "customer_code", label: "Customer Code" },
@@ -14,14 +12,15 @@ const columns = [
   { key: "lead_source_name", label: "Lead Source Name" },
 ];
 
-const Customers = () => (
-  <CRMDataTable
-    title="Customers"
-    description="View and manage all customers"
-    columns={columns}
-    initialData={customersData}
-    entityType="customers"
-  />
-);
+const Customers = () => {
+  return (
+    <CRMDataTable
+      title="Customers"
+      description="View and manage all customers"
+      columns={columns}
+      entityType="customers"
+    />
+  );
+};
 
 export default Customers;

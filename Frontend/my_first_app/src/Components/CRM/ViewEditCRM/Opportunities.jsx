@@ -1,7 +1,5 @@
-
 import React from "react";
 import CRMDataTable from "./CRMDataTable";
-import { opportunitiesData } from "./crmMockData";
 
 const columns = [
   { key: "title", label: "Title" },
@@ -14,14 +12,15 @@ const columns = [
   { key: "employee_name", label: "Employee Name" },
 ];
 
-const Opportunities = () => (
-  <CRMDataTable
-    title="Opportunities"
-    description="View and manage all sales opportunities"
-    columns={columns}
-    initialData={opportunitiesData}
-    entityType="opportunities"
-  />
-);
+const Opportunities = () => {
+  return (
+    <CRMDataTable
+      title="Opportunities"
+      description="View and manage all sales opportunities"
+      columns={columns}
+      entityType="opportunities"
+    />
+  );
+};
 
 export default Opportunities;

@@ -1,14 +1,20 @@
+
 /* =========================
    VIEW CRM PAGE
 ========================= */
 
 .view-crm-page {
+  flex: 1;
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
+  min-height: 0;
   padding: 30px 35px;
-  background: var(--home-bg);
-  color: var(--text-color);
+  background: var(--bg);
+  color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* =========================
@@ -38,7 +44,7 @@
 
 .view-crm-header p {
   margin: 8px 0 0;
-  color: var(--muted-color);
+  color: var(--muted);
   font-size: 13px;
 }
 
@@ -52,7 +58,7 @@
   gap: 32px;
   width: 100%;
   margin-bottom: 25px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--line);
   overflow: hidden;
 }
 
@@ -60,23 +66,17 @@
   position: relative;
   flex-shrink: 0;
   padding: 12px 2px 14px;
-
   border: none;
   background: transparent;
-
   color: var(--muted-color);
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-
   cursor: pointer;
   transition: color 0.2s ease;
 }
 
-.view-crm-tab:hover {
-  color: var(--accent-color);
-}
-
+.view-crm-tab:hover,
 .view-crm-tab.active {
   color: var(--accent-color);
 }
@@ -98,14 +98,31 @@
 
 .crm-table-section {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
+
+/* =========================
+   TABLE HEADER
+========================= */
 
 .crm-table-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 18px;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 20px;
+}
+
+.crm-table-heading {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  flex: 1;
+  min-width: 0;
 }
 
 .crm-table-header h2 {
@@ -128,35 +145,97 @@
   color: var(--muted-color);
   font-size: 12px;
   white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* =========================
+   OPPORTUNITY SEARCH
+========================= */
+
+.crm-search-container {
+  flex: 1;
+  width: 100%;
+  max-width: 380px;
+  min-width: 180px;
+}
+
+.crm-search-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text-color);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.crm-search-wrapper:focus-within {
+  border-color: var(--blue);
+}
+
+.crm-search-wrapper input {
+  width: 100%;
+  min-width: 0;
+  padding: 11px 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.crm-search-wrapper input::placeholder {
+  color: var(--muted);
+}
+
+.crm-search-wrapper input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+/* =========================
+   TABLE CONTAINER
+========================= */
+
+.crm-table-container {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: min(55vh, 480px);
+  min-width: 0;
+  overflow: auto;
+  box-sizing: border-box;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--sidebar-bg);
+  overscroll-behavior: contain;
 }
 
 /* =========================
    TABLE
 ========================= */
 
-.crm-table-container {
-  width: 100%;
-  overflow-x: auto;
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  background: var(--sidebar-bg);
-}
-
 .crm-data-table {
   width: 100%;
-  min-width: 850px;
+  min-width: 900px;
   border-collapse: collapse;
   text-align: left;
+  table-layout: auto;
 }
 
 .crm-data-table thead {
-  background: var(--hover-bg);
+  position: static;
+  background: var(--soft-blue);
 }
 
 .crm-data-table th {
   padding: 15px 16px;
   border-bottom: 1px solid var(--border-color);
-
   color: var(--muted-color);
   font-size: 11px;
   font-weight: 700;
@@ -167,7 +246,6 @@
 .crm-data-table td {
   padding: 15px 16px;
   border-bottom: 1px solid var(--border-color);
-
   color: var(--text-color);
   font-size: 12px;
   white-space: nowrap;
@@ -193,7 +271,7 @@
   display: inline-block;
   padding: 5px 10px;
   border-radius: 20px;
-  background: var(--active-bg);
+  background: var(--soft-blue);
   color: var(--accent-color);
   font-size: 11px;
   font-weight: 600;
@@ -225,6 +303,23 @@
 
   .view-crm-tabs {
     gap: 22px;
+  }
+
+  .crm-table-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .crm-table-heading {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .crm-search-container {
+    width: 100%;
+    max-width: none;
   }
 
   .crm-table-header h2 {

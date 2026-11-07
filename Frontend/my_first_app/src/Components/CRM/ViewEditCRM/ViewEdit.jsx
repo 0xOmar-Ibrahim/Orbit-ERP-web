@@ -10,32 +10,24 @@ const TABS = [
   { id: "opportunities", label: "Opportunities" },
   { id: "customers", label: "Customers" },
   { id: "contacts", label: "Contacts" },
-  { id: "Compaigns", label: "Compaigns" },
+  { id: "campaigns", label: "Campaigns" },
 ];
 
 const ViewEdit = () => {
   const [activeTab, setActiveTab] = useState("opportunities");
 
-  const renderActiveTab = () => {
-    switch (activeTab) {
-      case "customers":
-        return <Customers />;
-
-      case "contacts":
-        return <Contacts />;
-
-      case "Compaigns":
-        return <Compaigns />;
-
-      default:
-        return <Opportunities />;
-    }
+  const tabComponents = {
+    opportunities: <Opportunities />,
+    customers: <Customers />,
+    contacts: <Contacts />,
+    campaigns: <Compaigns />,
   };
 
   return (
     <div className="view-crm-page">
       <div className="view-crm-header">
         <span className="view-crm-breadcrumb">WORKSPACE / SALES</span>
+
         <h1>View & Edit CRM</h1>
         <p>Show and Edit your CRM records</p>
       </div>
@@ -55,7 +47,9 @@ const ViewEdit = () => {
         ))}
       </div>
 
-      <div className="view-crm-content">{renderActiveTab()}</div>
+      <div className="view-crm-content">
+        {tabComponents[activeTab]}
+      </div>
     </div>
   );
 };
