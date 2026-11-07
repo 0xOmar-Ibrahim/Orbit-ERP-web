@@ -45,7 +45,22 @@ class CrmEmployeeList(APIView):
         )
         return Response({"Employees": list(employees)}, status=status.HTTP_200_OK)
 
-        
+class OpportunityOptionsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({
+            "stages": [
+                {"value": value, "label": label}
+                for value, label in Opportunity._meta
+                .get_field("stage").choices
+            ],
+            "statuses": [
+                {"value": value, "label": label}
+                for value, label in Opportunity._meta
+                .get_field("status").choices
+            ],
+        })
 
 class OpportunityView(APIView):
     permission_classes = [IsAuthenticated]

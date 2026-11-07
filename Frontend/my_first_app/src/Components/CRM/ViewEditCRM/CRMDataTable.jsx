@@ -287,7 +287,11 @@ const CRMDataTable = ({
           company_name: updatedItem.company_name,
           email: updatedItem.email,
           address: updatedItem.address,
-          lead_source_id: updatedItem.lead_source_id || null,
+          lead_source_id:
+            updatedItem.lead_source_id === "" ||
+            updatedItem.lead_source_id == null
+              ? null
+              : updatedItem.lead_source_id,
         };
       }
 

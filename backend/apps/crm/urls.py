@@ -9,11 +9,17 @@ from .views import (
     GetOpportunities,
     LeadSourceManagement,
     CrmDashboardView,
-    CrmEmployeeList
+    CrmEmployeeList,
+    OpportunityOptionsView
 )
 
 urlpatterns = [
-
+# opportunity overview endpoints
+    path(
+        "opportunity-options/",
+        OpportunityOptionsView.as_view(),
+        name="opportunity-options",
+    ),
     # Assignee list for opportunity forms (any authenticated user)
     path("employees", CrmEmployeeList.as_view(), name="crm-employees"),
     path("employees/", CrmEmployeeList.as_view(), name="crm-employees-slash"),

@@ -354,8 +354,8 @@ const CRMEditPopup = ({
     setShowDeleteConfirm(true);
   };
 
-  const confirmDelete = () => {
-    onDelete(item);
+  const confirmDelete = async () => {
+    await onDelete(item);
     setShowDeleteConfirm(false);
   };
 
@@ -363,9 +363,9 @@ const CRMEditPopup = ({
     setShowDeleteConfirm(false);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     if (
       entityType === "opportunities" &&
       formData.status === "lost" &&
@@ -374,7 +374,7 @@ const CRMEditPopup = ({
       alert("Please enter the lost reason.");
       return;
     }
-
+  
     if (
       entityType === "opportunities" &&
       !formData.customer_id
@@ -382,49 +382,52 @@ const CRMEditPopup = ({
       alert("Please select a customer.");
       return;
     }
-
+  
     const updatedItem = { ...formData };
-
+  
     if (
       entityType === "opportunities" &&
       updatedItem.employee_id === ""
     ) {
       updatedItem.employee_id = null;
     }
-
+  
     if (entityType === "campaigns") {
       updatedItem.is_active = Boolean(updatedItem.is_active);
     }
-
+  
     if (entityType === "customers") {
       updatedItem.lead_source_id =
-        updatedItem.lead_source_id || null;
+        updatedItem.lead_source_id === "" ||
+        updatedItem.lead_source_id == null
+          ? null
+          : Number(updatedItem.lead_source_id);
     }
-
+  
     if (entityType === "contacts") {
       updatedItem.is_primary = Boolean(updatedItem.is_primary);
     }
-
+  
     if (entityType === "opportunities") {
       updatedItem.customer_id = Number(updatedItem.customer_id);
-
+  
       if (updatedItem.employee_id !== null) {
         updatedItem.employee_id = Number(updatedItem.employee_id);
       }
-
+  
       if (updatedItem.probability === "") {
         updatedItem.probability = null;
       } else if (updatedItem.probability !== null) {
         updatedItem.probability = Number(updatedItem.probability);
       }
-
+  
       updatedItem.estimated_value =
         updatedItem.estimated_value === ""
           ? 0
           : Number(updatedItem.estimated_value);
     }
-
-    onSave(updatedItem);
+  
+    await onSave(updatedItem);
   };
 
   const renderField = (field) => {
