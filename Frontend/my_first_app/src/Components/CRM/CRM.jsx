@@ -75,23 +75,22 @@ async function call(path, { method = "GET", body } = {}) {
 
   return data;
 }
-async function callAuth(path) {
-<<<<<<< HEAD
-  const res = await authFetch(`${API}/api/auth/${path}`);
+// async function callAuth(path) {
+//   const res = await authFetch(`${API}/api/auth/${path}`);
 
-  const res = await authFetch(`${API}/admin/${path}`);
+//   const res = await authFetch(`${API}/admin/${path}`);
 
->>>>>>> 9c561b0a9b1730efb522c1c2e273193e1a10484d
-  const data = await res.json();
 
-  if (!res.ok) {
-    throw new Error(
-      data?.detail || data?.error || "Unable to load employees."
-    );
-  }
+//   const data = await res.json();
 
-  return data;
-}
+//   if (!res.ok) {
+//     throw new Error(
+//       data?.detail || data?.error || "Unable to load employees."
+//     );
+//   }
+
+//   return data;
+// }
 
 const toUiOpportunity = (o) => ({
   id: o.opportunity_id,
