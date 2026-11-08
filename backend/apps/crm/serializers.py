@@ -294,7 +294,6 @@ class AddCustomerSerializer(serializers.ModelSerializer):
             "email",
             "address",
             "lead_source_id",
-            "assigned_employee_id",
         ]
 
     def validate(self, attrs):
