@@ -85,8 +85,18 @@ class OpportunityView(APIView):
             filters["status"] = request.query_params["status"].lower()
 
         queryset = Opportunity.objects.select_related("customer", "employee").filter(**filters)
-        if "search" in request.query_params:
-            queryset = queryset.filter(title__icontains=request.query_params["search"])
+        # Partial, case-insensitive search. Every word must match at least one field,
+        # so "omar", "ibra" and "omar ibrahim" all find an opportunity owned by Omar Ibrahim.
+        search = request.query_params.get("search", "").strip()
+        for term in search.split():
+            queryset = queryset.filter(
+                Q(title__icontains=term)
+                | Q(customer__first_name__icontains=term)
+                | Q(customer__last_name__icontains=term)
+                | Q(customer__company_name__icontains=term)
+                | Q(employee__first_name__icontains=term)
+                | Q(employee__last_name__icontains=term)
+            )
 
         total_count = queryset.count()
         opportunities = queryset[start_range:end_range]
