@@ -434,6 +434,12 @@ class InteractionManagement(APIView):
             for field, value in request_parameters.items()
             if field in allowed_filters and value
         }
+
+        for field in ("subject", "description"):
+            value = request_parameters.get(field)
+            if value:
+                filters[f"{field}__icontains"] = value
+
         try:
             interactions = [
                 {
