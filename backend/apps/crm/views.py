@@ -619,30 +619,30 @@ class GetOpportunities(APIView):
     def get(self, request):
         params = request.query_params
 
-        # Filtering
-        allowed_filters = {
-            "title",
-            "stage",
-            "status",
-            "customer_id",
-            "employee_id",
-            "opportunity_id",
-        }
+        exact_filters = {"stage", "status", "customer_id", "employee_id", "opportunity_id"}
 
         filters = {
             field: value
             for field, value in params.items()
-            if field in allowed_filters and value
+            if field in exact_filters and value
         }
 
         for field in ("opportunity_id", "customer_id", "employee_id"):
             if field in filters and not is_valid_id(filters[field]):
-                return Response({"error": f"{field} must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": f"{field} must be an integer."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-        # Stored stage/status values are lowercase
+        # Case-insensitive match for stage/status
         for field in ("stage", "status"):
             if field in filters:
-                filters[field] = filters[field].lower()
+                filters[f"{field}__iexact"] = filters.pop(field)
+
+        # Partial text search on title
+        title = params.get("title")
+        if title:
+            filters["title__icontains"] = title
 
         queryset = (
             Opportunity.objects
