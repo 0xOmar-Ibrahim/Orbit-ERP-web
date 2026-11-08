@@ -12,6 +12,7 @@ from .pagination import PageNumberPagination
 from .exchange_rates import usd_value_expression
 from .models import Opportunity, Customer, Contact, Interaction, CustomerNote, LeadSource
 from apps.accounts.models import Employee
+from rest_framework.exceptions import ValidationError
 
 from .serializers import (
     LeadSourceSerializer,
@@ -415,53 +416,49 @@ class ContactManagement(APIView):
 class InteractionManagement(APIView):
     permission_classes = [IsAuthenticated]
 
+    
     def get(self, request):
-        request_parameters = request.query_params
+        params = request.query_params
 
-        allowed_filters = {
+        exact_filters = {
             "interaction_id",
             "type",
-            "subject",
-            "description",
             "customer_id",
             "employee_id",
             "contact_id",
-            "opportunity_id"
+            "opportunity_id",
         }
+        search_filters = {"subject", "description"}
 
         filters = {
             field: value
-            for field, value in request_parameters.items()
-            if field in allowed_filters and value
+            for field, value in params.items()
+            if field in exact_filters and value
         }
 
-        for field in ("subject", "description"):
-            value = request_parameters.get(field)
+        # Partial, case-insensitive text search
+        for field in search_filters:
+            value = params.get(field)
             if value:
                 filters[f"{field}__icontains"] = value
 
         try:
-            interactions = [
-                {
-                    **interaction, 
-                } 
-                for interaction in Interaction.objects.values(
-                    "interaction_id",
-                    "type",
-                    "subject",
-                    "description",
-                    "interaction_date",
-                    "customer_id",
-                    "employee_id",
-                    "contact_id",
-                    "opportunity_id"
-                ).filter(**filters)
-            ]
-        except:
+            interactions = Interaction.objects.filter(**filters).values(
+                "interaction_id",
+                "type",
+                "subject",
+                "description",
+                "interaction_date",
+                "customer_id",
+                "employee_id",
+                "contact_id",
+                "opportunity_id",
+            )
+            return Response({"Interactions": list(interactions)})
+
+        except (ValueError, TypeError, ValidationError):
             return Response({"error": "Invalid data entered."}, status=400)
         
-        return Response({"Interactions": interactions})
-    
     def post(self, request):
         serializer = AddInteractionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
