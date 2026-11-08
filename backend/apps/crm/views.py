@@ -11,6 +11,8 @@ from rest_framework.decorators import api_view
 from .pagination import PageNumberPagination
 from .exchange_rates import usd_value_expression
 from .models import Opportunity, Customer, Contact, Interaction, CustomerNote, LeadSource
+from apps.accounts.models import Employee
+from rest_framework.exceptions import ValidationError
 
 from .serializers import (
     LeadSourceSerializer,
@@ -31,6 +33,35 @@ def is_valid_id(value):
     # IDs are positive integers; anything else would raise a ValueError in the ORM
     return str(value).isdigit()
 
+class CrmEmployeeList(APIView):
+    """Employee list for CRM assignee pickers (db_table: employee)."""
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        employees = (
+            Employee.objects.exclude(
+                employment_status=Employee.EmploymentStatus.TERMINATED
+            )
+            .order_by("first_name", "last_name")
+            .values("employee_id", "first_name", "last_name", "employee_code")
+        )
+        return Response({"Employees": list(employees)}, status=status.HTTP_200_OK)
+
+class OpportunityOptionsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({
+            "stages": [
+                {"value": value, "label": label}
+                for value, label in Opportunity._meta
+                .get_field("stage").choices
+            ],
+            "statuses": [
+                {"value": value, "label": label}
+                for value, label in Opportunity._meta
+                .get_field("status").choices
+            ],
+        })
 
 class OpportunityView(APIView):
     permission_classes = [IsAuthenticated]
@@ -395,47 +426,49 @@ class ContactManagement(APIView):
 class InteractionManagement(APIView):
     permission_classes = [IsAuthenticated]
 
+    
     def get(self, request):
-        request_parameters = request.query_params
+        params = request.query_params
 
-        allowed_filters = {
+        exact_filters = {
             "interaction_id",
             "type",
-            "subject",
-            "description",
             "customer_id",
             "employee_id",
             "contact_id",
-            "opportunity_id"
+            "opportunity_id",
         }
+        search_filters = {"subject", "description"}
 
         filters = {
             field: value
-            for field, value in request_parameters.items()
-            if field in allowed_filters and value
+            for field, value in params.items()
+            if field in exact_filters and value
         }
+
+        # Partial, case-insensitive text search
+        for field in search_filters:
+            value = params.get(field)
+            if value:
+                filters[f"{field}__icontains"] = value
+
         try:
-            interactions = [
-                {
-                    **interaction, 
-                } 
-                for interaction in Interaction.objects.values(
-                    "interaction_id",
-                    "type",
-                    "subject",
-                    "description",
-                    "interaction_date",
-                    "customer_id",
-                    "employee_id",
-                    "contact_id",
-                    "opportunity_id"
-                ).filter(**filters)
-            ]
-        except:
+            interactions = Interaction.objects.filter(**filters).values(
+                "interaction_id",
+                "type",
+                "subject",
+                "description",
+                "interaction_date",
+                "customer_id",
+                "employee_id",
+                "contact_id",
+                "opportunity_id",
+            )
+            return Response({"Interactions": list(interactions)})
+
+        except (ValueError, TypeError, ValidationError):
             return Response({"error": "Invalid data entered."}, status=400)
         
-        return Response({"Interactions": interactions})
-    
     def post(self, request):
         serializer = AddInteractionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

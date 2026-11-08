@@ -1,0 +1,276 @@
+
+.activity-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.activity-modal {
+  width: 100%;
+  max-width: 540px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 24px;
+  background: var(--sidebar-bg);
+  color: var(--text-color);
+  border: 1px solid var(--accent-color);
+  border-radius: 10px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+}
+
+.activity-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.activity-eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--accent-color);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: none;
+}
+
+.activity-header h2 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 21px;
+  font-weight: 500;
+  text-transform: none;
+}
+
+.activity-close {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-color);
+  font-size: 24px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.activity-close:hover {
+  background: var(--hover-bg);
+}
+
+.activity-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 20px;
+  min-width: 0;
+}
+
+.activity-label {
+  color: var(--text-color);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.activity-required {
+  color: #e05252;
+}
+
+.activity-types {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.activity-type {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background: var(--home-bg);
+  color: var(--muted-color);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.activity-type svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.activity-type:hover {
+  border-color: var(--accent-color);
+  color: var(--text-color);
+}
+
+.activity-type.selected {
+  border-color: var(--accent-color);
+  background: var(--active-bg);
+  color: var(--accent-color);
+}
+
+.activity-field input,
+.activity-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  outline: none;
+  background: var(--home-bg);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  transition: border-color 0.2s ease;
+}
+
+.activity-field input {
+  min-height: 42px;
+}
+
+.activity-field textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.activity-field input::placeholder,
+.activity-field textarea::placeholder {
+  color: var(--muted-color);
+  opacity: 0.8;
+}
+
+.activity-field input:focus,
+.activity-field textarea:focus {
+  border-color: var(--accent-color);
+}
+
+.activity-field input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: none;
+}
+
+.activity-input-error {
+  border-color: #e05252 !important;
+}
+
+.activity-error {
+  color: #e05252;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.activity-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.activity-actions button {
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.activity-cancel {
+  border: 1px solid var(--accent-color);
+  background: transparent;
+  color: var(--text-color);
+}
+
+.activity-cancel:hover {
+  background: var(--hover-bg);
+}
+
+.activity-submit {
+  border: 1px solid var(--accent-color);
+  background: var(--accent-color);
+  color: #fff;
+}
+
+.activity-submit:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+@media (max-width: 480px) {
+  .activity-modal {
+    padding: 18px;
+  }
+
+  .activity-header h2 {
+    font-size: 19px;
+  }
+
+  .activity-types {
+    gap: 5px;
+  }
+
+  .activity-type {
+    flex-direction: column;
+    gap: 5px;
+    font-size: 12px;
+  }
+
+  .activity-actions button {
+    flex: 1;
+    padding: 0 10px;
+  }
+}
+/* Date & Time picker icon */
+.activity-field input[type="datetime-local"] {
+  color-scheme: light;
+}
+
+/* Dark mode */
+.dark .activity-field input[type="datetime-local"],
+[data-theme="dark"] .activity-field input[type="datetime-local"],
+.dark-mode .activity-field input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
+/* Make both buttons look the same */
+.activity-actions button {
+  min-height: 40px;
+  min-width: 100px;
+  padding: 0 18px;
+  border: 1px solid var(--accent-color);
+  border-radius: 7px;
+  background: var(--accent-color);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.activity-actions button:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}

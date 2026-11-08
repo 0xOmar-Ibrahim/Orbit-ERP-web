@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import {
+  useNavigate,
+  useLocation,
+  Outlet,
+} from "react-router-dom";
 
 import logoDark from "../../assets/dark.png";
 import logoLight from "../../assets/light.png";
@@ -24,6 +28,20 @@ const UserHome = () => {
   const location = useLocation();
 
   const [collapsed, setCollapsed] = useState(false);
+  const [crmMenuOpen, setCrmMenuOpen] = useState(
+  location.pathname.startsWith("/crm")
+);
+
+const crmSubModules = [
+  {
+    name: "View & Edit",
+    path: "/crm/view-edit",
+  },
+  {
+    name: "Dashboard",
+    path: "/crm/dashboard",
+  },
+];
 
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("orbitLoginTheme") === "dark"
@@ -31,6 +49,15 @@ const UserHome = () => {
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+ useEffect(() => {
+  if (
+    location.pathname.startsWith("/crm") &&
+    location.pathname !== "/crm"
+  ) {
+    setCrmMenuOpen(true);
+  }
+}, [location.pathname]);
 
   // Keep the Home theme synchronized with the saved Login theme.
   useEffect(() => {
@@ -254,27 +281,89 @@ const UserHome = () => {
     }
   };
 
-  const renderModule = (module) => (
-    <button
-      type="button"
-      key={module.path}
-      className={`module-link ${
-        location.pathname === module.path ? "active" : ""
-      }`}
-      onClick={() => openModule(module.path)}
-      title={collapsed ? module.name : ""}
-    >
-      <img
-        src={module.icon}
-        alt=""
-        className="nav-icon"
-        aria-hidden="true"
-      />
+  const renderModule = (module) => {
+  // باقي عناصر الـ Sidebar
+  if (module.name !== "CRM") {
+    return (
+      <button
+        type="button"
+        key={module.path}
+        className={`module-link ${
+          location.pathname === module.path ? "active" : ""
+        }`}
+        onClick={() => openModule(module.path)}
+        title={collapsed ? module.name : ""}
+      >
+        <img
+          src={module.icon}
+          alt=""
+          className="nav-icon"
+          aria-hidden="true"
+        />
+        {!collapsed && <span>{module.name}</span>}
+      </button>
+    );
+  }
 
-      {!collapsed && <span>{module.name}</span>}
-    </button>
+  // CRM مع القائمة الفرعية
+  return (
+    <div className="crm-module-wrapper" key={module.path}>
+      <button
+        type="button"
+        className={`module-link crm-main-link ${
+          location.pathname.startsWith("/crm") ? "active" : ""
+        }`}
+        onClick={() => {
+          navigate("/crm");
+          setCrmMenuOpen((prev) => !prev);
+        }}
+        title={collapsed ? module.name : ""}
+      >
+        <img
+          src={module.icon}
+          alt=""
+          className="nav-icon"
+          aria-hidden="true"
+        />
+        {!collapsed && <span>CRM</span>}
+      </button>
+
+      {crmMenuOpen && !collapsed && (
+        <div className="crm-submenu">
+          {crmSubModules.map((subModule) => (
+            <button
+              type="button"
+              key={subModule.path}
+              className={`crm-submenu-link ${
+                location.pathname === subModule.path ? "active" : ""
+              }`}
+              onClick={() => navigate(subModule.path)}
+            >
+              {subModule.name === "View & Edit" && (
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L9 17l-4 1 1-4Z" />
+  </svg>
+)}
+
+              {subModule.name === "Dashboard" && (
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="3" y="3" width="8" height="8" rx="1.5" />
+                  <rect x="13" y="3" width="8" height="5" rx="1.5" />
+                  <rect x="13" y="10" width="8" height="11" rx="1.5" />
+                  <rect x="3" y="13" width="8" height="8" rx="1.5" />
+                </svg>
+              )}
+
+              <span>{subModule.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
-
+};
+  
   if (loading) {
     return (
       <main className={`home-page ${darkMode ? "dark-mode" : ""}`}>
@@ -292,10 +381,10 @@ const UserHome = () => {
       <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
        <div className="brand-container">
   <img
-    className={`home-logo ${collapsed ? "logo-collapsed" : ""}`}
-    src={darkMode ? logoDark : logoLight}
-    alt="Orbit logo"
-  />
+  className={`home-logo ${collapsed ? "logo-collapsed" : ""}`}
+  src={darkMode ? logoDark : logoLight}
+  alt="Orbit logo"
+/>
 
   <button
     className="collapse-button"
@@ -349,15 +438,25 @@ const UserHome = () => {
 
         {!collapsed && (
           <div className="sidebar-footer">
-            <div className="profile-card">
-              <div className="profile-info">
-                <strong>{fullName || user.username || "User"}</strong>
+  <div
+    className="profile-card"
+    onClick={() => navigate("/")}
+    role="button"
+    tabIndex={0}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        navigate("/");
+      }
+    }}
+  >
+    <div className="profile-info">
+      <strong>{fullName || user.username || "User"}</strong>
 
-                <span>
-                  {user.role_name || user.role || "Employee"}
-                </span>
-              </div>
-            </div>
+      <span>
+        {user.role_name || user.role || "Employee"}
+      </span>
+    </div>
+  </div>
 
             <button
               type="button"
@@ -370,9 +469,95 @@ const UserHome = () => {
         )}
       </aside>
 
-      <section className="home-content">
-        {/* Your page content or nested routes go here. */}
-      </section>
+     <section className="home-content">
+  {location.pathname === "/home" && (
+    <div className="home-dashboard">
+      <p className="welcome-subtitle">ORBIT ERP</p>
+
+      <h1>Welcome to Orbit</h1>
+
+      <p className="welcome-message">
+        Hello,{" "}
+        {[
+          user?.first_name,
+          user?.last_name,
+        ]
+          .filter(Boolean)
+          .join(" ") ||
+          user?.full_name ||
+          user?.username ||
+          "User"}
+        ! We're glad to have you here.
+      </p>
+
+      <div className="user-details-card">
+        <div className="user-details-header">
+          <div>
+            <h2>
+              {[
+                user?.first_name,
+                user?.last_name,
+              ]
+                .filter(Boolean)
+                .join(" ") ||
+                user?.full_name ||
+                user?.username ||
+                "User"}
+            </h2>
+
+            <p className="user-role">
+              {user?.role_name ||
+                (typeof user?.role === "string"
+                  ? user.role
+                  : null) ||
+                user?.user_type ||
+                "Employee"}
+            </p>
+          </div>
+        </div>
+
+        <div className="details-divider" />
+
+        <h3>Account Details</h3>
+
+        <div className="user-details-grid">
+          {Object.entries(user || {})
+            .filter(
+              ([key, value]) =>
+                !/password|token|secret|cookie|authorization|session|csrf/i.test(
+                  key
+                ) &&
+                value !== null &&
+                value !== undefined &&
+                typeof value !== "object" &&
+                value !== ""
+            )
+            .map(([key, value]) => (
+              <div className="detail-item" key={key}>
+                <span className="detail-label">
+                  {key
+                    .replace(/_/g, " ")
+                    .replace(
+                      /([a-z])([A-Z])/g,
+                      "$1 $2"
+                    )
+                    .replace(/\b\w/g, (letter) =>
+                      letter.toUpperCase()
+                    )}
+                </span>
+
+                <span className="detail-value">
+                  {String(value)}
+                </span>
+              </div>
+            ))}
+        </div>
+      </div>
+    </div>
+  )}
+
+  <Outlet context={{ user }} />
+</section>
     </main>
   );
 };

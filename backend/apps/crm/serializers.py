@@ -294,7 +294,6 @@ class AddCustomerSerializer(serializers.ModelSerializer):
             "email",
             "address",
             "lead_source_id",
-            "assigned_employee_id",
         ]
 
     def validate(self, attrs):
@@ -308,10 +307,17 @@ class AddCustomerSerializer(serializers.ModelSerializer):
 
 
 class UpdateCustomerSerializer(serializers.ModelSerializer):
-    customer_code = serializers.CharField(read_only=True)
+
+    lead_source_id = serializers.PrimaryKeyRelatedField(
+        queryset=LeadSource.objects.all(),
+        source="lead_source",
+        required=False,
+        allow_null=True,
+    )
 
     class Meta:
         model = Customer
+
         fields = [
             "customer_id",
             "customer_code",
@@ -322,7 +328,11 @@ class UpdateCustomerSerializer(serializers.ModelSerializer):
             "email",
             "address",
             "lead_source_id",
-            "assigned_employee_id",
+        ]
+
+        read_only_fields = [
+            "customer_id",
+            "customer_code",
         ]
 
     def validate(self, data):

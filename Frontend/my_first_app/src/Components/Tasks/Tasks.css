@@ -1,0 +1,15 @@
+
+.module-page {
+  padding: 30px;
+  color: var(--text-color);
+}
+
+.module-page h1 {
+  margin-bottom: 12px;
+  font-size: 28px;
+}
+
+.module-page p {
+  color: var(--muted-color);
+  font-size: 15px;
+}
