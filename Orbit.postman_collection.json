@@ -1706,6 +1706,790 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "HR",
+      "item": [
+        {
+          "name": "Skill Categories",
+          "item": [
+            {
+              "name": "Get Skill Categories",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/skill-categories/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "skill-categories"
+                  ],
+                  "query": [
+                    {
+                      "key": "skill_category_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "name",
+                      "value": "Communication",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100)."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Skill Categorie",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/skill-categories/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "skill-categories"
+                  ]
+                },
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Communication\",\n    \"description\": \"Communication and interpersonal skills\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Skill Categorie",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/skill-categories/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "skill-categories"
+                  ]
+                },
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"skill_category_id\": 1,\n    \"name\": \"Communication\",\n    \"description\": \"Communication and interpersonal skills\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Skill Categorie",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/skill-categories/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "skill-categories"
+                  ]
+                },
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"skill_category_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Skills",
+          "item": [
+            {
+              "name": "Get Skills",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/skills/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "skills"
+                  ],
+                  "query": [
+                    {
+                      "key": "skill_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "skill_category_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "name",
+                      "value": "Active Listening",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100)."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Skill",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/skills/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "skills"
+                  ]
+                },
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"skill_category\": 1,\n    \"name\": \"Active Listening\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Skill",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/skills/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "skills"
+                  ]
+                },
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"skill_id\": 1,\n    \"skill_category\": 1,\n    \"name\": \"Active Listening\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Skill",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/skills/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "skills"
+                  ]
+                },
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"skill_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Employee Skills",
+          "item": [
+            {
+              "name": "Get Employee Skills",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/employee-skills/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "employee-skills"
+                  ],
+                  "query": [
+                    {
+                      "key": "employee_skill_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "employee_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "skill_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "level",
+                      "value": "intermediate",
+                      "disabled": true
+                    },
+                    {
+                      "key": "years_experience",
+                      "value": "2",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100)."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Employee Skill",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/employee-skills/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "employee-skills"
+                  ]
+                },
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"employee\": 1,\n    \"skill\": 1,\n    \"level\": \"intermediate\",\n    \"years_experience\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Employee Skill",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/employee-skills/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "employee-skills"
+                  ]
+                },
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"employee_skill_id\": 1,\n    \"employee\": 1,\n    \"skill\": 1,\n    \"level\": \"intermediate\",\n    \"years_experience\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Employee Skill",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/employee-skills/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "employee-skills"
+                  ]
+                },
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"employee_skill_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Employee Attendance",
+          "item": [
+            {
+              "name": "Get Employee Attendance",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/attendance/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "attendance",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "attendance_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "employee_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "attendance_date",
+                      "value": "2026-11-17",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "present",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "List employee attendance records. Optional filters: attendance_id, employee_id, attendance_date, status. Pagination: page, page_size (default 10, maximum 100). Results are ordered by -attendance_date, attendance_id."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Employee Attendance",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"employee_id\": 1,\n    \"attendance_date\": \"2026-11-17\",\n    \"check_in\": \"09:00:00\",\n    \"check_out\": \"17:00:00\",\n    \"status\": \"present\",\n    \"notes\": \"Regular working day\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/attendance/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "attendance",
+                    ""
+                  ]
+                },
+                "description": "Create an attendance record. Worked/overtime minutes are calculated by the API."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Employee Attendance",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"attendance_id\": 1,\n    \"employee_id\": 1,\n    \"attendance_date\": \"2026-11-17\",\n    \"check_in\": \"09:00:00\",\n    \"check_out\": \"17:30:00\",\n    \"status\": \"present\",\n    \"notes\": \"Updated check-out time\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/attendance/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "attendance",
+                    ""
+                  ]
+                },
+                "description": "Update an attendance record. attendance_id is required. Worked/overtime minutes are calculated by the API."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Employee Attendance",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"attendance_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/attendance/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "attendance",
+                    ""
+                  ]
+                },
+                "description": "Delete an attendance record by attendance_id."
+              },
+              "response": []
+            }
+          ],
+          "description": "Employee attendance management endpoints."
+        }
+      ]
     }
   ],
   "variable": [

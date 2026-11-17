@@ -16,8 +16,12 @@ class Migration(migrations.Migration):
             model_name='employmentcontract',
             name='uq_one_running_contract_per_employee',
         ),
-        migrations.AddIndex(
+        migrations.AddConstraint(
             model_name='employmentcontract',
-            index=models.UniqueConstraint(condition=models.Q(('status', 'running')), fields=('employee',), name='uq_one_running_contract_per_employee'),
+            constraint=models.UniqueConstraint(
+                condition=models.Q(status='running'),
+                fields=('employee',),
+                name='uq_one_running_contract_per_employee',
+            ),
         ),
     ]

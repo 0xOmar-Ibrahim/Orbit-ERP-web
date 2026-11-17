@@ -4,10 +4,21 @@ import time
 import re
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import BasePermission
-
+from django.db.models import Q
+from apps.hr.models import EmploymentContract, WorkScheduleLine
 
 EMAIL_REGEX = r"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
 
+
+class IsAdministratorUser(BasePermission):
+    """
+    Allows access only to admin users.
+    """
+
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_superuser)
+
+    
 def validate_email_regex(email):
     if not re.fullmatch(EMAIL_REGEX, email or ""):
         raise ValidationError({
@@ -75,10 +86,94 @@ def generate_code(account_type = 1):
 
     return generated_code
 
-class IsAdministratorUser(BasePermission):
+
+
+def calculate_attendance_metrics(attendance):
     """
-    Allows access only to admin users.
+    Calculate worked_minutes and overtime_minutes using the employee's
+    running contract and assigned WorkSchedule.
     """
 
-    def has_permission(self, request, view):
-        return bool(request.user and request.user.is_superuser)
+    attendance.worked_minutes = 0
+    attendance.overtime_minutes = 0
+
+    # An incomplete attendance record has no finalized working duration.
+    if not attendance.check_in or not attendance.check_out:
+        return
+
+    elapsed_minutes = int(
+        (attendance.check_out - attendance.check_in).total_seconds() // 60
+    )
+
+    # Prevent negative durations.
+    if elapsed_minutes <= 0:
+        return
+
+    # Find the contract active on the attendance date.
+    contract = (
+        EmploymentContract.objects
+        .filter(
+            employee_id=attendance.employee_id,
+            status=EmploymentContract.ContractStatus.RUNNING,
+            start_date__lte=attendance.attendance_date,
+        )
+        .filter(
+            Q(end_date__isnull=True) |
+            Q(end_date__gte=attendance.attendance_date)
+        )
+        .select_related("schedule")
+        .first()
+    )
+
+    # No active contract or no assigned schedule:
+    # Record actual elapsed time, but do not assume overtime.
+    if not contract or not contract.schedule:
+        attendance.worked_minutes = elapsed_minutes
+        return
+
+    schedule = contract.schedule
+
+    # Your WorkScheduleLine weekday values are:
+    # Saturday=0, Sunday=1, Monday=2, ..., Friday=6.
+    weekday = (attendance.attendance_date.weekday() + 2) % 7
+
+    schedule_line = WorkScheduleLine.objects.filter(
+        schedule=schedule,
+        weekday=weekday,
+    ).first()
+
+    # No schedule line means no defined working duration for this day.
+    if not schedule_line:
+        attendance.worked_minutes = elapsed_minutes
+        return
+
+    # WorkScheduleLine requires end_time > start_time.
+    scheduled_minutes = int(
+        (
+            schedule_line.end_time.hour * 60
+            + schedule_line.end_time.minute
+        )
+        -
+        (
+            schedule_line.start_time.hour * 60
+            + schedule_line.start_time.minute
+        )
+    )
+
+    # Subtract the configured break from the scheduled working duration.
+    scheduled_work_minutes = max(
+        0,
+        scheduled_minutes - schedule_line.break_minutes
+    )
+
+    # The schema defines break_minutes as a deduction from worked hours.
+    actual_worked_minutes = max(
+        0,
+        elapsed_minutes - schedule_line.break_minutes
+    )
+
+    attendance.worked_minutes = actual_worked_minutes
+    attendance.overtime_minutes = max(
+        0,
+        actual_worked_minutes - scheduled_work_minutes
+    )

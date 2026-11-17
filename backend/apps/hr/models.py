@@ -331,31 +331,27 @@ class EmploymentContract(models.Model):
 
     class Meta:
         db_table = "employment_contract"
+
         constraints = [
-            # ABO ELNOUR: end_date must be strictly after start_date when provided.
             models.CheckConstraint(
                 condition=(
-                    models.Q(end_date__isnull=True) |
-                    models.Q(end_date__gt=models.F("start_date"))
+                    models.Q(end_date__isnull=True)
+                    | models.Q(end_date__gt=models.F("start_date"))
                 ),
                 name="chk_contract_date_order",
             ),
+            models.UniqueConstraint(
+                fields=["employee"],
+                condition=models.Q(status="running"),
+                name="uq_one_running_contract_per_employee",
+            ),
         ]
-        # indexes = [
-        #     # ABO ELNOUR: partial unique index — only one RUNNING contract allowed per employee.
-        #     # Prevents duplicate active contracts for the same person.
-        #     models.UniqueConstraint(
-        #         fields=["employee"],
-        #         condition=models.Q(status="running"),
-        #         name="uq_one_running_contract_per_employee",
-        #     ),
-        constraints = [
-        models.UniqueConstraint(
-            fields=["employee"],
-            condition=models.Q(status="running"),
-            name="uq_one_running_contract_per_employee",
-        ),
-            models.Index(fields=["employee"], name="idx_contract_employee"),
+
+        indexes = [
+            models.Index(
+                fields=["employee"],
+                name="idx_contract_employee",
+            ),
         ]
 
     def __str__(self):
@@ -405,11 +401,13 @@ class Attendance(models.Model):
                 fields=["employee", "attendance_date"],
                 name="uq_attendance_employee_date",
             ),
-            # ABO ELNOUR: check_out must be after check_in when both are set.
             models.CheckConstraint(
                 condition=(
                     models.Q(check_out__isnull=True) |
-                    models.Q(check_out__gt=models.F("check_in"))
+                    (
+                        models.Q(check_in__isnull=False) &
+                        models.Q(check_out__gt=models.F("check_in"))
+                    )
                 ),
                 name="chk_attendance_time_order",
             ),
