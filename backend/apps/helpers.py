@@ -19,6 +19,11 @@ class IsAdministratorUser(BasePermission):
         return bool(request.user and request.user.is_superuser)
 
     
+def is_valid_id(value):
+    # IDs are positive integers; anything else would raise a ValueError in the ORM
+    return str(value).isdigit()
+
+
 def validate_email_regex(email):
     if not re.fullmatch(EMAIL_REGEX, email or ""):
         raise ValidationError({

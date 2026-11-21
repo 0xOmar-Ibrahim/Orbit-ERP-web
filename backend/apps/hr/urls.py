@@ -3,7 +3,8 @@ from .views import (
     SkillCategoryManagement,
     SkillManagement,
     EmployeeSkillManagement,
-    AttendanceManagement
+    AttendanceManagement,
+    EmploymentContractManagement,
 )
 
 urlpatterns = [
@@ -26,5 +27,10 @@ urlpatterns = [
         "attendance/",
         AttendanceManagement.as_view(),
         name="attendance"
+    ),
+    path(
+        "contracts/",
+        EmploymentContractManagement.as_view(),
+        name="contracts",
     ),
 ]

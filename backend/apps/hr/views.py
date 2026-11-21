@@ -3,11 +3,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from django.db.models import ProtectedError
+from django.db.models import ProtectedError, Q
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError, transaction
-from .models import SkillCategory, EmployeeSkill, Skill, Attendance
+from .models import SkillCategory, EmployeeSkill, Skill, Attendance, EmploymentContract
 from ..pagination import StandardPagination
-from ..helpers import calculate_attendance_metrics
+from ..helpers import calculate_attendance_metrics, is_valid_id
 from .serializers import (
     AddSkillCategorySerializer,
     UpdateSkillCategorySerializer,
@@ -16,7 +17,9 @@ from .serializers import (
     AddSkillSerializer,
     UpdateSkillSerializer,
     AddAttendanceSerializer,
-    UpdateAttendanceSerializer
+    UpdateAttendanceSerializer,
+    AddEmploymentContractSerializer,
+    UpdateEmploymentContractSerializer,
 )
 
 class SkillCategoryManagement(APIView):
@@ -538,4 +541,234 @@ class AttendanceManagement(APIView):
         return Response(
             {"message": "Attendance deleted successfully."},
             status=status.HTTP_200_OK
+        )
+
+
+class EmploymentContractManagement(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardPagination
+
+    CONTRACT_VALUES = (
+        "contract_id",
+        "contract_number",
+        "employee_id",
+        "employee__first_name",
+        "employee__last_name",
+        "contract_type",
+        "start_date",
+        "end_date",
+        "position_id",
+        "position__title",
+        "schedule_id",
+        "schedule__name",
+        "wage",
+        "currency",
+        "status",
+        "created_at",
+        "updated_at",
+    )
+
+    def _get_contract_id(self, request):
+        return (
+            request.data.get("contract_id")
+            or request.query_params.get("contract_id")
+        )
+
+    def get(self, request):
+        request_parameters = request.query_params
+        contract_id = request_parameters.get("contract_id")
+
+        # Get a specific contract by ID
+        if contract_id:
+            if not is_valid_id(contract_id):
+                return Response(
+                    {"error": "contract_id must be an integer."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            contract = (
+                EmploymentContract.objects
+                .filter(contract_id=contract_id)
+                .values(*self.CONTRACT_VALUES)
+                .first()
+            )
+
+            if not contract:
+                return Response(
+                    {"error": "Contract not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            return Response({"contract": contract})
+
+        # Exact-match filters
+        allowed_filters = {
+            "contract_number",
+            "employee_id",
+            "contract_type",
+            "status",
+            "position_id",
+            "schedule_id",
+            "currency",
+        }
+
+        filters = {
+            field: value
+            for field, value in request_parameters.items()
+            if field in allowed_filters and value
+        }
+
+        # Date range filters
+        range_filters = {
+            "start_date_from": "start_date__gte",
+            "start_date_to": "start_date__lte",
+            "end_date_from": "end_date__gte",
+            "end_date_to": "end_date__lte",
+        }
+
+        for param, lookup in range_filters.items():
+            value = request_parameters.get(param)
+            if value:
+                filters[lookup] = value
+
+        try:
+            queryset = EmploymentContract.objects.filter(**filters)
+
+            # Partial, case-insensitive search. Every word must match the
+            # contract number, employee name or position title.
+            search = request_parameters.get("search", "").strip()
+            for term in search.split():
+                queryset = queryset.filter(
+                    Q(contract_number__icontains=term)
+                    | Q(employee__first_name__icontains=term)
+                    | Q(employee__last_name__icontains=term)
+                    | Q(position__title__icontains=term)
+                )
+
+            contracts = (
+                queryset
+                .order_by("-start_date", "contract_id")
+                .values(*self.CONTRACT_VALUES)
+            )
+
+            paginator = self.pagination_class()
+            page = paginator.paginate_queryset(
+                contracts, request, view=self
+            )
+
+            return paginator.get_paginated_response(page)
+
+        except (ValueError, TypeError, DjangoValidationError):
+            return Response(
+                {"error": "Invalid data entered."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def post(self, request):
+        serializer = AddEmploymentContractSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            with transaction.atomic():
+                contract = serializer.save()
+        except IntegrityError:
+            return Response(
+                {
+                    "error": (
+                        "This employee already has a running contract, "
+                        "or another database constraint was violated."
+                    )
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return Response(
+            {
+                "message": "Contract created successfully.",
+                "contract_id": contract.contract_id,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    def patch(self, request):
+        contract_id = self._get_contract_id(request)
+
+        if not contract_id:
+            return Response(
+                {"error": "contract_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not is_valid_id(contract_id):
+            return Response(
+                {"error": "contract_id must be an integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            contract = EmploymentContract.objects.get(contract_id=contract_id)
+        except EmploymentContract.DoesNotExist:
+            return Response(
+                {"error": "Contract not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = UpdateEmploymentContractSerializer(
+            contract,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            with transaction.atomic():
+                serializer.save()
+        except IntegrityError:
+            return Response(
+                {
+                    "error": (
+                        "This employee already has a running contract, "
+                        "or another database constraint was violated."
+                    )
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return Response(
+            {"message": "Contract updated successfully."}
+        )
+
+    def delete(self, request):
+        contract_id = self._get_contract_id(request)
+
+        if not contract_id:
+            return Response(
+                {"error": "contract_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not is_valid_id(contract_id):
+            return Response(
+                {"error": "contract_id must be an integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            contract = EmploymentContract.objects.get(contract_id=contract_id)
+        except EmploymentContract.DoesNotExist:
+            return Response(
+                {"error": "Contract not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        try:
+            contract.delete()
+        except ProtectedError:
+            return Response(
+                {"error": "This contract is referenced by other records and cannot be deleted."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return Response(
+            {"message": "Contract deleted successfully."}
         )

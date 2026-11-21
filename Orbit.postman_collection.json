@@ -2488,6 +2488,282 @@
             }
           ],
           "description": "Employee attendance management endpoints."
+        },
+        {
+          "name": "Employment Contracts",
+          "item": [
+            {
+              "name": "Get Contracts",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/contracts/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "contracts",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "CTR",
+                      "disabled": true
+                    },
+                    {
+                      "key": "employee_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "contract_type",
+                      "value": "fixed_term",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "running",
+                      "disabled": true
+                    },
+                    {
+                      "key": "position_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "schedule_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "currency",
+                      "value": "EGP",
+                      "disabled": true
+                    },
+                    {
+                      "key": "start_date_from",
+                      "value": "2026-01-01",
+                      "disabled": true
+                    },
+                    {
+                      "key": "start_date_to",
+                      "value": "2026-12-31",
+                      "disabled": true
+                    },
+                    {
+                      "key": "end_date_from",
+                      "value": "2026-01-01",
+                      "disabled": true
+                    },
+                    {
+                      "key": "end_date_to",
+                      "value": "2026-12-31",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "List employment contracts. Optional exact filters: contract_number, employee_id, contract_type (permanent, fixed_term, temporary, intern, contractor), status (draft, running, expired, terminated), position_id, schedule_id, currency. Date ranges: start_date_from, start_date_to, end_date_from, end_date_to (YYYY-MM-DD). search: partial match on contract number, employee first/last name or position title (every word must match). Pagination: page, page_size (default 10, maximum 100). Ordered by -start_date, contract_id."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Contract by id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/contracts/?contract_id=1",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "contracts",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "contract_id",
+                      "value": "1",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Get a single employment contract. Returns {\"contract\": {...}} or 404."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Contract",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/contracts/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "contracts",
+                    ""
+                  ]
+                },
+                "description": "Create an employment contract. Required: contract_number (unique), employee_id, contract_type, start_date, wage. Optional: end_date (must be after start_date, null for open-ended), position_id, schedule_id, currency (default EGP), status (default draft). Returns 409 if the employee already has a running contract.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"contract_number\": \"CTR-2026-0001\",\n    \"employee_id\": 1,\n    \"contract_type\": \"fixed_term\",\n    \"start_date\": \"2026-01-01\",\n    \"end_date\": \"2026-12-31\",\n    \"position_id\": 1,\n    \"schedule_id\": 1,\n    \"wage\": \"15000.00\",\n    \"currency\": \"EGP\",\n    \"status\": \"draft\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Contract",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/contracts/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "contracts",
+                    ""
+                  ]
+                },
+                "description": "Partially update an employment contract. contract_id is required; send only the fields to change. Returns 409 if the change would give the employee a second running contract.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"contract_id\": 1,\n    \"status\": \"running\",\n    \"wage\": \"16000.00\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Contract",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/contracts/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "contracts",
+                    ""
+                  ]
+                },
+                "description": "Delete an employment contract. contract_id is required.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"contract_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     }
