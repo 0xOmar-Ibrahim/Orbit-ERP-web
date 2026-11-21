@@ -5,6 +5,8 @@ from .views import (
     EmployeeSkillManagement,
     AttendanceManagement,
     EmploymentContractManagement,
+    EmployeeDocumentManagement,
+    EmployeeDocumentDownload,
 )
 
 urlpatterns = [
@@ -32,5 +34,15 @@ urlpatterns = [
         "contracts/",
         EmploymentContractManagement.as_view(),
         name="contracts",
+    ),
+    path(
+        "documents/",
+        EmployeeDocumentManagement.as_view(),
+        name="documents",
+    ),
+    path(
+        "documents/download/",
+        EmployeeDocumentDownload.as_view(),
+        name="documents-download",
     ),
 ]

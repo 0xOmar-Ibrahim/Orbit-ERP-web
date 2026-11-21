@@ -2764,6 +2764,377 @@
               "response": []
             }
           ]
+        },
+        {
+          "name": "Employee Documents",
+          "item": [
+            {
+              "name": "Get Documents",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/documents/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "documents",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "cv",
+                      "disabled": true
+                    },
+                    {
+                      "key": "employee_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "document_type",
+                      "value": "cv",
+                      "disabled": true
+                    },
+                    {
+                      "key": "uploaded_by_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "expiry_date_from",
+                      "value": "2026-01-01",
+                      "disabled": true
+                    },
+                    {
+                      "key": "expiry_date_to",
+                      "value": "2027-12-31",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "List employee documents. Optional filters: employee_id, document_type (national_id, passport, contract, cv, certificate, other), uploaded_by_id, expiry_date_from, expiry_date_to (YYYY-MM-DD). search: partial match on document name or employee first/last name. Pagination: page, page_size (default 10, maximum 100). Each row includes a download_url. Ordered by -uploaded_at."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Document by id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/documents/?document_id=1",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "documents",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "document_id",
+                      "value": "1",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Get a single document's metadata. Returns {\"document\": {...}} with a download_url, or 404."
+              },
+              "response": []
+            },
+            {
+              "name": "Upload Document",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/documents/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "documents",
+                    ""
+                  ]
+                },
+                "description": "Upload a document (multipart/form-data). Required: employee_id, document_type, file. Optional: document_name (defaults to the original file name), expiry_date (YYYY-MM-DD). Allowed types: pdf, doc, docx, jpg, jpeg, png; max 10 MB. The file is stored in backend/uploads/employee_documents/ with a random name; uploaded_by is set to the logged-in user.",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "employee_id",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": false
+                    },
+                    {
+                      "key": "document_type",
+                      "value": "cv",
+                      "type": "text",
+                      "disabled": false
+                    },
+                    {
+                      "key": "document_name",
+                      "value": "Ahmed CV",
+                      "type": "text",
+                      "disabled": false
+                    },
+                    {
+                      "key": "expiry_date",
+                      "value": "2027-12-31",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Document (metadata)",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/documents/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "documents",
+                    ""
+                  ]
+                },
+                "description": "Edit document metadata (JSON). document_id is required; send only the fields to change.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"document_id\": 1,\n    \"document_name\": \"Ahmed CV 2026\",\n    \"expiry_date\": \"2027-12-31\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Replace Document File",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/documents/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "documents",
+                    ""
+                  ]
+                },
+                "description": "Replace the stored file (multipart/form-data). document_id and file are required; other fields optional. The old file is deleted from the server after the update succeeds.",
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "document_id",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": false
+                    },
+                    {
+                      "key": "document_name",
+                      "value": "Ahmed CV (updated)",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Document",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/documents/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "documents",
+                    ""
+                  ]
+                },
+                "description": "Delete a document record and its stored file. document_id is required.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"document_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Download Document",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/documents/download/?document_id=1",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "documents",
+                    "download",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "document_id",
+                      "value": "1",
+                      "disabled": false
+                    },
+                    {
+                      "key": "inline",
+                      "value": "true",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Download the stored file. document_id is required. Add inline=true to open it in the browser instead of downloading."
+              },
+              "response": []
+            }
+          ]
         }
       ]
     }

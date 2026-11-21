@@ -170,6 +170,16 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 
+# Uploaded files (employee documents, CVs, ...)
+# Files are NOT served publicly; they are downloaded through authenticated API endpoints.
+
+MEDIA_ROOT = BASE_DIR / "uploads"
+
+# Max size of a single uploaded document (10 MB)
+MAX_DOCUMENT_UPLOAD_SIZE = 10 * 1024 * 1024
+ALLOWED_DOCUMENT_EXTENSIONS = {"pdf", "doc", "docx", "jpg", "jpeg", "png"}
+
+
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 

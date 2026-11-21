@@ -182,3 +182,41 @@ def calculate_attendance_metrics(attendance):
         0,
         actual_worked_minutes - scheduled_work_minutes
     )
+
+# ==========================
+# Uploaded file storage
+# ==========================
+
+def get_upload_storage():
+    """Storage rooted at settings.MEDIA_ROOT (backend/uploads/)."""
+    from django.conf import settings
+    from django.core.files.storage import FileSystemStorage
+
+    return FileSystemStorage(location=settings.MEDIA_ROOT)
+
+
+def save_uploaded_file(uploaded_file, folder):
+    """
+    Save an uploaded file under MEDIA_ROOT/<folder>/ with a random name,
+    keeping only the original extension. Returns the relative path to store in the DB.
+    """
+    import os
+    import uuid
+
+    extension = os.path.splitext(uploaded_file.name)[1].lower()
+    random_name = f"{folder}/{uuid.uuid4().hex}{extension}"
+
+    return get_upload_storage().save(random_name, uploaded_file)
+
+
+def delete_stored_file(relative_path):
+    """Delete a stored file if it exists. Never raises."""
+    if not relative_path:
+        return
+
+    try:
+        storage = get_upload_storage()
+        if storage.exists(relative_path):
+            storage.delete(relative_path)
+    except Exception:
+        pass

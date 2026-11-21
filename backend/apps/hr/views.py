@@ -1,14 +1,33 @@
 
+import os
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.db.models import ProtectedError, Q
-from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.exceptions import (
+    ValidationError as DjangoValidationError,
+    SuspiciousFileOperation,
+)
+from django.http import FileResponse
+from django.urls import reverse
 from django.db import IntegrityError, transaction
-from .models import SkillCategory, EmployeeSkill, Skill, Attendance, EmploymentContract
+from .models import (
+    SkillCategory,
+    EmployeeSkill,
+    Skill,
+    Attendance,
+    EmploymentContract,
+    EmployeeDocument,
+)
 from ..pagination import StandardPagination
-from ..helpers import calculate_attendance_metrics, is_valid_id
+from ..helpers import (
+    calculate_attendance_metrics,
+    is_valid_id,
+    get_upload_storage,
+    delete_stored_file,
+)
 from .serializers import (
     AddSkillCategorySerializer,
     UpdateSkillCategorySerializer,
@@ -20,6 +39,8 @@ from .serializers import (
     UpdateAttendanceSerializer,
     AddEmploymentContractSerializer,
     UpdateEmploymentContractSerializer,
+    AddEmployeeDocumentSerializer,
+    UpdateEmployeeDocumentSerializer,
 )
 
 class SkillCategoryManagement(APIView):
@@ -771,4 +792,263 @@ class EmploymentContractManagement(APIView):
 
         return Response(
             {"message": "Contract deleted successfully."}
+        )
+
+
+class EmployeeDocumentManagement(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardPagination
+    # multipart/form-data for uploads, JSON for metadata-only edits and deletes
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    DOCUMENT_VALUES = (
+        "document_id",
+        "employee_id",
+        "employee__first_name",
+        "employee__last_name",
+        "document_type",
+        "document_name",
+        "file_path",
+        "expiry_date",
+        "uploaded_by_id",
+        "uploaded_by__first_name",
+        "uploaded_by__last_name",
+        "uploaded_at",
+    )
+
+    def _get_document_id(self, request):
+        return (
+            request.data.get("document_id")
+            or request.query_params.get("document_id")
+        )
+
+    def _with_download_url(self, request, document):
+        document["download_url"] = request.build_absolute_uri(
+            reverse("documents-download")
+            + f"?document_id={document['document_id']}"
+        )
+        return document
+
+    def get(self, request):
+        request_parameters = request.query_params
+        document_id = request_parameters.get("document_id")
+
+        # Get a specific document by ID
+        if document_id:
+            if not is_valid_id(document_id):
+                return Response(
+                    {"error": "document_id must be an integer."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            document = (
+                EmployeeDocument.objects
+                .filter(document_id=document_id)
+                .values(*self.DOCUMENT_VALUES)
+                .first()
+            )
+
+            if not document:
+                return Response(
+                    {"error": "Document not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            return Response(
+                {"document": self._with_download_url(request, document)}
+            )
+
+        # Exact-match filters
+        allowed_filters = {
+            "employee_id",
+            "document_type",
+            "uploaded_by_id",
+        }
+
+        filters = {
+            field: value
+            for field, value in request_parameters.items()
+            if field in allowed_filters and value
+        }
+
+        # Expiry date range filters
+        range_filters = {
+            "expiry_date_from": "expiry_date__gte",
+            "expiry_date_to": "expiry_date__lte",
+        }
+
+        for param, lookup in range_filters.items():
+            value = request_parameters.get(param)
+            if value:
+                filters[lookup] = value
+
+        try:
+            queryset = EmployeeDocument.objects.filter(**filters)
+
+            # Partial, case-insensitive search. Every word must match the
+            # document name or the employee's name.
+            search = request_parameters.get("search", "").strip()
+            for term in search.split():
+                queryset = queryset.filter(
+                    Q(document_name__icontains=term)
+                    | Q(employee__first_name__icontains=term)
+                    | Q(employee__last_name__icontains=term)
+                )
+
+            documents = (
+                queryset
+                .order_by("-uploaded_at", "document_id")
+                .values(*self.DOCUMENT_VALUES)
+            )
+
+            paginator = self.pagination_class()
+            page = paginator.paginate_queryset(
+                documents, request, view=self
+            )
+            page = [
+                self._with_download_url(request, document)
+                for document in page
+            ]
+
+            return paginator.get_paginated_response(page)
+
+        except (ValueError, TypeError, DjangoValidationError):
+            return Response(
+                {"error": "Invalid data entered."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def post(self, request):
+        serializer = AddEmployeeDocumentSerializer(
+            data=request.data,
+            context={"uploaded_by": request.user},
+        )
+        serializer.is_valid(raise_exception=True)
+        document = serializer.save()
+
+        return Response(
+            {
+                "message": "Document uploaded successfully.",
+                "document_id": document.document_id,
+                "file_path": document.file_path,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    def patch(self, request):
+        document_id = self._get_document_id(request)
+
+        if not document_id:
+            return Response(
+                {"error": "document_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not is_valid_id(document_id):
+            return Response(
+                {"error": "document_id must be an integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            document = EmployeeDocument.objects.get(document_id=document_id)
+        except EmployeeDocument.DoesNotExist:
+            return Response(
+                {"error": "Document not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = UpdateEmployeeDocumentSerializer(
+            document,
+            data=request.data,
+            partial=True,
+            context={"uploaded_by": request.user},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            {"message": "Document updated successfully."}
+        )
+
+    def delete(self, request):
+        document_id = self._get_document_id(request)
+
+        if not document_id:
+            return Response(
+                {"error": "document_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not is_valid_id(document_id):
+            return Response(
+                {"error": "document_id must be an integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            document = EmployeeDocument.objects.get(document_id=document_id)
+        except EmployeeDocument.DoesNotExist:
+            return Response(
+                {"error": "Document not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        file_path = document.file_path
+        document.delete()
+        # Remove the file only after the row is gone
+        delete_stored_file(file_path)
+
+        return Response(
+            {"message": "Document deleted successfully."}
+        )
+
+
+class EmployeeDocumentDownload(APIView):
+    """Streams a stored employee document to authenticated users."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        document_id = request.query_params.get("document_id")
+
+        if not document_id:
+            return Response(
+                {"error": "document_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not is_valid_id(document_id):
+            return Response(
+                {"error": "document_id must be an integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            document = EmployeeDocument.objects.get(document_id=document_id)
+        except EmployeeDocument.DoesNotExist:
+            return Response(
+                {"error": "Document not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        storage = get_upload_storage()
+
+        try:
+            if not document.file_path or not storage.exists(document.file_path):
+                raise FileNotFoundError
+            stored_file = storage.open(document.file_path, "rb")
+        except (FileNotFoundError, SuspiciousFileOperation):
+            return Response(
+                {"error": "The file for this document is missing on the server."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        extension = os.path.splitext(document.file_path)[1]
+        download_name = f"{document.document_name}{extension}"
+        inline = request.query_params.get("inline") in ("1", "true")
+
+        return FileResponse(
+            stored_file,
+            as_attachment=not inline,
+            filename=download_name,
         )

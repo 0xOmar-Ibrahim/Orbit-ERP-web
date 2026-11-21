@@ -188,6 +188,7 @@ class EmployeeDocument(models.Model):
         NATIONAL_ID = "national_id", "National ID"
         PASSPORT = "passport", "Passport"
         CONTRACT = "contract", "Contract"
+        CV = "cv", "CV"
         CERTIFICATE = "certificate", "Certificate"
         OTHER = "other", "Other"
 

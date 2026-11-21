@@ -8,7 +8,14 @@ from .models import (
     EmploymentContract,
     JobPosition,
     WorkSchedule,
+    EmployeeDocument,
 )
+import os
+from django.conf import settings
+from django.db import transaction
+from apps.helpers import save_uploaded_file, delete_stored_file
+
+EMPLOYEE_DOCUMENTS_FOLDER = "employee_documents"
 from apps.accounts.models import Employee
 
 
@@ -227,3 +234,122 @@ class UpdateEmploymentContractSerializer(serializers.ModelSerializer):
             attrs.get("wage"),
         )
         return attrs
+
+
+# ===============================
+# Employee Document Serializers
+# ===============================
+
+def validate_document_file(uploaded_file):
+    extension = os.path.splitext(uploaded_file.name)[1].lower().lstrip(".")
+    allowed = settings.ALLOWED_DOCUMENT_EXTENSIONS
+
+    if extension not in allowed:
+        raise serializers.ValidationError(
+            f"Unsupported file type. Allowed types: {', '.join(sorted(allowed))}."
+        )
+
+    max_size = settings.MAX_DOCUMENT_UPLOAD_SIZE
+    if uploaded_file.size > max_size:
+        raise serializers.ValidationError(
+            f"File is too large. Maximum size is {max_size // (1024 * 1024)} MB."
+        )
+
+    return uploaded_file
+
+
+def default_document_name(uploaded_file):
+    # Original file name without extension, trimmed to the column length
+    name = os.path.splitext(os.path.basename(uploaded_file.name))[0]
+    return (name or "document")[:200]
+
+
+class AddEmployeeDocumentSerializer(serializers.ModelSerializer):
+    employee_id = serializers.PrimaryKeyRelatedField(
+        source="employee",
+        queryset=Employee.objects.all()
+    )
+    file = serializers.FileField(
+        write_only=True,
+        validators=[validate_document_file]
+    )
+    document_name = serializers.CharField(
+        max_length=200,
+        required=False,
+        allow_blank=True
+    )
+
+    class Meta:
+        model = EmployeeDocument
+        fields = [
+            "employee_id",
+            "document_type",
+            "document_name",
+            "file",
+            "expiry_date",
+        ]
+
+    def create(self, validated_data):
+        uploaded_file = validated_data.pop("file")
+
+        if not validated_data.get("document_name"):
+            validated_data["document_name"] = default_document_name(uploaded_file)
+
+        file_path = save_uploaded_file(uploaded_file, EMPLOYEE_DOCUMENTS_FOLDER)
+
+        try:
+            with transaction.atomic():
+                return EmployeeDocument.objects.create(
+                    **validated_data,
+                    file_path=file_path,
+                    uploaded_by=self.context.get("uploaded_by"),
+                )
+        except Exception:
+            # Don't leave orphaned files when the DB insert fails
+            delete_stored_file(file_path)
+            raise
+
+
+class UpdateEmployeeDocumentSerializer(serializers.ModelSerializer):
+    employee_id = serializers.PrimaryKeyRelatedField(
+        source="employee",
+        queryset=Employee.objects.all(),
+        required=False
+    )
+    file = serializers.FileField(
+        write_only=True,
+        required=False,
+        validators=[validate_document_file]
+    )
+
+    class Meta:
+        model = EmployeeDocument
+        fields = [
+            "employee_id",
+            "document_type",
+            "document_name",
+            "file",
+            "expiry_date",
+        ]
+
+    def update(self, instance, validated_data):
+        uploaded_file = validated_data.pop("file", None)
+
+        if not uploaded_file:
+            return super().update(instance, validated_data)
+
+        # Replacing the file: store the new one, update the row, then remove the old one
+        old_file_path = instance.file_path
+        new_file_path = save_uploaded_file(uploaded_file, EMPLOYEE_DOCUMENTS_FOLDER)
+
+        try:
+            with transaction.atomic():
+                validated_data["file_path"] = new_file_path
+                validated_data["uploaded_by"] = self.context.get("uploaded_by")
+                instance = super().update(instance, validated_data)
+        except Exception:
+            delete_stored_file(new_file_path)
+            raise
+
+        delete_stored_file(old_file_path)
+        return instance
