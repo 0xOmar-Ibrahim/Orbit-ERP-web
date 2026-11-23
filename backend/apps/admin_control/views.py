@@ -9,6 +9,7 @@ from apps.accounts.serializers import LoginSerializer
 from apps.accounts.views import LoginThrottle
 from apps.accounts.models import Branch
 from apps.hr.models import Department, JobPosition, WorkSchedule
+from apps.hr.history import snapshot_employee, log_employee_changes
 from .serializers import AddEmployeeSerializer, UpdateEmployeeSerializer
 from django.db import transaction
 from django.utils import timezone
@@ -100,7 +101,12 @@ class Employees(APIView):
 
         serializer = UpdateEmployeeSerializer(employee, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+
+        # Save the update and its history rows together
+        before = snapshot_employee(employee)
+        with transaction.atomic():
+            employee = serializer.save()
+            log_employee_changes(employee, before, recorded_by=request.user)
 
         return Response({"message": "Employee updated successfully."})
 

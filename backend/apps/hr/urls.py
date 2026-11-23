@@ -7,6 +7,7 @@ from .views import (
     EmploymentContractManagement,
     EmployeeDocumentManagement,
     EmployeeDocumentDownload,
+    EmployeeHistoryView,
 )
 
 urlpatterns = [
@@ -44,5 +45,10 @@ urlpatterns = [
         "documents/download/",
         EmployeeDocumentDownload.as_view(),
         name="documents-download",
+    ),
+    path(
+        "employee-history/",
+        EmployeeHistoryView.as_view(),
+        name="employee-history",
     ),
 ]

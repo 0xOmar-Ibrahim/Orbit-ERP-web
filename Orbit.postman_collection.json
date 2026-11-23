@@ -3135,6 +3135,128 @@
               "response": []
             }
           ]
+        },
+        {
+          "name": "Employee History",
+          "item": [
+            {
+              "name": "Get Employee History",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/employee-history/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "employee-history",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "employee_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "change_type",
+                      "value": "salary_change",
+                      "disabled": true
+                    },
+                    {
+                      "key": "recorded_by_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "change_date_from",
+                      "value": "2025-01-01",
+                      "disabled": true
+                    },
+                    {
+                      "key": "change_date_to",
+                      "value": "2026-12-31",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": "Sales",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Read-only career history. Rows are created automatically when an employee's position, department, branch, employment status/type or manager changes (admin employee PATCH), or a contract's wage changes (contract PATCH). Optional filters: employee_id, change_type (promotion, transfer, salary_change, status_change, position_change, other), recorded_by_id, change_date_from, change_date_to (YYYY-MM-DD). search: partial match on old/new value, notes or employee name. Pagination: page, page_size (default 10, maximum 100). Ordered by -change_date, -created_at. POST/PATCH/DELETE return 405."
+              },
+              "response": []
+            },
+            {
+              "name": "Get History Entry by id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/employee-history/?history_id=1",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "employee-history",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "history_id",
+                      "value": "1",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Get a single history entry. Returns {\"history\": {...}} or 404."
+              },
+              "response": []
+            }
+          ]
         }
       ]
     }

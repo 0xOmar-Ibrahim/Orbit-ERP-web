@@ -20,7 +20,9 @@ from .models import (
     Attendance,
     EmploymentContract,
     EmployeeDocument,
+    EmployeeHistory,
 )
+from .history import log_salary_change
 from ..pagination import StandardPagination
 from ..helpers import (
     calculate_attendance_metrics,
@@ -740,10 +742,13 @@ class EmploymentContractManagement(APIView):
             partial=True,
         )
         serializer.is_valid(raise_exception=True)
+        old_wage = contract.wage
 
         try:
+            # Save the update and its salary history row together
             with transaction.atomic():
-                serializer.save()
+                contract = serializer.save()
+                log_salary_change(contract, old_wage, recorded_by=request.user)
         except IntegrityError:
             return Response(
                 {
@@ -1052,3 +1057,115 @@ class EmployeeDocumentDownload(APIView):
             as_attachment=not inline,
             filename=download_name,
         )
+
+
+class EmployeeHistoryView(APIView):
+    """
+    Read-only career history. Rows are written automatically when an employee's
+    position/department/branch/status/type/manager or a contract's wage changes
+    (see apps/hr/history.py). POST/PATCH/DELETE are not allowed (405).
+    """
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardPagination
+
+    HISTORY_VALUES = (
+        "history_id",
+        "employee_id",
+        "employee__first_name",
+        "employee__last_name",
+        "employee__employee_code",
+        "change_type",
+        "old_value",
+        "new_value",
+        "notes",
+        "change_date",
+        "recorded_by_id",
+        "recorded_by__first_name",
+        "recorded_by__last_name",
+        "created_at",
+    )
+
+    def get(self, request):
+        request_parameters = request.query_params
+        history_id = request_parameters.get("history_id")
+
+        # Get a specific history entry by ID
+        if history_id:
+            if not is_valid_id(history_id):
+                return Response(
+                    {"error": "history_id must be an integer."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            history = (
+                EmployeeHistory.objects
+                .filter(history_id=history_id)
+                .values(*self.HISTORY_VALUES)
+                .first()
+            )
+
+            if not history:
+                return Response(
+                    {"error": "History entry not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            return Response({"history": history})
+
+        # Exact-match filters
+        allowed_filters = {
+            "employee_id",
+            "change_type",
+            "recorded_by_id",
+        }
+
+        filters = {
+            field: value
+            for field, value in request_parameters.items()
+            if field in allowed_filters and value
+        }
+
+        # Change date range filters
+        range_filters = {
+            "change_date_from": "change_date__gte",
+            "change_date_to": "change_date__lte",
+        }
+
+        for param, lookup in range_filters.items():
+            value = request_parameters.get(param)
+            if value:
+                filters[lookup] = value
+
+        try:
+            queryset = EmployeeHistory.objects.filter(**filters)
+
+            # Partial, case-insensitive search. Every word must match the
+            # old/new value, the notes or the employee's name.
+            search = request_parameters.get("search", "").strip()
+            for term in search.split():
+                queryset = queryset.filter(
+                    Q(old_value__icontains=term)
+                    | Q(new_value__icontains=term)
+                    | Q(notes__icontains=term)
+                    | Q(employee__first_name__icontains=term)
+                    | Q(employee__last_name__icontains=term)
+                )
+
+            history = (
+                queryset
+                .order_by("-change_date", "-created_at")
+                .values(*self.HISTORY_VALUES)
+            )
+
+            paginator = self.pagination_class()
+            page = paginator.paginate_queryset(
+                history, request, view=self
+            )
+
+            return paginator.get_paginated_response(page)
+
+        except (ValueError, TypeError, DjangoValidationError):
+            return Response(
+                {"error": "Invalid data entered."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
