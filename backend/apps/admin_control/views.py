@@ -102,7 +102,8 @@ class Employees(APIView):
         serializer = UpdateEmployeeSerializer(employee, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
-        # Save the update and its history rows together
+        # Save the update and its history rows together (every edited field is
+        # logged; see apps/hr/history.py — reuse it in any new employee-editing endpoint)
         before = snapshot_employee(employee)
         with transaction.atomic():
             employee = serializer.save()
