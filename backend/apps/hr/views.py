@@ -1,11 +1,13 @@
 
 import os
+import calendar
+import datetime
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from django.db.models import ProtectedError, Q
+from django.db.models import ProtectedError, Q, Count
 from django.core.exceptions import (
     ValidationError as DjangoValidationError,
     SuspiciousFileOperation,
@@ -21,6 +23,8 @@ from .models import (
     EmploymentContract,
     EmployeeDocument,
     EmployeeHistory,
+    WorkSchedule,
+    PublicHoliday,
 )
 from .history import log_salary_change
 from ..pagination import StandardPagination
@@ -43,6 +47,10 @@ from .serializers import (
     UpdateEmploymentContractSerializer,
     AddEmployeeDocumentSerializer,
     UpdateEmployeeDocumentSerializer,
+    AddWorkScheduleSerializer,
+    UpdateWorkScheduleSerializer,
+    AddPublicHolidaySerializer,
+    UpdatePublicHolidaySerializer,
 )
 
 class SkillCategoryManagement(APIView):
@@ -406,34 +414,66 @@ class AttendanceManagement(APIView):
         filters = {
             key: value
             for key, value in request_parameters.items()
-            if key in allowed_filters
+            if key in allowed_filters and value
         }
 
-        queryset = (
-            Attendance.objects
-            .filter(**filters)
-            .order_by("-attendance_date", "attendance_id")
-            .values(
-                "attendance_id",
-                "employee_id",
-                "attendance_date",
-                "check_in",
-                "check_out",
-                "worked_minutes",
-                "overtime_minutes",
-                "status",
-                "notes",
+        # Date range filters
+        range_filters = {
+            "attendance_date_from": "attendance_date__gte",
+            "attendance_date_to": "attendance_date__lte",
+        }
+
+        for param, lookup in range_filters.items():
+            value = request_parameters.get(param)
+            if value:
+                filters[lookup] = value
+
+        try:
+            queryset = Attendance.objects.filter(**filters)
+
+            # Partial, case-insensitive search. Every word must match the
+            # employee's first name, last name or code.
+            search = request_parameters.get("search", "").strip()
+            for term in search.split():
+                queryset = queryset.filter(
+                    Q(employee__first_name__icontains=term)
+                    | Q(employee__last_name__icontains=term)
+                    | Q(employee__employee_code__icontains=term)
+                )
+
+            queryset = (
+                queryset
+                .order_by("-attendance_date", "attendance_id")
+                .values(
+                    "attendance_id",
+                    "employee_id",
+                    "employee__first_name",
+                    "employee__last_name",
+                    "employee__employee_code",
+                    "attendance_date",
+                    "check_in",
+                    "check_out",
+                    "worked_minutes",
+                    "overtime_minutes",
+                    "status",
+                    "notes",
+                )
             )
-        )
 
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(
-            queryset,
-            request,
-            view=self
-        )
+            paginator = self.pagination_class()
+            page = paginator.paginate_queryset(
+                queryset,
+                request,
+                view=self
+            )
 
-        return paginator.get_paginated_response(page)
+            return paginator.get_paginated_response(page)
+
+        except (ValueError, TypeError, DjangoValidationError):
+            return Response(
+                {"error": "Invalid data entered."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     def post(self, request):
         serializer = AddAttendanceSerializer(data=request.data)
@@ -1170,3 +1210,405 @@ class EmployeeHistoryView(APIView):
                 {"error": "Invalid data entered."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+def _parse_bool(value):
+    """'true'/'1'/'yes' -> True, 'false'/'0'/'no' -> False, anything else -> ValueError."""
+    normalized = str(value).strip().lower()
+    if normalized in ("true", "1", "yes"):
+        return True
+    if normalized in ("false", "0", "no"):
+        return False
+    raise ValueError("Invalid boolean.")
+
+
+class WorkScheduleManagement(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardPagination
+
+    def _get_schedule_id(self, request):
+        return (
+            request.data.get("schedule_id")
+            or request.query_params.get("schedule_id")
+        )
+
+    def _queryset(self):
+        return (
+            WorkSchedule.objects
+            .prefetch_related("lines")
+            .annotate(
+                employee_count=Count("employees", distinct=True),
+                contract_count=Count("contracts", distinct=True),
+            )
+        )
+
+    def _serialize(self, schedule):
+        # Sunday first, Saturday last (weekday values: Saturday=0 ... Friday=6)
+        lines = sorted(schedule.lines.all(), key=lambda line: (line.weekday - 1) % 7)
+
+        return {
+            "schedule_id": schedule.schedule_id,
+            "name": schedule.name,
+            "timezone_name": schedule.timezone_name,
+            "hours_per_week": schedule.hours_per_week,
+            "active": schedule.active,
+            "employee_count": schedule.employee_count,
+            "contract_count": schedule.contract_count,
+            "lines": [
+                {
+                    "line_id": line.line_id,
+                    "weekday": line.weekday,
+                    "weekday_label": line.get_weekday_display(),
+                    "start_time": line.start_time,
+                    "end_time": line.end_time,
+                    "break_minutes": line.break_minutes,
+                }
+                for line in lines
+            ],
+        }
+
+    def get(self, request):
+        request_parameters = request.query_params
+        schedule_id = request_parameters.get("schedule_id")
+
+        # Get a specific schedule by ID
+        if schedule_id:
+            if not is_valid_id(schedule_id):
+                return Response(
+                    {"error": "schedule_id must be an integer."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            schedule = self._queryset().filter(schedule_id=schedule_id).first()
+
+            if not schedule:
+                return Response(
+                    {"error": "Work schedule not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            return Response({"schedule": self._serialize(schedule)})
+
+        try:
+            queryset = self._queryset()
+
+            active = request_parameters.get("active")
+            if active:
+                queryset = queryset.filter(active=_parse_bool(active))
+
+            search = request_parameters.get("search", "").strip()
+            for term in search.split():
+                queryset = queryset.filter(name__icontains=term)
+
+            queryset = queryset.order_by("name", "schedule_id")
+
+            paginator = self.pagination_class()
+            page = paginator.paginate_queryset(queryset, request, view=self)
+
+            return paginator.get_paginated_response(
+                [self._serialize(schedule) for schedule in page]
+            )
+
+        except (ValueError, TypeError, DjangoValidationError):
+            return Response(
+                {"error": "Invalid data entered."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def post(self, request):
+        serializer = AddWorkScheduleSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            schedule = serializer.save()
+        except IntegrityError:
+            return Response(
+                {"error": "The schedule conflicts with an existing record or a database constraint."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return Response(
+            {
+                "message": "Work schedule created successfully.",
+                "schedule_id": schedule.schedule_id,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    def patch(self, request):
+        schedule_id = self._get_schedule_id(request)
+
+        if not schedule_id:
+            return Response(
+                {"error": "schedule_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not is_valid_id(schedule_id):
+            return Response(
+                {"error": "schedule_id must be an integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            schedule = WorkSchedule.objects.get(schedule_id=schedule_id)
+        except WorkSchedule.DoesNotExist:
+            return Response(
+                {"error": "Work schedule not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = UpdateWorkScheduleSerializer(
+            schedule,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            serializer.save()
+        except IntegrityError:
+            return Response(
+                {"error": "The schedule conflicts with an existing record or a database constraint."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return Response(
+            {"message": "Work schedule updated successfully."}
+        )
+
+    def delete(self, request):
+        schedule_id = self._get_schedule_id(request)
+
+        if not schedule_id:
+            return Response(
+                {"error": "schedule_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not is_valid_id(schedule_id):
+            return Response(
+                {"error": "schedule_id must be an integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        schedule = self._queryset().filter(schedule_id=schedule_id).first()
+
+        if not schedule:
+            return Response(
+                {"error": "Work schedule not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Deleting would silently unassign employees/contracts (SET_NULL)
+        # and break overtime calculation, so block it while in use.
+        if schedule.employee_count or schedule.contract_count:
+            return Response(
+                {
+                    "error": (
+                        "This schedule is still in use. Reassign its employees and "
+                        "contracts, or set active=false instead of deleting it."
+                    ),
+                    "employee_count": schedule.employee_count,
+                    "contract_count": schedule.contract_count,
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        schedule.delete()
+
+        return Response(
+            {"message": "Work schedule deleted successfully."}
+        )
+
+
+class PublicHolidayManagement(APIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardPagination
+
+    HOLIDAY_VALUES = ("holiday_id", "name", "date", "is_recurring")
+
+    def _get_holiday_id(self, request):
+        return (
+            request.data.get("holiday_id")
+            or request.query_params.get("holiday_id")
+        )
+
+    def _holidays_for_year(self, queryset, year):
+        """
+        Holidays that fall in `year`: one-off holidays dated in that year, plus every
+        recurring holiday moved to that year (Feb 29 -> Feb 28 in non-leap years).
+        """
+        holidays = []
+
+        for holiday in queryset.filter(Q(is_recurring=True) | Q(date__year=year)).values(*self.HOLIDAY_VALUES):
+            holiday_date = holiday["date"]
+
+            if holiday["is_recurring"]:
+                if holiday_date.month == 2 and holiday_date.day == 29 and not calendar.isleap(year):
+                    occurs_on = datetime.date(year, 2, 28)
+                else:
+                    occurs_on = holiday_date.replace(year=year)
+            else:
+                occurs_on = holiday_date
+
+            holidays.append({**holiday, "occurs_on": occurs_on})
+
+        return sorted(holidays, key=lambda holiday: (holiday["occurs_on"], holiday["holiday_id"]))
+
+    def get(self, request):
+        request_parameters = request.query_params
+        holiday_id = request_parameters.get("holiday_id")
+
+        # Get a specific holiday by ID
+        if holiday_id:
+            if not is_valid_id(holiday_id):
+                return Response(
+                    {"error": "holiday_id must be an integer."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            holiday = (
+                PublicHoliday.objects
+                .filter(holiday_id=holiday_id)
+                .values(*self.HOLIDAY_VALUES)
+                .first()
+            )
+
+            if not holiday:
+                return Response(
+                    {"error": "Public holiday not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            return Response({"holiday": holiday})
+
+        try:
+            queryset = PublicHoliday.objects.all()
+
+            is_recurring = request_parameters.get("is_recurring")
+            if is_recurring:
+                queryset = queryset.filter(is_recurring=_parse_bool(is_recurring))
+
+            search = request_parameters.get("search", "").strip()
+            for term in search.split():
+                queryset = queryset.filter(name__icontains=term)
+
+            # Holidays for one calendar year (recurring ones moved to that year)
+            year = request_parameters.get("year")
+            if year:
+                year = int(year)
+                if not (1 <= year <= 9999):
+                    raise ValueError("Invalid year.")
+
+                holidays = self._holidays_for_year(queryset, year)
+                return Response({
+                    "year": year,
+                    "count": len(holidays),
+                    "results": holidays,
+                })
+
+            # Date range filters on the stored date
+            range_filters = {
+                "date_from": "date__gte",
+                "date_to": "date__lte",
+            }
+
+            for param, lookup in range_filters.items():
+                value = request_parameters.get(param)
+                if value:
+                    queryset = queryset.filter(**{lookup: value})
+
+            holidays = (
+                queryset
+                .order_by("date", "holiday_id")
+                .values(*self.HOLIDAY_VALUES)
+            )
+
+            paginator = self.pagination_class()
+            page = paginator.paginate_queryset(holidays, request, view=self)
+
+            return paginator.get_paginated_response(page)
+
+        except (ValueError, TypeError, DjangoValidationError):
+            return Response(
+                {"error": "Invalid data entered."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def post(self, request):
+        serializer = AddPublicHolidaySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        holiday = serializer.save()
+
+        return Response(
+            {
+                "message": "Public holiday created successfully.",
+                "holiday_id": holiday.holiday_id,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    def patch(self, request):
+        holiday_id = self._get_holiday_id(request)
+
+        if not holiday_id:
+            return Response(
+                {"error": "holiday_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not is_valid_id(holiday_id):
+            return Response(
+                {"error": "holiday_id must be an integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            holiday = PublicHoliday.objects.get(holiday_id=holiday_id)
+        except PublicHoliday.DoesNotExist:
+            return Response(
+                {"error": "Public holiday not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = UpdatePublicHolidaySerializer(
+            holiday,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            {"message": "Public holiday updated successfully."}
+        )
+
+    def delete(self, request):
+        holiday_id = self._get_holiday_id(request)
+
+        if not holiday_id:
+            return Response(
+                {"error": "holiday_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not is_valid_id(holiday_id):
+            return Response(
+                {"error": "holiday_id must be an integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            holiday = PublicHoliday.objects.get(holiday_id=holiday_id)
+        except PublicHoliday.DoesNotExist:
+            return Response(
+                {"error": "Public holiday not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        holiday.delete()
+
+        return Response(
+            {"message": "Public holiday deleted successfully."}
+        )

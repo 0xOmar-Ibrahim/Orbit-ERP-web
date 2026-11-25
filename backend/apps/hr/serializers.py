@@ -9,8 +9,11 @@ from .models import (
     JobPosition,
     WorkSchedule,
     EmployeeDocument,
+    WorkScheduleLine,
+    PublicHoliday,
 )
 import os
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from django.conf import settings
 from django.db import transaction
 from apps.helpers import save_uploaded_file, delete_stored_file, generate_unique_code
@@ -362,3 +365,130 @@ class UpdateEmployeeDocumentSerializer(serializers.ModelSerializer):
 
         delete_stored_file(old_file_path)
         return instance
+
+
+# ==========================
+# Work Schedule Serializers
+# ==========================
+
+def _minutes(value):
+    return value.hour * 60 + value.minute
+
+
+class WorkScheduleLineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkScheduleLine
+        fields = ["weekday", "start_time", "end_time", "break_minutes"]
+
+    def validate(self, attrs):
+        start_time = attrs["start_time"]
+        end_time = attrs["end_time"]
+
+        # Mirrors the chk_schedule_time_order DB constraint
+        if end_time <= start_time:
+            raise serializers.ValidationError({
+                "end_time": "End time must be later than start time."
+            })
+
+        break_minutes = attrs.get("break_minutes", 0)
+        shift_minutes = _minutes(end_time) - _minutes(start_time)
+
+        if break_minutes < 0 or break_minutes >= shift_minutes:
+            raise serializers.ValidationError({
+                "break_minutes": "Break must be 0 or more and shorter than the shift."
+            })
+
+        return attrs
+
+
+def validate_schedule_values(attrs):
+    timezone_name = attrs.get("timezone_name")
+    if timezone_name is not None:
+        try:
+            ZoneInfo(timezone_name)
+        except (ZoneInfoNotFoundError, ValueError):
+            raise serializers.ValidationError({
+                "timezone_name": "Enter a valid IANA timezone (e.g. Africa/Cairo)."
+            })
+
+    hours_per_week = attrs.get("hours_per_week")
+    if hours_per_week is not None and not (0 < hours_per_week <= 168):
+        raise serializers.ValidationError({
+            "hours_per_week": "Hours per week must be between 0 and 168."
+        })
+
+    lines = attrs.get("lines")
+    if lines is not None:
+        weekdays = [line["weekday"] for line in lines]
+        if len(weekdays) != len(set(weekdays)):
+            raise serializers.ValidationError({
+                "lines": "Each weekday can only appear once."
+            })
+
+    return attrs
+
+
+def replace_schedule_lines(schedule, lines):
+    schedule.lines.all().delete()
+    WorkScheduleLine.objects.bulk_create([
+        WorkScheduleLine(schedule=schedule, **line)
+        for line in lines
+    ])
+
+
+class AddWorkScheduleSerializer(serializers.ModelSerializer):
+    lines = WorkScheduleLineSerializer(many=True, required=False)
+
+    class Meta:
+        model = WorkSchedule
+        fields = ["name", "timezone_name", "hours_per_week", "active", "lines"]
+
+    def validate(self, attrs):
+        return validate_schedule_values(attrs)
+
+    def create(self, validated_data):
+        lines = validated_data.pop("lines", [])
+
+        with transaction.atomic():
+            schedule = WorkSchedule.objects.create(**validated_data)
+            replace_schedule_lines(schedule, lines)
+
+        return schedule
+
+
+class UpdateWorkScheduleSerializer(serializers.ModelSerializer):
+    # When sent, replaces all of the schedule's lines ([] clears them)
+    lines = WorkScheduleLineSerializer(many=True, required=False)
+
+    class Meta:
+        model = WorkSchedule
+        fields = ["name", "timezone_name", "hours_per_week", "active", "lines"]
+
+    def validate(self, attrs):
+        return validate_schedule_values(attrs)
+
+    def update(self, instance, validated_data):
+        lines = validated_data.pop("lines", None)
+
+        with transaction.atomic():
+            instance = super().update(instance, validated_data)
+            if lines is not None:
+                replace_schedule_lines(instance, lines)
+
+        return instance
+
+
+# ===========================
+# Public Holiday Serializers
+# ===========================
+
+class AddPublicHolidaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicHoliday
+        fields = ["name", "date", "is_recurring"]
+
+
+class UpdatePublicHolidaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicHoliday
+        fields = ["name", "date", "is_recurring"]

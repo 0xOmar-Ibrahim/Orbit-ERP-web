@@ -2351,10 +2351,25 @@
                       "key": "page_size",
                       "value": "10",
                       "disabled": true
+                    },
+                    {
+                      "key": "attendance_date_from",
+                      "value": "2026-11-01",
+                      "disabled": true
+                    },
+                    {
+                      "key": "attendance_date_to",
+                      "value": "2026-11-30",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": "omar",
+                      "disabled": true
                     }
                   ]
                 },
-                "description": "List employee attendance records. Optional filters: attendance_id, employee_id, attendance_date, status. Pagination: page, page_size (default 10, maximum 100). Results are ordered by -attendance_date, attendance_id."
+                "description": "List employee attendance records with employee names (employee__first_name, employee__last_name, employee__employee_code). Optional filters: attendance_id, employee_id, attendance_date, status, attendance_date_from, attendance_date_to (YYYY-MM-DD), search (employee name or code). Pagination: page, page_size (default 10, maximum 100). Results are ordered by -attendance_date, attendance_id. worked_minutes/overtime_minutes are calculated from the employee's running contract schedule."
               },
               "response": []
             },
@@ -3254,6 +3269,519 @@
                   ]
                 },
                 "description": "Get a single history entry. Returns {\"history\": {...}} or 404."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Work Schedules",
+          "item": [
+            {
+              "name": "Get Work Schedules",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/work-schedules/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "work-schedules",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "active",
+                      "value": "true",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": "cairo",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "List work schedules with their daily lines nested. Optional filters: active (true/false), search (partial name). Pagination: page, page_size. Each schedule includes employee_count, contract_count and lines [{line_id, weekday, weekday_label, start_time, end_time, break_minutes}] ordered Sunday first. weekday values: Saturday=0, Sunday=1, Monday=2, Tuesday=3, Wednesday=4, Thursday=5, Friday=6."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Work Schedule by id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/work-schedules/?schedule_id=1",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "work-schedules",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "schedule_id",
+                      "value": "1",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Get one schedule with its lines. Returns {\"schedule\": {...}} or 404."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Work Schedule",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/work-schedules/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "work-schedules",
+                    ""
+                  ]
+                },
+                "description": "Create a schedule, optionally with its daily lines. Required: name (unique), hours_per_week (0-168). Optional: timezone_name (IANA, default Africa/Cairo), active (default true), lines. Each line: weekday (0-6, once per schedule), start_time < end_time, 0 <= break_minutes < shift.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Standard 9-5 Alex\",\n    \"timezone_name\": \"Africa/Cairo\",\n    \"hours_per_week\": \"40.00\",\n    \"active\": true,\n    \"lines\": [\n        {\n            \"weekday\": 1,\n            \"start_time\": \"09:00\",\n            \"end_time\": \"17:00\",\n            \"break_minutes\": 60\n        },\n        {\n            \"weekday\": 2,\n            \"start_time\": \"09:00\",\n            \"end_time\": \"17:00\",\n            \"break_minutes\": 60\n        },\n        {\n            \"weekday\": 3,\n            \"start_time\": \"09:00\",\n            \"end_time\": \"17:00\",\n            \"break_minutes\": 60\n        },\n        {\n            \"weekday\": 4,\n            \"start_time\": \"09:00\",\n            \"end_time\": \"17:00\",\n            \"break_minutes\": 60\n        },\n        {\n            \"weekday\": 5,\n            \"start_time\": \"09:00\",\n            \"end_time\": \"17:00\",\n            \"break_minutes\": 60\n        }\n    ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Work Schedule",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/work-schedules/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "work-schedules",
+                    ""
+                  ]
+                },
+                "description": "Update a schedule. schedule_id is required; send only the fields to change. If lines is sent it REPLACES all of the schedule's lines ([] clears them); omit it to keep the current lines.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"schedule_id\": 1,\n    \"hours_per_week\": \"35.00\",\n    \"lines\": [\n        {\n            \"weekday\": 1,\n            \"start_time\": \"09:00\",\n            \"end_time\": \"16:00\",\n            \"break_minutes\": 60\n        },\n        {\n            \"weekday\": 2,\n            \"start_time\": \"09:00\",\n            \"end_time\": \"16:00\",\n            \"break_minutes\": 60\n        },\n        {\n            \"weekday\": 3,\n            \"start_time\": \"09:00\",\n            \"end_time\": \"16:00\",\n            \"break_minutes\": 60\n        },\n        {\n            \"weekday\": 4,\n            \"start_time\": \"09:00\",\n            \"end_time\": \"16:00\",\n            \"break_minutes\": 60\n        },\n        {\n            \"weekday\": 5,\n            \"start_time\": \"09:00\",\n            \"end_time\": \"16:00\",\n            \"break_minutes\": 60\n        }\n    ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Work Schedule",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/work-schedules/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "work-schedules",
+                    ""
+                  ]
+                },
+                "description": "Delete a schedule and its lines. schedule_id is required. Returns 409 with employee_count and contract_count while the schedule is still assigned; set active=false instead.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"schedule_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Public Holidays",
+          "item": [
+            {
+              "name": "Get Public Holidays",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/public-holidays/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "public-holidays",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "is_recurring",
+                      "value": "true",
+                      "disabled": true
+                    },
+                    {
+                      "key": "date_from",
+                      "value": "2026-01-01",
+                      "disabled": true
+                    },
+                    {
+                      "key": "date_to",
+                      "value": "2026-12-31",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": "revolution",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "List public holidays ordered by date. Optional filters: is_recurring (true/false), date_from, date_to (YYYY-MM-DD), search (partial name). Pagination: page, page_size. is_recurring=true -> 'Recurring' (repeats every year on the same day), false -> 'Added yearly' (one-off)."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Public Holidays for a year",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/public-holidays/?year=2027",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "public-holidays",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "year",
+                      "value": "2027",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "All holidays that fall in a calendar year: one-off holidays dated in that year plus every recurring holiday moved to that year (occurs_on; Feb 29 -> Feb 28 in non-leap years). Sorted by occurs_on, not paginated. Can be combined with is_recurring and search."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Public Holiday by id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/public-holidays/?holiday_id=1",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "public-holidays",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "holiday_id",
+                      "value": "1",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Get one holiday. Returns {\"holiday\": {...}} or 404."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Public Holiday",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/public-holidays/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "public-holidays",
+                    ""
+                  ]
+                },
+                "description": "Create a holiday. Required: name, date (unique). Optional: is_recurring (default false).",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Eid al-Fitr\",\n    \"date\": \"2027-03-10\",\n    \"is_recurring\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Public Holiday",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/public-holidays/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "public-holidays",
+                    ""
+                  ]
+                },
+                "description": "Update a holiday. holiday_id is required; send only the fields to change.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"holiday_id\": 1,\n    \"name\": \"Coptic Christmas\",\n    \"is_recurring\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Public Holiday",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/public-holidays/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "public-holidays",
+                    ""
+                  ]
+                },
+                "description": "Delete a holiday. holiday_id is required.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"holiday_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
               },
               "response": []
             }

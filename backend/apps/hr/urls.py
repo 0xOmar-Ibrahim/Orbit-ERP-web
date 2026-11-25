@@ -8,6 +8,8 @@ from .views import (
     EmployeeDocumentManagement,
     EmployeeDocumentDownload,
     EmployeeHistoryView,
+    WorkScheduleManagement,
+    PublicHolidayManagement,
 )
 
 urlpatterns = [
@@ -50,5 +52,15 @@ urlpatterns = [
         "employee-history/",
         EmployeeHistoryView.as_view(),
         name="employee-history",
+    ),
+    path(
+        "work-schedules/",
+        WorkScheduleManagement.as_view(),
+        name="work-schedules",
+    ),
+    path(
+        "public-holidays/",
+        PublicHolidayManagement.as_view(),
+        name="public-holidays",
     ),
 ]
