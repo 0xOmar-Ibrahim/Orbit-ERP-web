@@ -76,20 +76,37 @@ def generate_code(account_type = 1):
         generate code based on account type
         1 ==> employee
         2 ==> customer
+        3 ==> employment contract
     """
 
     if account_type == 1:
         prefix = "EMP"
-    elif account_type == 2: 
-        prefix = "CUS" 
+    elif account_type == 2:
+        prefix = "CUS"
+    elif account_type == 3:
+        prefix = "CTR"
     else:
-        raise ValueError("The Code type must be Employee or Customer.")
+        raise ValueError("The Code type must be Employee, Customer or Contract.")
 
     random_number = random.randint(1000, 9999)
     current_year = time.strftime("%Y")
     generated_code = f"{prefix}-{current_year}-{random_number}"
 
     return generated_code
+
+
+def generate_unique_code(model, field, account_type, max_attempts=20):
+    """
+    Generate a code with generate_code() that isn't already used in model.<field>.
+    """
+    from rest_framework.exceptions import APIException
+
+    for _ in range(max_attempts):
+        code = generate_code(account_type)
+        if not model.objects.filter(**{field: code}).exists():
+            return code
+
+    raise APIException("Could not generate a unique code. Please try again.")
 
 
 

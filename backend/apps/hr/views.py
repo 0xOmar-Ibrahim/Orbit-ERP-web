@@ -709,6 +709,7 @@ class EmploymentContractManagement(APIView):
             {
                 "message": "Contract created successfully.",
                 "contract_id": contract.contract_id,
+                "contract_number": contract.contract_number,
             },
             status=status.HTTP_201_CREATED,
         )
