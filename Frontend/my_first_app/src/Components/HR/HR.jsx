@@ -1,12 +1,7 @@
-
 import React from "react";
 import "./HR.css";
+import Attendance from "./Attendance/Attendance";
 
 export default function HR() {
-  return (
-    <div className="module-page">
-      <h1>Human Resources (HR)</h1>
-      <p>Manage employee information and HR activities.</p>
-    </div>
-  );
+  return <Attendance />;
 }
