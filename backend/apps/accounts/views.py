@@ -15,12 +15,13 @@ from authlib.integrations.base_client.errors import OAuthError
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import RegistrationRequest
 from .oidc import oauth
-from ..helpers import get_user_permissions, validate_email_regex, IsAdministratorUser
+from ..helpers import get_user_permissions, validate_email_regex
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenRefreshView
 from .authentication import CookieJWTAuthentication
+from ..pagination import StandardPagination
 # Assuming the first allowed origin is your frontend URL
 FRONTEND_URL = "http://localhost:3000" 
 
@@ -397,7 +398,7 @@ def sso_callback(request):
 
 class Employees(APIView):
     permission_classes = [IsAuthenticated]  # must be open, the user isn't logged in yet
-
+    pagination_class = StandardPagination
     def get(self, request):
         parameters = request.query_params
 
@@ -418,7 +419,7 @@ class Employees(APIView):
             "manager_id",
             "position_id",
             "schedule_id",
-            "branch_id"
+            "branch_id",
         }
 
         filters = {
@@ -426,38 +427,59 @@ class Employees(APIView):
             for field, value in parameters.items()
             if field in allowed_filters and value
         }
-        try: 
-            employees = [
-                            {
-                                **employee,
-                                "gender": Employee.Gender(employee["gender"]).label,
-                                
-                            }
-                            for employee in Employee.objects.select_related("role").values(
-                                "employee_id",
-                                "first_name",
-                                "last_name",
-                                "role__role_name",
-                                "employee_code",
-                                "work_email",
-                                "phone",
-                                "national_id",
-                                "gender",
-                                "employment_status",
-                                "employment_type",
-                                "hire_date",
-                                "department_id",
-                                "manager_id",
-                                "position_id",
-                                "schedule_id",
-                                "branch_id"
-                            ).filter(**filters)
-                        ]
-        except:
-            return Response({"error": "Invalid data entered."}, status=400)
-        
-        # You can add any validation logic here if needed
-        return Response({"Employees": employees})
+
+        try:
+            employees = (
+                Employee.objects
+                .select_related("role")
+                .values(
+                    "employee_id",
+                    "first_name",
+                    "last_name",
+                    "role__role_name",
+                    "employee_code",
+                    "work_email",
+                    "phone",
+                    "national_id",
+                    "gender",
+                    "employment_status",
+                    "employment_type",
+                    "hire_date",
+                    "department_id",
+                    "manager_id",
+                    "position_id",
+                    "schedule_id",
+                    "branch_id",
+                )
+                .filter(**filters)
+                .order_by("employee_id")
+            )
+
+            paginator = StandardPagination()
+
+            paginated_employees = paginator.paginate_queryset(
+                employees, request, view=self
+            )
+
+            employee_data = [
+                {
+                    **employee,
+                    "gender": (
+                        Employee.Gender(employee["gender"]).label
+                        if employee["gender"] else None
+                    ),
+                }
+                for employee in paginated_employees
+            ]
+
+            return paginator.get_paginated_response(employee_data)
+
+        except Exception:
+            return Response(
+                {"error": "Invalid data entered."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
     
     def post(self, request):
         serializer = AddEmployeeSerializer(data=request.data)
