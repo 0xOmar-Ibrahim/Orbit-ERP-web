@@ -3786,6 +3786,667 @@
               "response": []
             }
           ]
+        },
+        {
+          "name": "Leave",
+          "item": [
+            {
+              "name": "Get Leave Types",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-types/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-types",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "include_inactive",
+                      "value": "true",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Leave types for the dropdown (active only; include_inactive=true for all). unit is days or hours."
+              },
+              "response": []
+            },
+            {
+              "name": "Preview Counted Days",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-requests/preview/?leave_type_id=1&date_from=2026-12-06&date_to=2026-12-10",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-requests",
+                    "preview",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "leave_type_id",
+                      "value": "1",
+                      "disabled": false
+                    },
+                    {
+                      "key": "date_from",
+                      "value": "2026-12-06",
+                      "disabled": false
+                    },
+                    {
+                      "key": "date_to",
+                      "value": "2026-12-10",
+                      "disabled": false
+                    },
+                    {
+                      "key": "employee_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "requested_amount",
+                      "value": "2",
+                      "disabled": true
+                    },
+                    {
+                      "key": "leave_id",
+                      "value": "1",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Counted working days for a prospective request (weekends = days without a schedule line, default Fri/Sat; public holidays excluded, recurring ones every year), checked against the balance. Required: leave_type_id, date_from, date_to. Optional: employee_id (default: me), requested_amount (hour-based types), leave_id (when editing, so the request isn't counted against itself). Returns counted_days, weekend_days, holiday_days, holidays[], balance_remaining (null = no limit), enough_balance, overlaps. Writes nothing."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Leave Balances",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-balances/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-balances",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "employee_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "date",
+                      "value": "2026-11-25",
+                      "disabled": true
+                    },
+                    {
+                      "key": "leave_type_id",
+                      "value": "1",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Balance panel: per leave type, allocated (approved allocations covering the date) - used (approved requests) - pending (submitted requests) = remaining. Optional: employee_id (default: me), date (default: today), leave_type_id (one type, also those without an allocation)."
+              },
+              "response": []
+            },
+            {
+              "name": "Get My Leave Requests",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-requests/?mine=true",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-requests",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "mine",
+                      "value": "true",
+                      "disabled": false
+                    },
+                    {
+                      "key": "status",
+                      "value": "submitted",
+                      "disabled": true
+                    },
+                    {
+                      "key": "leave_type_id",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "date_from",
+                      "value": "2026-11-01",
+                      "disabled": true
+                    },
+                    {
+                      "key": "date_to",
+                      "value": "2026-12-31",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "'My requests' table. Filters: mine=true, employee_id, leave_type_id, status (draft, submitted, approved, refused, cancelled), approver_id, to_review=true (submitted requests where I'm the approver), date_from/date_to (requests overlapping the range), search (employee name/code). Pagination: page, page_size. Ordered by -date_from."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Requests To Review",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-requests/?to_review=true",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-requests",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "to_review",
+                      "value": "true",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Submitted leave requests where the logged-in user is the approver."
+              },
+              "response": []
+            },
+            {
+              "name": "Get Leave Request by id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-requests/?leave_id=1",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-requests",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "leave_id",
+                      "value": "1",
+                      "disabled": false
+                    }
+                  ]
+                },
+                "description": "Get one leave request. Returns {\"leave_request\": {...}} or 404."
+              },
+              "response": []
+            },
+            {
+              "name": "Create Leave Request (Save draft)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-requests/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-requests",
+                    ""
+                  ]
+                },
+                "description": "Create a draft. Required: leave_type_id, date_from, date_to. Optional: employee_id (default: me), employee_comment, approver_id (default: employee's manager; can't be the employee). requested_amount is computed for day-based types (weekends/holidays excluded) and required for hour-based types (single day). Drafts skip the balance check but not overlap.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"leave_type_id\": 1,\n    \"date_from\": \"2026-12-06\",\n    \"date_to\": \"2026-12-10\",\n    \"employee_comment\": \"Family trip\",\n    \"approver_id\": 2,\n    \"status\": \"draft\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Leave Request (Submit)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-requests/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-requests",
+                    ""
+                  ]
+                },
+                "description": "Create and submit in one step (status=submitted): the balance is checked. Types with requires_approval=false are approved immediately.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"leave_type_id\": 1,\n    \"date_from\": \"2026-12-06\",\n    \"date_to\": \"2026-12-10\",\n    \"employee_comment\": \"Family trip\",\n    \"approver_id\": 2,\n    \"status\": \"submitted\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Edit Leave Request",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-requests/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-requests",
+                    ""
+                  ]
+                },
+                "description": "Edit a draft or submitted request (requester or admin). leave_id is required; send only fields to change. requested_amount is recalculated and validated again.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"leave_id\": 1,\n    \"date_to\": \"2026-12-09\",\n    \"employee_comment\": \"Shorter trip\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Submit Leave Request",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-requests/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-requests",
+                    ""
+                  ]
+                },
+                "description": "draft -> submitted (requester or admin). The balance is checked.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"leave_id\": 1,\n    \"status\": \"submitted\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Approve Leave Request",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-requests/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-requests",
+                    ""
+                  ]
+                },
+                "description": "submitted -> approved. Only the assigned approver or a superuser; never the requester. The balance is checked again.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"leave_id\": 1,\n    \"status\": \"approved\",\n    \"reviewer_comment\": \"Enjoy your vacation\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Refuse Leave Request",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-requests/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-requests",
+                    ""
+                  ]
+                },
+                "description": "submitted -> refused. Only the assigned approver or a superuser; never the requester.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"leave_id\": 1,\n    \"status\": \"refused\",\n    \"reviewer_comment\": \"Peak period, please reschedule\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Cancel Leave Request",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-requests/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-requests",
+                    ""
+                  ]
+                },
+                "description": "draft/submitted -> cancelled (requester or admin); approved -> cancelled (requester, approver or admin), which frees the balance. Refused and cancelled are final.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"leave_id\": 1,\n    \"status\": \"cancelled\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Draft Leave Request",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token_0zk8}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://127.0.0.1:8000/hr/leave-requests/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "hr",
+                    "leave-requests",
+                    ""
+                  ]
+                },
+                "description": "Delete a draft (requester or admin). Other statuses return 409 - cancel them instead.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"leave_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     }

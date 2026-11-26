@@ -1,12 +1,19 @@
 
 import os
-import calendar
 import datetime
+from decimal import Decimal
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework.exceptions import (
+    NotFound,
+    PermissionDenied,
+    ValidationError as DRFValidationError,
+)
+from django.utils import timezone
+from apps.accounts.models import Employee
 from django.db.models import ProtectedError, Q, Count
 from django.core.exceptions import (
     ValidationError as DjangoValidationError,
@@ -25,7 +32,11 @@ from .models import (
     EmployeeHistory,
     WorkSchedule,
     PublicHoliday,
+    LeaveType,
+    LeaveRequest,
 )
+from . import leave as leave_logic
+from .leave import project_to_year
 from .history import log_salary_change
 from ..pagination import StandardPagination
 from ..helpers import (
@@ -51,6 +62,8 @@ from .serializers import (
     UpdateWorkScheduleSerializer,
     AddPublicHolidaySerializer,
     UpdatePublicHolidaySerializer,
+    AddLeaveRequestSerializer,
+    UpdateLeaveRequestSerializer,
 )
 
 class SkillCategoryManagement(APIView):
@@ -1445,10 +1458,7 @@ class PublicHolidayManagement(APIView):
             holiday_date = holiday["date"]
 
             if holiday["is_recurring"]:
-                if holiday_date.month == 2 and holiday_date.day == 29 and not calendar.isleap(year):
-                    occurs_on = datetime.date(year, 2, 28)
-                else:
-                    occurs_on = holiday_date.replace(year=year)
+                occurs_on = project_to_year(holiday_date, year)
             else:
                 occurs_on = holiday_date
 
@@ -1611,4 +1621,401 @@ class PublicHolidayManagement(APIView):
 
         return Response(
             {"message": "Public holiday deleted successfully."}
+        )
+
+
+# ==========================
+# Leave
+# ==========================
+
+def _parse_date(value, field):
+    try:
+        return datetime.date.fromisoformat(str(value))
+    except (TypeError, ValueError):
+        raise DRFValidationError({field: "Enter a valid date (YYYY-MM-DD)."})
+
+
+def _employee_from_params(request, param="employee_id"):
+    """The employee named by ?employee_id=, or the logged-in user."""
+    employee_id = request.query_params.get(param)
+    if not employee_id:
+        return request.user
+    if not is_valid_id(employee_id):
+        raise DRFValidationError({param: "Must be an integer."})
+    try:
+        return Employee.objects.get(employee_id=employee_id)
+    except Employee.DoesNotExist:
+        raise NotFound("Employee not found.")
+
+
+class LeaveTypeList(APIView):
+    """Leave types for the leave-type dropdown (active only unless include_inactive=true)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        queryset = LeaveType.objects.all()
+
+        if request.query_params.get("include_inactive") not in ("1", "true"):
+            queryset = queryset.filter(is_active=True)
+
+        leave_types = queryset.order_by("name").values(
+            "leave_type_id",
+            "name",
+            "code",
+            "unit",
+            "requires_allocation",
+            "requires_approval",
+            "is_active",
+        )
+
+        return Response({"leave_types": list(leave_types)})
+
+
+class LeaveBalanceView(APIView):
+    """
+    Remaining leave per type for an employee (default: logged-in user) on a date
+    (default: today): allocated - used (approved) - pending (submitted).
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        employee = _employee_from_params(request)
+
+        on_date = request.query_params.get("date")
+        on_date = _parse_date(on_date, "date") if on_date else timezone.localdate()
+
+        leave_types = LeaveType.objects.filter(is_active=True).order_by("name")
+
+        leave_type_id = request.query_params.get("leave_type_id")
+        if leave_type_id:
+            if not is_valid_id(leave_type_id):
+                raise DRFValidationError({"leave_type_id": "Must be an integer."})
+            leave_types = leave_types.filter(leave_type_id=leave_type_id)
+        else:
+            # Balance panel: only limited types the employee actually has an allocation for
+            leave_types = leave_types.filter(requires_allocation=True)
+
+        balances = []
+        for leave_type in leave_types:
+            balance = leave_logic.leave_balance(employee.pk, leave_type, on_date)
+            if leave_type_id or balance["allocated"]:
+                balances.append(balance)
+
+        return Response({
+            "employee_id": employee.pk,
+            "date": on_date,
+            "balances": balances,
+        })
+
+
+class LeaveRequestPreview(APIView):
+    """
+    Counted days for a prospective request (weekends and public holidays excluded),
+    checked against the balance. Writes nothing.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        params = request.query_params
+        employee = _employee_from_params(request)
+
+        leave_type_id = params.get("leave_type_id")
+        if not leave_type_id or not is_valid_id(leave_type_id):
+            raise DRFValidationError({"leave_type_id": "A valid leave_type_id is required."})
+        try:
+            leave_type = LeaveType.objects.get(leave_type_id=leave_type_id)
+        except LeaveType.DoesNotExist:
+            raise NotFound("Leave type not found.")
+
+        date_from = _parse_date(params.get("date_from"), "date_from")
+        date_to = _parse_date(params.get("date_to"), "date_to")
+        if date_to < date_from:
+            raise DRFValidationError({"date_to": "End date must be on or after the start date."})
+
+        # When editing an existing request, don't count it against itself
+        exclude_leave_id = params.get("leave_id")
+        if exclude_leave_id and not is_valid_id(exclude_leave_id):
+            raise DRFValidationError({"leave_id": "Must be an integer."})
+
+        counted = leave_logic.count_leave_days(employee, date_from, date_to)
+
+        if leave_type.unit == LeaveType.LeaveUnit.HOURS:
+            amount = params.get("requested_amount")
+            amount = Decimal(amount) if amount else None
+        else:
+            amount = Decimal(counted["counted_days"])
+
+        balance = leave_logic.leave_balance(
+            employee.pk, leave_type, date_from, exclude_leave_id
+        )
+        remaining = balance["remaining"]
+
+        if remaining is None:
+            enough_balance = True  # no allocation needed
+        elif amount is None:
+            enough_balance = None
+        else:
+            enough_balance = amount <= remaining
+
+        return Response({
+            "employee_id": employee.pk,
+            "leave_type_id": leave_type.leave_type_id,
+            "unit": leave_type.unit,
+            "date_from": date_from,
+            "date_to": date_to,
+            **counted,
+            "requested_amount": amount,
+            "balance_remaining": remaining,
+            "enough_balance": enough_balance,
+            "overlaps": leave_logic.has_overlap(employee.pk, date_from, date_to, exclude_leave_id),
+        })
+
+
+class LeaveRequestManagement(APIView):
+    """
+    Leave requests. Status flow: draft -> submitted -> approved / refused; draft,
+    submitted and approved can be cancelled. Only the assigned approver or a
+    superuser can approve/refuse (see apps/hr/leave.py).
+    """
+    permission_classes = [IsAuthenticated]
+    pagination_class = StandardPagination
+
+    LEAVE_VALUES = (
+        "leave_id",
+        "employee_id",
+        "employee__first_name",
+        "employee__last_name",
+        "employee__employee_code",
+        "leave_type_id",
+        "leave_type__name",
+        "leave_type__code",
+        "leave_type__unit",
+        "date_from",
+        "date_to",
+        "requested_amount",
+        "status",
+        "approver_id",
+        "approver__first_name",
+        "approver__last_name",
+        "employee_comment",
+        "reviewer_comment",
+        "created_at",
+        "updated_at",
+    )
+
+    EDITABLE_FIELDS = {
+        "leave_type_id",
+        "date_from",
+        "date_to",
+        "requested_amount",
+        "employee_comment",
+        "approver_id",
+    }
+
+    def _get_leave_id(self, request):
+        return (
+            request.data.get("leave_id")
+            or request.query_params.get("leave_id")
+        )
+
+    def _get_leave(self, request):
+        leave_id = self._get_leave_id(request)
+
+        if not leave_id:
+            raise DRFValidationError({"leave_id": "leave_id is required."})
+        if not is_valid_id(leave_id):
+            raise DRFValidationError({"leave_id": "leave_id must be an integer."})
+
+        try:
+            return (
+                LeaveRequest.objects
+                .select_related("employee", "leave_type", "approver")
+                .get(leave_id=leave_id)
+            )
+        except LeaveRequest.DoesNotExist:
+            raise NotFound("Leave request not found.")
+
+    def get(self, request):
+        params = request.query_params
+        leave_id = params.get("leave_id")
+
+        # Get a specific leave request by ID
+        if leave_id:
+            if not is_valid_id(leave_id):
+                return Response(
+                    {"error": "leave_id must be an integer."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            leave = (
+                LeaveRequest.objects
+                .filter(leave_id=leave_id)
+                .values(*self.LEAVE_VALUES)
+                .first()
+            )
+
+            if not leave:
+                return Response(
+                    {"error": "Leave request not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            return Response({"leave_request": leave})
+
+        allowed_filters = {
+            "employee_id",
+            "leave_type_id",
+            "status",
+            "approver_id",
+        }
+
+        filters = {
+            field: value
+            for field, value in params.items()
+            if field in allowed_filters and value
+        }
+
+        # "My requests"
+        if params.get("mine") in ("1", "true"):
+            filters["employee_id"] = request.user.pk
+
+        # Requests waiting for my review
+        if params.get("to_review") in ("1", "true"):
+            filters["approver_id"] = request.user.pk
+            filters["status"] = LeaveRequest.LeaveStatus.SUBMITTED
+
+        # Requests overlapping a date range
+        if params.get("date_from"):
+            filters["date_to__gte"] = params["date_from"]
+        if params.get("date_to"):
+            filters["date_from__lte"] = params["date_to"]
+
+        try:
+            queryset = LeaveRequest.objects.filter(**filters)
+
+            search = params.get("search", "").strip()
+            for term in search.split():
+                queryset = queryset.filter(
+                    Q(employee__first_name__icontains=term)
+                    | Q(employee__last_name__icontains=term)
+                    | Q(employee__employee_code__icontains=term)
+                )
+
+            leaves = (
+                queryset
+                .order_by("-date_from", "-leave_id")
+                .values(*self.LEAVE_VALUES)
+            )
+
+            paginator = self.pagination_class()
+            page = paginator.paginate_queryset(leaves, request, view=self)
+
+            return paginator.get_paginated_response(page)
+
+        except (ValueError, TypeError, DjangoValidationError):
+            return Response(
+                {"error": "Invalid data entered."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def post(self, request):
+        serializer = AddLeaveRequestSerializer(
+            data=request.data,
+            context={"request_user": request.user},
+        )
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            with transaction.atomic():
+                leave = serializer.save()
+        except IntegrityError:
+            return Response(
+                {"error": "The leave request violates a database constraint."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return Response(
+            {
+                "message": "Leave request created successfully.",
+                "leave_id": leave.leave_id,
+                "requested_amount": leave.requested_amount,
+                "status": leave.status,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    def patch(self, request):
+        leave = self._get_leave(request)
+        user = request.user
+        is_admin = bool(getattr(user, "is_superuser", False))
+
+        wants_edit = any(field in request.data for field in self.EDITABLE_FIELDS)
+        new_status = request.data.get("status")
+        reviewer_comment = request.data.get("reviewer_comment")
+
+        if not wants_edit and not new_status and reviewer_comment is None:
+            return Response(
+                {"error": "Nothing to update."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            with transaction.atomic():
+                # 1. Edit the request's details (requester or admin only)
+                if wants_edit:
+                    if user.pk != leave.employee_id and not is_admin:
+                        raise PermissionDenied("Only the requester can edit this leave request.")
+
+                    serializer = UpdateLeaveRequestSerializer(
+                        leave,
+                        data=request.data,
+                        partial=True,
+                    )
+                    serializer.is_valid(raise_exception=True)
+                    leave = serializer.save()
+
+                # 2. Status change (and/or reviewer comment)
+                if new_status:
+                    if new_status not in LeaveRequest.LeaveStatus.values:
+                        raise DRFValidationError({"status": "Invalid status."})
+                    leave_logic.change_status(leave, new_status, user, reviewer_comment)
+                    leave.save()
+
+                elif reviewer_comment is not None:
+                    is_approver = leave.approver_id is not None and user.pk == leave.approver_id
+                    if user.pk == leave.employee_id or not (is_approver or is_admin):
+                        raise PermissionDenied("Only the approver or an administrator can write the reviewer comment.")
+                    leave.reviewer_comment = reviewer_comment
+                    leave.save(update_fields=["reviewer_comment", "updated_at"])
+
+        except IntegrityError:
+            return Response(
+                {"error": "The leave request violates a database constraint."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return Response({
+            "message": "Leave request updated successfully.",
+            "leave_id": leave.leave_id,
+            "requested_amount": leave.requested_amount,
+            "status": leave.status,
+        })
+
+    def delete(self, request):
+        leave = self._get_leave(request)
+        user = request.user
+
+        if user.pk != leave.employee_id and not getattr(user, "is_superuser", False):
+            raise PermissionDenied("Only the requester can delete this leave request.")
+
+        if leave.status != LeaveRequest.LeaveStatus.DRAFT:
+            return Response(
+                {"error": "Only draft leave requests can be deleted. Cancel it instead."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        leave.delete()
+
+        return Response(
+            {"message": "Leave request deleted successfully."}
         )

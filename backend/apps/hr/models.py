@@ -584,6 +584,8 @@ class LeaveRequest(models.Model):
         related_name="leave_approvals",
         db_column="approver_id",
     )
+    # Comment written by the employee when requesting the leave
+    employee_comment = models.TextField(blank=True, default="")
     reviewer_comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

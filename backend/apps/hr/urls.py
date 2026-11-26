@@ -10,6 +10,10 @@ from .views import (
     EmployeeHistoryView,
     WorkScheduleManagement,
     PublicHolidayManagement,
+    LeaveTypeList,
+    LeaveBalanceView,
+    LeaveRequestPreview,
+    LeaveRequestManagement,
 )
 
 urlpatterns = [
@@ -62,5 +66,25 @@ urlpatterns = [
         "public-holidays/",
         PublicHolidayManagement.as_view(),
         name="public-holidays",
+    ),
+    path(
+        "leave-types/",
+        LeaveTypeList.as_view(),
+        name="leave-types",
+    ),
+    path(
+        "leave-balances/",
+        LeaveBalanceView.as_view(),
+        name="leave-balances",
+    ),
+    path(
+        "leave-requests/preview/",
+        LeaveRequestPreview.as_view(),
+        name="leave-requests-preview",
+    ),
+    path(
+        "leave-requests/",
+        LeaveRequestManagement.as_view(),
+        name="leave-requests",
     ),
 ]

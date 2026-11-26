@@ -11,6 +11,8 @@ from .models import (
     EmployeeDocument,
     WorkScheduleLine,
     PublicHoliday,
+    LeaveType,
+    LeaveRequest,
 )
 import os
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -492,3 +494,167 @@ class UpdatePublicHolidaySerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicHoliday
         fields = ["name", "date", "is_recurring"]
+
+
+# ==========================
+# Leave Request Serializers
+# ==========================
+
+from . import leave as leave_logic
+
+
+class AddLeaveRequestSerializer(serializers.ModelSerializer):
+    """
+    requested_amount is computed for day-based leave types (weekends and public
+    holidays excluded) and required for hour-based ones. Status can only be
+    draft or submitted on create; balance is checked when submitting.
+    Context: {"request_user": Employee}
+    """
+    employee_id = serializers.PrimaryKeyRelatedField(
+        source="employee",
+        queryset=Employee.objects.all(),
+        required=False
+    )
+    leave_type_id = serializers.PrimaryKeyRelatedField(
+        source="leave_type",
+        queryset=LeaveType.objects.all()
+    )
+    approver_id = serializers.PrimaryKeyRelatedField(
+        source="approver",
+        queryset=Employee.objects.all(),
+        required=False,
+        allow_null=True
+    )
+    requested_amount = serializers.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        required=False
+    )
+    status = serializers.ChoiceField(
+        choices=[LeaveRequest.LeaveStatus.DRAFT, LeaveRequest.LeaveStatus.SUBMITTED],
+        default=LeaveRequest.LeaveStatus.DRAFT
+    )
+
+    class Meta:
+        model = LeaveRequest
+        fields = [
+            "employee_id",
+            "leave_type_id",
+            "date_from",
+            "date_to",
+            "requested_amount",
+            "employee_comment",
+            "approver_id",
+            "status",
+        ]
+
+    def validate(self, attrs):
+        employee = attrs.get("employee") or self.context["request_user"]
+        attrs["employee"] = employee
+        leave_type = attrs["leave_type"]
+
+        # Default approver: the employee's manager
+        if "approver" not in attrs and getattr(employee, "manager_id", None):
+            attrs["approver"] = employee.manager
+
+        approver = attrs.get("approver")
+        if approver and approver.pk == employee.pk:
+            raise serializers.ValidationError({
+                "approver_id": "An employee cannot approve their own leave request."
+            })
+
+        if attrs["date_to"] < attrs["date_from"]:
+            raise serializers.ValidationError({
+                "date_to": "End date must be on or after the start date."
+            })
+
+        attrs["requested_amount"] = leave_logic.compute_requested_amount(
+            employee, leave_type, attrs["date_from"], attrs["date_to"],
+            attrs.get("requested_amount"),
+        )
+
+        submitting = attrs["status"] == LeaveRequest.LeaveStatus.SUBMITTED
+        leave_logic.validate_leave(
+            employee, leave_type, attrs["date_from"], attrs["date_to"],
+            attrs["requested_amount"], check_balance=submitting,
+        )
+
+        # Leave types that don't need approval are approved on submit
+        if submitting and not leave_type.requires_approval:
+            attrs["status"] = LeaveRequest.LeaveStatus.APPROVED
+
+        return attrs
+
+
+class UpdateLeaveRequestSerializer(serializers.ModelSerializer):
+    """
+    Edits the request's details while it is draft or submitted. Status changes are
+    handled separately (apps/hr/leave.py change_status).
+    """
+    leave_type_id = serializers.PrimaryKeyRelatedField(
+        source="leave_type",
+        queryset=LeaveType.objects.all(),
+        required=False
+    )
+    approver_id = serializers.PrimaryKeyRelatedField(
+        source="approver",
+        queryset=Employee.objects.all(),
+        required=False,
+        allow_null=True
+    )
+    requested_amount = serializers.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        required=False
+    )
+
+    class Meta:
+        model = LeaveRequest
+        fields = [
+            "leave_type_id",
+            "date_from",
+            "date_to",
+            "requested_amount",
+            "employee_comment",
+            "approver_id",
+        ]
+
+    def validate(self, attrs):
+        instance = self.instance
+
+        if instance.status not in (LeaveRequest.LeaveStatus.DRAFT, LeaveRequest.LeaveStatus.SUBMITTED):
+            raise serializers.ValidationError(
+                "Only draft or submitted leave requests can be edited."
+            )
+
+        employee = instance.employee
+        leave_type = attrs.get("leave_type", instance.leave_type)
+        date_from = attrs.get("date_from", instance.date_from)
+        date_to = attrs.get("date_to", instance.date_to)
+
+        approver = attrs.get("approver", instance.approver)
+        if approver and approver.pk == employee.pk:
+            raise serializers.ValidationError({
+                "approver_id": "An employee cannot approve their own leave request."
+            })
+
+        if date_to < date_from:
+            raise serializers.ValidationError({
+                "date_to": "End date must be on or after the start date."
+            })
+
+        given_amount = attrs.get("requested_amount")
+        if given_amount is None and leave_type.unit == LeaveType.LeaveUnit.HOURS:
+            given_amount = instance.requested_amount
+
+        attrs["requested_amount"] = leave_logic.compute_requested_amount(
+            employee, leave_type, date_from, date_to, given_amount,
+        )
+
+        leave_logic.validate_leave(
+            employee, leave_type, date_from, date_to, attrs["requested_amount"],
+            exclude_leave_id=instance.leave_id,
+            check_balance=instance.status == LeaveRequest.LeaveStatus.SUBMITTED,
+        )
+
+        return attrs
