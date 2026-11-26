@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "e1837aca-e0eb-4b30-8685-f524a7f8d570",
-    "name": "Orbit",
+    "_postman_id": "c8946886-80c3-41ee-b5b3-9ceb7fee4292",
+    "name": "Orbit Copy 5",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "58738667",
-    "_collection_link": "https://go.postman.co/collection/58738667-e1837aca-e0eb-4b30-8685-f524a7f8d570?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/58738667-c8946886-80c3-41ee-b5b3-9ceb7fee4292?source=collection_link"
   },
   "item": [
     {
@@ -120,15 +120,6 @@
               "request": {
                 "method": "GET",
                 "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"email\":\"Omar1asdxaswdWSxdaxaa_3@gmail.com\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
                   "raw": "http://127.0.0.1:8000/api/auth/get_employee_status/",
                   "protocol": "http",
@@ -159,15 +150,6 @@
                     "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyNjk4MjAwLCJpYXQiOjE3OTI2MTE4MDEsImp0aSI6IjIyMjk3MjE0NDVjNjRhOGNhMzVkZDdkNmVjYmEwYmNjIiwidXNlcl9pZCI6IjEifQ.pSDvl1Jcg6WuUApWH7gtZSy3zY9K5eoIBHX2lbhAO9o"
                   }
                 ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"refresh\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc5MzE3MjE1MywiaWF0IjoxNzkyNTY3MzUzLCJqdGkiOiIwNGIzOWRlOTYyYmY0MDlhODA1NTdmNDNlNTUxNjRhZSIsInVzZXJfaWQiOiIxIn0.ml6G8RLLbdP_bTVmu8aXg_94zu43L4SJmphLX5BnXtY\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
                   "raw": "http://localhost:8000/api/auth/me/",
                   "protocol": "http",
@@ -308,7 +290,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/admin/login/",
+                  "raw": "http://127.0.0.1:8000/api/admin/login/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -318,6 +300,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "admin",
                     "login",
                     ""
@@ -346,190 +329,18 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_admin_url}}/logout/",
+                  "raw": "http://127.0.0.1:8000/api/logout/",
+                  "protocol": "http",
                   "host": [
-                    "{{base_admin_url}}"
+                    "127",
+                    "0",
+                    "0",
+                    "1"
                   ],
+                  "port": "8000",
                   "path": [
+                    "api",
                     "logout",
-                    ""
-                  ]
-                }
-              },
-              "response": []
-            }
-          ]
-        },
-        {
-          "name": "employee management",
-          "item": [
-            {
-              "name": "employees",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "{{bearer_token_0zk8}}"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"first_name\":\"Abdo\",\r\n    \"last_name\":\"Mostafa\",\r\n    \"role\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"103400500789\",\r\n    \"phone\":\"01000000000\",\r\n    \"work_email\":\"o6ma_r@example.com\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\",\r\n    \"password\":\"123456\",\r\n    \"department_id\": 1,\r\n    \"manager_id\":1,\r\n    \"position_id\":1,\r\n    \"schedule_id\":1,\r\n    \"branch_id\":1\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "http://127.0.0.1:8000/admin/employee/",
-                  "protocol": "http",
-                  "host": [
-                    "127",
-                    "0",
-                    "0",
-                    "1"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "admin",
-                    "employee",
-                    ""
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "employees",
-              "request": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTU2MjYyLCJpYXQiOjE3OTIxNTI2NjIsImp0aSI6ImE2MmFkODViZDg2NDQyMjhhODhjYzQ5NWYzMGUxODUxIiwidXNlcl9pZCI6IjEifQ.X_Q4Ttt_rJMeskZkoMxBtVKfIfykZbE7Yl9YiVrFj20"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"employee_code\": \"EMP001\",\r\n    \"last_name\": \"Mohammed\",\r\n    \"address\": \"Cairo\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "http://127.0.0.1:8000/admin/employees",
-                  "protocol": "http",
-                  "host": [
-                    "127",
-                    "0",
-                    "0",
-                    "1"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "admin",
-                    "employees"
-                  ]
-                },
-                "description": "Every edited field is logged automatically in Employee History (GET /hr/employee-history/), with recorded_by = the logged-in admin. Password changes are logged without values."
-              },
-              "response": []
-            },
-            {
-              "name": "employees",
-              "request": {
-                "method": "DELETE",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "{{bearer_token_1axj}}"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"employee_code\": \"EMP-2026-3987\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "http://127.0.0.1:8000/admin/employee/",
-                  "protocol": "http",
-                  "host": [
-                    "127",
-                    "0",
-                    "0",
-                    "1"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "admin",
-                    "employee",
-                    ""
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "employees",
-              "request": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "{{bearer_token_0zk8}}"
-                  }
-                ],
-                "url": {
-                  "raw": "http://127.0.0.1:8000/admin/employee/",
-                  "protocol": "http",
-                  "host": [
-                    "127",
-                    "0",
-                    "0",
-                    "1"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "admin",
-                    "employee",
-                    ""
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "registration_requests",
-              "request": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "{{bearer_token_0zk8}}"
-                  }
-                ],
-                "url": {
-                  "raw": "http://127.0.0.1:8000/admin/employee/registration_requests/",
-                  "protocol": "http",
-                  "host": [
-                    "127",
-                    "0",
-                    "0",
-                    "1"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "admin",
-                    "employee",
-                    "registration_requests",
                     ""
                   ]
                 }
@@ -561,7 +372,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/admin/approved/employee/",
+                  "raw": "http://127.0.0.1:8000/api/admin/approved/employee/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -571,6 +382,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "admin",
                     "approved",
                     "employee",
@@ -581,24 +393,19 @@
               "response": []
             }
           ]
-        }
-      ]
-    },
-    {
-      "name": "CRM",
-      "item": [
+        },
         {
-          "name": "employees",
+          "name": "registration_requests",
           "request": {
             "method": "GET",
             "header": [
               {
                 "key": "Authorization",
-                "value": "{{bearer_token_0zk8}}"
+                "value": "{{bearer_token_0zvx}}"
               }
             ],
             "url": {
-              "raw": "http://127.0.0.1:8000/crm/employees/",
+              "raw": "http://127.0.0.1:8000/api/admin/employee/registration_requests/",
               "protocol": "http",
               "host": [
                 "127",
@@ -608,14 +415,21 @@
               ],
               "port": "8000",
               "path": [
-                "crm",
-                "employees",
+                "api",
+                "admin",
+                "employee",
+                "registration_requests",
                 ""
               ]
             }
           },
           "response": []
-        },
+        }
+      ]
+    },
+    {
+      "name": "CRM",
+      "item": [
         {
           "name": "Customer",
           "item": [
@@ -626,11 +440,11 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "{{bearer_token_0zk8}}"
+                    "value": "{{bearer_token_0zvx}}"
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customers/",
+                  "raw": "http://127.0.0.1:8000/api/crm/customers/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -640,6 +454,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "customers",
                     ""
@@ -668,7 +483,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customers",
+                  "raw": "http://127.0.0.1:8000/api/crm/customers/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -678,8 +493,10 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
-                    "customers"
+                    "customers",
+                    ""
                   ]
                 }
               },
@@ -705,7 +522,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customers",
+                  "raw": "http://127.0.0.1:8000/api/crm/customers/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -715,8 +532,10 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
-                    "customers"
+                    "customers",
+                    ""
                   ]
                 }
               },
@@ -742,7 +561,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customers",
+                  "raw": "http://127.0.0.1:8000/api/crm/customers/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -752,8 +571,10 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
-                    "customers"
+                    "customers",
+                    ""
                   ]
                 }
               },
@@ -775,7 +596,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/contacts/",
+                  "raw": "http://127.0.0.1:8000/api/crm/contacts/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -785,6 +606,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "contacts",
                     ""
@@ -813,7 +635,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/contacts/",
+                  "raw": "http://127.0.0.1:8000/api/crm/contacts/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -823,6 +645,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "contacts",
                     ""
@@ -851,7 +674,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/contacts/",
+                  "raw": "http://127.0.0.1:8000/api/crm/contacts/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -861,6 +684,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "contacts",
                     ""
@@ -889,7 +713,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/contacts/",
+                  "raw": "http://127.0.0.1:8000/api/crm/contacts/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -899,6 +723,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "contacts",
                     ""
@@ -923,7 +748,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/interactions/",
+                  "raw": "http://127.0.0.1:8000/api/crm/interactions/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -933,6 +758,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "interactions",
                     ""
@@ -961,7 +787,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/interactions/",
+                  "raw": "http://127.0.0.1:8000/api/crm/interactions/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -971,6 +797,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "interactions",
                     ""
@@ -999,7 +826,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/interactions/",
+                  "raw": "http://127.0.0.1:8000/api/crm/interactions/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1009,6 +836,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "interactions",
                     ""
@@ -1037,7 +865,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/interactions/",
+                  "raw": "http://127.0.0.1:8000/api/crm/interactions/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1047,6 +875,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "interactions",
                     ""
@@ -1071,7 +900,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/lead-sources/",
+                  "raw": "http://127.0.0.1:8000/api/crm/lead-sources/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1081,6 +910,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "lead-sources",
                     ""
@@ -1109,7 +939,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/lead-sources/",
+                  "raw": "http://127.0.0.1:8000/api/crm/lead-sources/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1119,6 +949,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "lead-sources",
                     ""
@@ -1147,7 +978,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/lead-sources/",
+                  "raw": "http://127.0.0.1:8000/api/crm/lead-sources/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1157,6 +988,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "lead-sources",
                     ""
@@ -1185,7 +1017,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/lead-sources/",
+                  "raw": "http://127.0.0.1:8000/api/crm/lead-sources/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1195,6 +1027,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "lead-sources",
                     ""
@@ -1214,7 +1047,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/opportunities/?startrange=0&endrange=50",
+                  "raw": "http://127.0.0.1:8000/api/crm/opportunities/?startrange=0&endrange=50",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1224,6 +1057,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "opportunities",
                     ""
@@ -1273,7 +1107,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/opportunities/?opportunity_id=1",
+                  "raw": "http://127.0.0.1:8000/api/crm/opportunities/?opportunity_id=1",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1283,6 +1117,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "opportunities",
                     ""
@@ -1302,8 +1137,17 @@
               "request": {
                 "method": "POST",
                 "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"customer_id\": 1,\r\n    \"employee_id\": 1,\r\n    \"title\": \"ERP license deal\",\r\n    \"estimated_value\": 150000.0,\r\n    \"currency\": \"EGP\",\r\n    \"stage\": \"lead\",\r\n    \"expected_close_date\": \"2026-12-31\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/opportunities/",
+                  "raw": "http://127.0.0.1:8000/api/crm/opportunities/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1313,19 +1157,11 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "opportunities",
                     ""
                   ]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"customer_id\": 1,\r\n    \"employee_id\": 1,\r\n    \"title\": \"ERP license deal\",\r\n    \"estimated_value\": 150000.0,\r\n    \"currency\": \"EGP\",\r\n    \"stage\": \"lead\",\r\n    \"expected_close_date\": \"2026-12-31\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
                 }
               },
               "response": []
@@ -1335,8 +1171,17 @@
               "request": {
                 "method": "PATCH",
                 "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"opportunity_id\": 1,\r\n    \"stage\": \"proposal\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/opportunities/",
+                  "raw": "http://127.0.0.1:8000/api/crm/opportunities/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1346,19 +1191,11 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "opportunities",
                     ""
                   ]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"opportunity_id\": 1,\r\n    \"stage\": \"proposal\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
                 }
               },
               "response": []
@@ -1368,8 +1205,17 @@
               "request": {
                 "method": "PATCH",
                 "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"opportunity_id\": 1,\r\n    \"stage\": \"closed\",\r\n    \"status\": \"lost\",\r\n    \"lost_reason\": \"Chose a competitor\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/opportunities/",
+                  "raw": "http://127.0.0.1:8000/api/crm/opportunities/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1379,19 +1225,11 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "opportunities",
                     ""
                   ]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"opportunity_id\": 1,\r\n    \"stage\": \"closed\",\r\n    \"status\": \"lost\",\r\n    \"lost_reason\": \"Chose a competitor\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
                 }
               },
               "response": []
@@ -1401,8 +1239,17 @@
               "request": {
                 "method": "PUT",
                 "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"opportunity_id\": 1,\r\n    \"title\": \"ERP license deal (renewed)\",\r\n    \"estimated_value\": 175000.0\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/opportunities/",
+                  "raw": "http://127.0.0.1:8000/api/crm/opportunities/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1412,19 +1259,11 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "opportunities",
                     ""
                   ]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"opportunity_id\": 1,\r\n    \"title\": \"ERP license deal (renewed)\",\r\n    \"estimated_value\": 175000.0\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
                 }
               },
               "response": []
@@ -1434,8 +1273,17 @@
               "request": {
                 "method": "DELETE",
                 "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"opportunity_id\": 1\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/opportunities/",
+                  "raw": "http://127.0.0.1:8000/api/crm/opportunities/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1445,19 +1293,11 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "opportunities",
                     ""
                   ]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"opportunity_id\": 1\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
                 }
               },
               "response": []
@@ -1473,7 +1313,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customers/1/notes/",
+                  "raw": "http://127.0.0.1:8000/api/crm/customers/1/notes/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1483,6 +1323,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "customers",
                     "1",
@@ -1499,7 +1340,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customer-notes/?customer_id=1",
+                  "raw": "http://127.0.0.1:8000/api/crm/customer-notes/?customer_id=1",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1509,6 +1350,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "customer-notes",
                     ""
@@ -1529,7 +1371,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customer-notes/1/",
+                  "raw": "http://127.0.0.1:8000/api/crm/customer-notes/1/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1539,6 +1381,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "customer-notes",
                     "1",
@@ -1553,8 +1396,17 @@
               "request": {
                 "method": "POST",
                 "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"note_text\": \"Customer asked for a demo of the HR module.\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customers/1/notes/",
+                  "raw": "http://127.0.0.1:8000/api/crm/customers/1/notes/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1564,21 +1416,13 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "customers",
                     "1",
                     "notes",
                     ""
                   ]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"note_text\": \"Customer asked for a demo of the HR module.\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
                 }
               },
               "response": []
@@ -1588,8 +1432,17 @@
               "request": {
                 "method": "POST",
                 "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"customer_id\": 1,\r\n    \"note_text\": \"Follow up next week about pricing.\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customer-notes/",
+                  "raw": "http://127.0.0.1:8000/api/crm/customer-notes/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1599,19 +1452,11 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "customer-notes",
                     ""
                   ]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"customer_id\": 1,\r\n    \"note_text\": \"Follow up next week about pricing.\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
                 }
               },
               "response": []
@@ -1621,8 +1466,17 @@
               "request": {
                 "method": "PATCH",
                 "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"note_text\": \"Follow up on Monday about pricing.\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customer-notes/1/",
+                  "raw": "http://127.0.0.1:8000/api/crm/customer-notes/1/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1632,20 +1486,12 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "customer-notes",
                     "1",
                     ""
                   ]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"note_text\": \"Follow up on Monday about pricing.\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
                 }
               },
               "response": []
@@ -1656,7 +1502,7 @@
                 "method": "DELETE",
                 "header": [],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/crm/customer-notes/1/",
+                  "raw": "http://127.0.0.1:8000/api/crm/customer-notes/1/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1666,6 +1512,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "crm",
                     "customer-notes",
                     "1",
@@ -1678,6 +1525,36 @@
           ]
         },
         {
+          "name": "employees",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_0zk8}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/crm/employees/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "crm",
+                "employees",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "GetOpportunities",
           "request": {
             "method": "GET",
@@ -1688,7 +1565,7 @@
               }
             ],
             "url": {
-              "raw": "http://127.0.0.1:8000/crm/opportunities_view/",
+              "raw": "http://127.0.0.1:8000/api/crm/opportunities_view/",
               "protocol": "http",
               "host": [
                 "127",
@@ -1698,6 +1575,7 @@
               ],
               "port": "8000",
               "path": [
+                "api",
                 "crm",
                 "opportunities_view",
                 ""
@@ -1729,7 +1607,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/skill-categories/",
+                  "raw": "http://127.0.0.1:8000/api/hr/skill-categories",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1739,6 +1617,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "skill-categories"
                   ],
@@ -1783,8 +1662,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Communication\",\n    \"description\": \"Communication and interpersonal skills\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/skill-categories/",
+                  "raw": "http://127.0.0.1:8000/api/hr/skill-categories/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1794,20 +1682,13 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
-                    "skill-categories"
+                    "skill-categories",
+                    ""
                   ]
                 },
-                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"name\": \"Communication\",\n    \"description\": \"Communication and interpersonal skills\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100)."
               },
               "response": []
             },
@@ -1825,8 +1706,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"skill_category_id\": 1,\n    \"name\": \"Communication\",\n    \"description\": \"Communication and interpersonal skills\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/skill-categories/",
+                  "raw": "http://127.0.0.1:8000/api/hr/skill-categories",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1836,20 +1726,12 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "skill-categories"
                   ]
                 },
-                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"skill_category_id\": 1,\n    \"name\": \"Communication\",\n    \"description\": \"Communication and interpersonal skills\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100)."
               },
               "response": []
             },
@@ -1867,8 +1749,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"skill_category_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/skill-categories/",
+                  "raw": "http://127.0.0.1:8000/api/hr/skill-categories",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1878,20 +1769,12 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "skill-categories"
                   ]
                 },
-                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"skill_category_id\": 1\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100)."
               },
               "response": []
             }
@@ -1915,7 +1798,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/skills/",
+                  "raw": "http://127.0.0.1:8000/api/hr/skills",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1925,6 +1808,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "skills"
                   ],
@@ -1974,8 +1858,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"skill_category\": 1,\n    \"name\": \"Active Listening\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/skills/",
+                  "raw": "http://127.0.0.1:8000/api/hr/skills",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -1985,20 +1878,12 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "skills"
                   ]
                 },
-                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"skill_category\": 1,\n    \"name\": \"Active Listening\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100)."
               },
               "response": []
             },
@@ -2016,8 +1901,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"skill_id\": 1,\n    \"skill_category\": 1,\n    \"name\": \"Active Listening\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/skills/",
+                  "raw": "http://127.0.0.1:8000/api/hr/skills",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2027,20 +1921,12 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "skills"
                   ]
                 },
-                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"skill_id\": 1,\n    \"skill_category\": 1,\n    \"name\": \"Active Listening\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100)."
               },
               "response": []
             },
@@ -2058,8 +1944,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"skill_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/skills/",
+                  "raw": "http://127.0.0.1:8000/api/hr/skills",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2069,20 +1964,12 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "skills"
                   ]
                 },
-                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"skill_id\": 1\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100)."
               },
               "response": []
             }
@@ -2098,7 +1985,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{bearer_token_0zk8}}"
+                    "value": "{{bearer_token_0oe3}}"
                   },
                   {
                     "key": "Content-Type",
@@ -2106,7 +1993,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/employee-skills/",
+                  "raw": "http://127.0.0.1:8000/api/hr/employee-skills?page_size=2",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2116,6 +2003,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "employee-skills"
                   ],
@@ -2152,8 +2040,7 @@
                     },
                     {
                       "key": "page_size",
-                      "value": "10",
-                      "disabled": true
+                      "value": "2"
                     }
                   ]
                 },
@@ -2175,8 +2062,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"employee\": 1,\n    \"skill\": 1,\n    \"level\": \"intermediate\",\n    \"years_experience\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/employee-skills/",
+                  "raw": "http://127.0.0.1:8000/api/hr/employee-skills",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2186,20 +2082,12 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "employee-skills"
                   ]
                 },
-                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"employee\": 1,\n    \"skill\": 1,\n    \"level\": \"intermediate\",\n    \"years_experience\": 2\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100)."
               },
               "response": []
             },
@@ -2217,8 +2105,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"employee_skill_id\": 1,\n    \"employee\": 1,\n    \"skill\": 1,\n    \"level\": \"intermediate\",\n    \"years_experience\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/employee-skills/",
+                  "raw": "http://127.0.0.1:8000/api/hr/employee-skills",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2228,20 +2125,12 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "employee-skills"
                   ]
                 },
-                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"employee_skill_id\": 1,\n    \"employee\": 1,\n    \"skill\": 1,\n    \"level\": \"intermediate\",\n    \"years_experience\": 2\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100)."
               },
               "response": []
             },
@@ -2259,8 +2148,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"employee_skill_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/employee-skills/",
+                  "raw": "http://127.0.0.1:8000/api/hr/employee-skills",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2270,20 +2168,12 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "employee-skills"
                   ]
                 },
-                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100).",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"employee_skill_id\": 1\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "HR Skills API. Pagination: page, page_size (default 10, maximum 100)."
               },
               "response": []
             }
@@ -2307,7 +2197,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/attendance/",
+                  "raw": "http://127.0.0.1:8000/api/hr/attendance/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2317,6 +2207,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "attendance",
                     ""
@@ -2397,7 +2288,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/attendance/",
+                  "raw": "http://127.0.0.1:8000/api/hr/attendance/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2407,6 +2298,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "attendance",
                     ""
@@ -2440,7 +2332,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/attendance/",
+                  "raw": "http://127.0.0.1:8000/api/hr/attendance/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2450,6 +2342,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "attendance",
                     ""
@@ -2483,7 +2376,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/attendance/",
+                  "raw": "http://127.0.0.1:8000/api/hr/attendance/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2493,6 +2386,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "attendance",
                     ""
@@ -2515,7 +2409,7 @@
                 "header": [
                   {
                     "key": "Authorization",
-                    "value": "Bearer {{bearer_token_0zk8}}"
+                    "value": "{{bearer_token_0oe3}}"
                   },
                   {
                     "key": "Content-Type",
@@ -2523,7 +2417,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/contracts/",
+                  "raw": "http://127.0.0.1:8000/api/hr/contracts/?page_size=2",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2533,6 +2427,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "contracts",
                     ""
@@ -2600,8 +2495,7 @@
                     },
                     {
                       "key": "page_size",
-                      "value": "10",
-                      "disabled": true
+                      "value": "2"
                     }
                   ]
                 },
@@ -2624,7 +2518,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/contracts/?contract_id=1",
+                  "raw": "http://127.0.0.1:8000/api/hr/contracts/?contract_id=1",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2634,6 +2528,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "contracts",
                     ""
@@ -2641,8 +2536,7 @@
                   "query": [
                     {
                       "key": "contract_id",
-                      "value": "1",
-                      "disabled": false
+                      "value": "1"
                     }
                   ]
                 },
@@ -2664,8 +2558,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"employee_id\": 1,\n    \"contract_type\": \"fixed_term\",\n    \"start_date\": \"2026-01-01\",\n    \"end_date\": \"2026-12-31\",\n    \"position_id\": 1,\n    \"schedule_id\": 1,\n    \"wage\": \"15000.00\",\n    \"currency\": \"EGP\",\n    \"status\": \"draft\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/contracts/",
+                  "raw": "http://127.0.0.1:8000/api/hr/contracts/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2675,21 +2578,13 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "contracts",
                     ""
                   ]
                 },
-                "description": "Create an employment contract. Required: employee_id, contract_type, start_date, wage. Optional: end_date (must be after start_date, null for open-ended), position_id, schedule_id, currency (default EGP), status (default draft). contract_number is generated by the server (CTR-YYYY-NNNN) and returned in the response; any contract_number sent is ignored. Returns 409 if the employee already has a running contract.",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"employee_id\": 1,\n    \"contract_type\": \"fixed_term\",\n    \"start_date\": \"2026-01-01\",\n    \"end_date\": \"2026-12-31\",\n    \"position_id\": 1,\n    \"schedule_id\": 1,\n    \"wage\": \"15000.00\",\n    \"currency\": \"EGP\",\n    \"status\": \"draft\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "Create an employment contract. Required: employee_id, contract_type, start_date, wage. Optional: end_date (must be after start_date, null for open-ended), position_id, schedule_id, currency (default EGP), status (default draft). contract_number is generated by the server (CTR-YYYY-NNNN) and returned in the response; any contract_number sent is ignored. Returns 409 if the employee already has a running contract."
               },
               "response": []
             },
@@ -2707,8 +2602,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"contract_id\": 1,\n    \"status\": \"running\",\n    \"wage\": \"16000.00\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/contracts/",
+                  "raw": "http://127.0.0.1:8000/api/hr/contracts/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2718,21 +2622,13 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "contracts",
                     ""
                   ]
                 },
-                "description": "Partially update an employment contract. contract_id is required; send only the fields to change. contract_number can't be changed. A wage change is logged automatically in Employee History. Returns 409 if the change would give the employee a second running contract.",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"contract_id\": 1,\n    \"status\": \"running\",\n    \"wage\": \"16000.00\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "Partially update an employment contract. contract_id is required; send only the fields to change. contract_number can't be changed. A wage change is logged automatically in Employee History. Returns 409 if the change would give the employee a second running contract."
               },
               "response": []
             },
@@ -2750,8 +2646,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"contract_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/contracts/",
+                  "raw": "http://127.0.0.1:8000/api/hr/contracts/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2761,21 +2666,13 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "contracts",
                     ""
                   ]
                 },
-                "description": "Delete an employment contract. contract_id is required.",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"contract_id\": 1\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "Delete an employment contract. contract_id is required."
               },
               "response": []
             }
@@ -2799,7 +2696,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/documents/",
+                  "raw": "http://127.0.0.1:8000/api/hr/documents/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2809,6 +2706,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "documents",
                     ""
@@ -2875,7 +2773,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/documents/?document_id=1",
+                  "raw": "http://127.0.0.1:8000/api/hr/documents/?document_id=1",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2885,6 +2783,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "documents",
                     ""
@@ -2892,8 +2791,7 @@
                   "query": [
                     {
                       "key": "document_id",
-                      "value": "1",
-                      "disabled": false
+                      "value": "1"
                     }
                   ]
                 },
@@ -2911,43 +2809,23 @@
                     "value": "Bearer {{bearer_token_0zk8}}"
                   }
                 ],
-                "url": {
-                  "raw": "http://127.0.0.1:8000/hr/documents/",
-                  "protocol": "http",
-                  "host": [
-                    "127",
-                    "0",
-                    "0",
-                    "1"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "hr",
-                    "documents",
-                    ""
-                  ]
-                },
-                "description": "Upload a document (multipart/form-data). Required: employee_id, document_type, file. Optional: document_name (defaults to the original file name), expiry_date (YYYY-MM-DD). Allowed types: pdf, doc, docx, jpg, jpeg, png; max 10 MB. The file is stored in backend/uploads/employee_documents/ with a random name; uploaded_by is set to the logged-in user.",
                 "body": {
                   "mode": "formdata",
                   "formdata": [
                     {
                       "key": "employee_id",
                       "value": "1",
-                      "type": "text",
-                      "disabled": false
+                      "type": "text"
                     },
                     {
                       "key": "document_type",
                       "value": "cv",
-                      "type": "text",
-                      "disabled": false
+                      "type": "text"
                     },
                     {
                       "key": "document_name",
                       "value": "Ahmed CV",
-                      "type": "text",
-                      "disabled": false
+                      "type": "text"
                     },
                     {
                       "key": "expiry_date",
@@ -2958,10 +2836,28 @@
                     {
                       "key": "file",
                       "type": "file",
-                      "src": []
+                      "value": ""
                     }
                   ]
-                }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/api/hr/documents/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "api",
+                    "hr",
+                    "documents",
+                    ""
+                  ]
+                },
+                "description": "Upload a document (multipart/form-data). Required: employee_id, document_type, file. Optional: document_name (defaults to the original file name), expiry_date (YYYY-MM-DD). Allowed types: pdf, doc, docx, jpg, jpeg, png; max 10 MB. The file is stored in backend/uploads/employee_documents/ with a random name; uploaded_by is set to the logged-in user."
               },
               "response": []
             },
@@ -2979,8 +2875,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"document_id\": 1,\n    \"document_name\": \"Ahmed CV 2026\",\n    \"expiry_date\": \"2027-12-31\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/documents/",
+                  "raw": "http://127.0.0.1:8000/api/hr/documents/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -2990,21 +2895,13 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "documents",
                     ""
                   ]
                 },
-                "description": "Edit document metadata (JSON). document_id is required; send only the fields to change.",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"document_id\": 1,\n    \"document_name\": \"Ahmed CV 2026\",\n    \"expiry_date\": \"2027-12-31\"\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "Edit document metadata (JSON). document_id is required; send only the fields to change."
               },
               "response": []
             },
@@ -3018,31 +2915,13 @@
                     "value": "Bearer {{bearer_token_0zk8}}"
                   }
                 ],
-                "url": {
-                  "raw": "http://127.0.0.1:8000/hr/documents/",
-                  "protocol": "http",
-                  "host": [
-                    "127",
-                    "0",
-                    "0",
-                    "1"
-                  ],
-                  "port": "8000",
-                  "path": [
-                    "hr",
-                    "documents",
-                    ""
-                  ]
-                },
-                "description": "Replace the stored file (multipart/form-data). document_id and file are required; other fields optional. The old file is deleted from the server after the update succeeds.",
                 "body": {
                   "mode": "formdata",
                   "formdata": [
                     {
                       "key": "document_id",
                       "value": "1",
-                      "type": "text",
-                      "disabled": false
+                      "type": "text"
                     },
                     {
                       "key": "document_name",
@@ -3053,10 +2932,28 @@
                     {
                       "key": "file",
                       "type": "file",
-                      "src": []
+                      "value": ""
                     }
                   ]
-                }
+                },
+                "url": {
+                  "raw": "http://127.0.0.1:8000/api/hr/documents/",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "api",
+                    "hr",
+                    "documents",
+                    ""
+                  ]
+                },
+                "description": "Replace the stored file (multipart/form-data). document_id and file are required; other fields optional. The old file is deleted from the server after the update succeeds."
               },
               "response": []
             },
@@ -3074,8 +2971,17 @@
                     "value": "application/json"
                   }
                 ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"document_id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/documents/",
+                  "raw": "http://127.0.0.1:8000/api/hr/documents/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -3085,21 +2991,13 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "documents",
                     ""
                   ]
                 },
-                "description": "Delete a document record and its stored file. document_id is required.",
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n    \"document_id\": 1\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                }
+                "description": "Delete a document record and its stored file. document_id is required."
               },
               "response": []
             },
@@ -3118,7 +3016,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/documents/download/?document_id=1",
+                  "raw": "http://127.0.0.1:8000/api/hr/documents/download/?document_id=1",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -3128,6 +3026,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "documents",
                     "download",
@@ -3136,8 +3035,7 @@
                   "query": [
                     {
                       "key": "document_id",
-                      "value": "1",
-                      "disabled": false
+                      "value": "1"
                     },
                     {
                       "key": "inline",
@@ -3170,7 +3068,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/employee-history/",
+                  "raw": "http://127.0.0.1:8000/api/hr/employee-history/",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -3180,6 +3078,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "employee-history",
                     ""
@@ -3246,7 +3145,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "http://127.0.0.1:8000/hr/employee-history/?history_id=1",
+                  "raw": "http://127.0.0.1:8000/api/hr/employee-history/?history_id=1",
                   "protocol": "http",
                   "host": [
                     "127",
@@ -3256,6 +3155,7 @@
                   ],
                   "port": "8000",
                   "path": [
+                    "api",
                     "hr",
                     "employee-history",
                     ""
@@ -3263,8 +3163,7 @@
                   "query": [
                     {
                       "key": "history_id",
-                      "value": "1",
-                      "disabled": false
+                      "value": "1"
                     }
                   ]
                 },
@@ -4449,139 +4348,300 @@
           ]
         }
       ]
+    },
+    {
+      "name": "employee management",
+      "item": [
+        {
+          "name": "employees",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_0zk8}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"first_name\":\"Abdo\",\r\n    \"last_name\":\"Mostafa\",\r\n    \"role\":2,\r\n    \"date_of_birth\":\"2004-01-01\",\r\n    \"gender\":\"male\",\r\n    \"national_id\":\"103400500789\",\r\n    \"phone\":\"01000000000\",\r\n    \"work_email\":\"o6ma_r@example.com\",\r\n    \"address\":\"Giza\",\r\n    \"hire_date\":\"2026-10-04\",\r\n    \"employment_status\":\"active\",\r\n    \"employment_type\": \"intern\",\r\n    \"password\":\"123456\",\r\n    \"department_id\": 1,\r\n    \"manager_id\":1,\r\n    \"position_id\":1,\r\n    \"schedule_id\":1,\r\n    \"branch_id\":1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/auth/employee/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "auth",
+                "employee",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "employees",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkyMTU2MjYyLCJpYXQiOjE3OTIxNTI2NjIsImp0aSI6ImE2MmFkODViZDg2NDQyMjhhODhjYzQ5NWYzMGUxODUxIiwidXNlcl9pZCI6IjEifQ.X_Q4Ttt_rJMeskZkoMxBtVKfIfykZbE7Yl9YiVrFj20"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"employee_code\": \"EMP001\",\r\n    \"last_name\": \"Mohammed\",\r\n    \"address\": \"Cairo\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/auth/employee/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "auth",
+                "employee",
+                ""
+              ]
+            },
+            "description": "Every edited field is logged automatically in Employee History (GET /hr/employee-history/), with recorded_by = the logged-in admin. Password changes are logged without values."
+          },
+          "response": []
+        },
+        {
+          "name": "employees",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_1axj}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"employee_code\": \"EMP-2026-3987\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/auth/employee/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "auth",
+                "employee",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "employees",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer_token_0zvx}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/auth/employee/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "auth",
+                "employee",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
     {
       "key": "bearer_token_12ei",
-      "secret": true
+      "value": ""
     },
     {
       "key": "json_web_token_0tem",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_14oc",
-      "secret": true
+      "value": ""
     },
     {
       "key": "json_web_token_08kc",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_0219",
-      "secret": true
+      "value": ""
     },
     {
       "key": "json_web_token_0o0t",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_1bpr",
-      "secret": true
+      "value": ""
     },
     {
       "key": "json_web_token_0lna",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_0s79",
-      "secret": true
+      "value": ""
     },
     {
       "key": "json_web_token_17gv",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_0cbg",
-      "secret": true
+      "value": ""
     },
     {
       "key": "json_web_token_0s59",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_1a1f",
-      "secret": true
+      "value": ""
     },
     {
       "key": "json_web_token_0i3z",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_0ts1",
-      "secret": true
+      "value": ""
     },
     {
       "key": "json_web_token_0lkx",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_109l",
-      "secret": true
+      "value": ""
     },
     {
       "key": "json_web_token_0w5h",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_1a5p",
-      "secret": true
+      "value": ""
     },
     {
       "key": "json_web_token_0e9y",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_0i5p",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_0jl2",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_0lym",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_1axj",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_0565",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_0vko",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_13vd",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_0a52",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_0uxq",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_18za",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_0zk8",
-      "secret": true
+      "value": ""
     },
     {
       "key": "bearer_token_14xz",
-      "secret": true
+      "value": ""
     },
     {
       "key": "json_web_token_0iwq",
+      "value": ""
+    },
+    {
+      "key": "bearer_token_0zvx",
+      "secret": true
+    },
+    {
+      "key": "bearer_token_0oe3",
       "secret": true
     }
   ]

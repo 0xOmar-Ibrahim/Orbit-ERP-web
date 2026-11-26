@@ -1,17 +1,17 @@
-
 import os
 import datetime
 from decimal import Decimal
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.exceptions import (
     NotFound,
     PermissionDenied,
     ValidationError as DRFValidationError,
 )
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.utils import timezone
 from apps.accounts.models import Employee
 from django.db.models import ProtectedError, Q, Count
@@ -43,7 +43,7 @@ from ..helpers import (
     calculate_attendance_metrics,
     is_valid_id,
     get_upload_storage,
-    delete_stored_file,
+    delete_stored_file
 )
 from .serializers import (
     AddSkillCategorySerializer,
@@ -298,9 +298,8 @@ class SkillManagement(APIView):
 class EmployeeSkillManagement(APIView):
     permission_classes = [IsAuthenticated]
     pagination_class = StandardPagination
-    def get(self, request):
-        request_parameters = request.query_params
 
+    def get(self, request):
         allowed_filters = {
             "employee_skill_id",
             "employee_id",
@@ -311,32 +310,34 @@ class EmployeeSkillManagement(APIView):
 
         filters = {
             field: value
-            for field, value in request_parameters.items()
+            for field, value in request.query_params.items()
             if field in allowed_filters and value
         }
 
         try:
-            employee_skills = [
-                {
-                    **employee_skill,
-                }
-                for employee_skill in EmployeeSkill.objects.values(
-                    "employee_skill_id",
-                    "employee_id",
-                    "skill_id",
-                    "skill__name",
-                    "skill__skill_category__name",
-                    "level",
-                    "years_experience",
-                ).filter(**filters)
-            ]
+            employee_skills = EmployeeSkill.objects.values(
+                "employee_skill_id",
+                "employee_id",
+                "skill_id",
+                "skill__name",
+                "skill__skill_category__name",
+                "level",
+                "years_experience",
+            ).filter(**filters)
+
         except Exception:
             return Response(
                 {"error": "Invalid data entered."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        return Response({"EmployeeSkills": employee_skills})
+        paginator = self.pagination_class()
+        paginated_queryset = paginator.paginate_queryset(
+            employee_skills, request, view=self
+        )
+
+        return paginator.get_paginated_response(paginated_queryset)
+
 
     def post(self, request):
         serializer = AddEmployeeSkillSerializer(data=request.data)
@@ -1065,9 +1066,27 @@ class EmployeeDocumentManagement(APIView):
 
 class EmployeeDocumentDownload(APIView):
     """Streams a stored employee document to authenticated users."""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
+        # Allow authentication via query param ?token=... or standard Authorization header
+        token = request.query_params.get("token")
+        if token:
+            try:
+                jwt_auth = JWTAuthentication()
+                validated_token = jwt_auth.get_validated_token(token)
+                request.user = jwt_auth.get_user(validated_token)
+            except Exception:
+                return Response(
+                    {"error": "Invalid or expired token."},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+        elif not request.user or not request.user.is_authenticated:
+            return Response(
+                {"error": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
         document_id = request.query_params.get("document_id")
 
         if not document_id:

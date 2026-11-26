@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import LoginSerializer, SignUPSerializer
+from .serializers import LoginSerializer, SignUPSerializer, AddEmployeeSerializer, UpdateEmployeeSerializer
 from .models import Employee
 from django.conf import settings
 from django.http import JsonResponse
@@ -21,6 +21,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenRefreshView
 from .authentication import CookieJWTAuthentication
+from ..pagination import StandardPagination
 # Assuming the first allowed origin is your frontend URL
 FRONTEND_URL = "http://localhost:3000" 
 
@@ -395,3 +396,130 @@ def sso_callback(request):
     )
 
 
+class Employees(APIView):
+    permission_classes = [IsAuthenticated]  # must be open, the user isn't logged in yet
+    pagination_class = StandardPagination
+    def get(self, request):
+        parameters = request.query_params
+
+        allowed_filters = {
+            "employee_id",
+            "first_name",
+            "last_name",
+            "role_id",
+            "employee_code",
+            "work_email",
+            "phone",
+            "national_id",
+            "gender",
+            "employment_status",
+            "employment_type",
+            "hire_date",
+            "department_id",
+            "manager_id",
+            "position_id",
+            "schedule_id",
+            "branch_id",
+        }
+
+        filters = {
+            field: value
+            for field, value in parameters.items()
+            if field in allowed_filters and value
+        }
+
+        try:
+            employees = (
+                Employee.objects
+                .select_related("role")
+                .values(
+                    "employee_id",
+                    "first_name",
+                    "last_name",
+                    "role__role_name",
+                    "employee_code",
+                    "work_email",
+                    "phone",
+                    "national_id",
+                    "gender",
+                    "employment_status",
+                    "employment_type",
+                    "hire_date",
+                    "department_id",
+                    "manager_id",
+                    "position_id",
+                    "schedule_id",
+                    "branch_id",
+                )
+                .filter(**filters)
+                .order_by("employee_id")
+            )
+
+            paginator = StandardPagination()
+
+            paginated_employees = paginator.paginate_queryset(
+                employees, request, view=self
+            )
+
+            employee_data = [
+                {
+                    **employee,
+                    "gender": (
+                        Employee.Gender(employee["gender"]).label
+                        if employee["gender"] else None
+                    ),
+                }
+                for employee in paginated_employees
+            ]
+
+            return paginator.get_paginated_response(employee_data)
+
+        except Exception:
+            return Response(
+                {"error": "Invalid data entered."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    
+    def post(self, request):
+        serializer = AddEmployeeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        # You can add any validation logic here if needed
+        return Response({"message": "Employee added successfully."})
+
+    def patch(self, request):
+        employee_code = request.data.get("employee_code")
+        if not employee_code:
+            return Response({"error": "Employee code is required."}, status=400)
+
+        try:
+            employee = Employee.objects.get(employee_code=employee_code)
+        except Employee.DoesNotExist:
+            return Response({"error": "Employee not found."}, status=404)
+
+        serializer = UpdateEmployeeSerializer(employee, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        # Save the update and its history rows together (every edited field is
+        # logged; see apps/hr/history.py — reuse it in any new employee-editing endpoint)
+        before = snapshot_employee(employee)
+        with transaction.atomic():
+            employee = serializer.save()
+            log_employee_changes(employee, before, recorded_by=request.user)
+
+        return Response({"message": "Employee updated successfully."})
+
+    def delete(self, request):
+        employee_code = request.data.get("employee_code")
+        if not employee_code:
+            return Response({"error": "Employee code is required."}, status=400)
+
+        try:
+            employee = Employee.objects.get(employee_code=employee_code)
+        except Employee.DoesNotExist:
+            return Response({"error": "Employee not found."}, status=404)
+
+        employee.delete()
+        return Response({"message": "Employee deleted successfully."})
