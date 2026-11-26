@@ -289,7 +289,10 @@ const crmSubModules = [
         type="button"
         key={module.path}
         className={`module-link ${
-          location.pathname === module.path ? "active" : ""
+          location.pathname === module.path ||
+          location.pathname.startsWith(`${module.path}/`)
+            ? "active"
+            : ""
         }`}
         onClick={() => openModule(module.path)}
         title={collapsed ? module.name : ""}

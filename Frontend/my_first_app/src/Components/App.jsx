@@ -21,6 +21,12 @@ import ProjectManagement from "./ProjectManagement/ProjectManagement";
 import CRM from "./CRM/CRM";
 import AccountingFinance from "./AccountingFinance/AccountingFinance";
 import HR from "./HR/HR";
+import HROverview from "./HR/Overview/Overview";
+import HRContracts from "./HR/Contracts/Contracts";
+import HRDocuments from "./HR/Documents/Documents";
+import HRHistory from "./HR/History/History";
+import HRSkills from "./HR/Skills/Skills";
+import HRAttendance from "./HR/Attendance/Attendance";
 import ReportsAnalytics from "./ReportsAnalytics/ReportsAnalytics";
 import Notifications from "./Notifications/Notifications";
 import Tasks from "./Tasks/Tasks";
@@ -86,7 +92,14 @@ class App extends Component {
               path="accounting-finance"
               element={<AccountingFinance />}
             />
-            <Route path="hr" element={<HR />} />
+            <Route path="hr" element={<HR />}>
+              <Route index element={<HROverview />} />
+              <Route path="contracts" element={<HRContracts />} />
+              <Route path="documents" element={<HRDocuments />} />
+              <Route path="history" element={<HRHistory />} />
+              <Route path="skills" element={<HRSkills />} />
+              <Route path="attendance" element={<HRAttendance />} />
+            </Route>
             <Route
               path="reports-analytics"
               element={<ReportsAnalytics />}
