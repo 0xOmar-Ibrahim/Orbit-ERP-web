@@ -28,7 +28,7 @@ from ..helpers import (
     calculate_attendance_metrics,
     is_valid_id,
     get_upload_storage,
-    delete_stored_file,
+    delete_stored_file
 )
 from .serializers import (
     AddSkillCategorySerializer,
@@ -277,9 +277,8 @@ class SkillManagement(APIView):
 class EmployeeSkillManagement(APIView):
     permission_classes = [IsAuthenticated]
     pagination_class = StandardPagination
-    def get(self, request):
-        request_parameters = request.query_params
 
+    def get(self, request):
         allowed_filters = {
             "employee_skill_id",
             "employee_id",
@@ -290,32 +289,34 @@ class EmployeeSkillManagement(APIView):
 
         filters = {
             field: value
-            for field, value in request_parameters.items()
+            for field, value in request.query_params.items()
             if field in allowed_filters and value
         }
 
         try:
-            employee_skills = [
-                {
-                    **employee_skill,
-                }
-                for employee_skill in EmployeeSkill.objects.values(
-                    "employee_skill_id",
-                    "employee_id",
-                    "skill_id",
-                    "skill__name",
-                    "skill__skill_category__name",
-                    "level",
-                    "years_experience",
-                ).filter(**filters)
-            ]
+            employee_skills = EmployeeSkill.objects.values(
+                "employee_skill_id",
+                "employee_id",
+                "skill_id",
+                "skill__name",
+                "skill__skill_category__name",
+                "level",
+                "years_experience",
+            ).filter(**filters)
+
         except Exception:
             return Response(
                 {"error": "Invalid data entered."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        return Response({"EmployeeSkills": employee_skills})
+        paginator = self.pagination_class()
+        paginated_queryset = paginator.paginate_queryset(
+            employee_skills, request, view=self
+        )
+
+        return paginator.get_paginated_response(paginated_queryset)
+
 
     def post(self, request):
         serializer = AddEmployeeSkillSerializer(data=request.data)
@@ -1188,3 +1189,4 @@ class EmployeeHistoryView(APIView):
                 {"error": "Invalid data entered."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+

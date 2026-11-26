@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CustomTokenRefreshView, LoginView, LogoutView, SignUP, GetEmployeeStatus, CurrentUserView, CookieDebugView, sso_mobile, sso_callback, sso_start 
+from .views import Employees, CustomTokenRefreshView, LoginView, LogoutView, SignUP, GetEmployeeStatus, CurrentUserView, CookieDebugView, sso_mobile, sso_callback, sso_start 
 
 urlpatterns = [
     path("", LoginView.as_view()),
@@ -18,4 +18,9 @@ urlpatterns = [
     path("get_employee_status/", GetEmployeeStatus.as_view()),
 
     path("refresh/", CustomTokenRefreshView.as_view()),
+    
+    path(
+        "employee/",
+        Employees.as_view(), 
+        name="get_employees"),
 ]

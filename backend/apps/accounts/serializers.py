@@ -3,7 +3,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
-from apps.accounts.models import Employee, RegistrationRequest
+from apps.accounts.models import Employee, RegistrationRequest, Branch
+from apps.hr.models import Department, JobPosition, WorkSchedule
 from ..helpers import get_user_permissions, validate_email_regex
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
@@ -92,3 +93,115 @@ class SignUPSerializer(serializers.Serializer):
             "email": new_user.work_email,
         }  
 
+class AddEmployeeSerializer(serializers.ModelSerializer):
+    department_id = serializers.PrimaryKeyRelatedField(
+        queryset=Department.objects.all(),
+        source="department",
+    )
+    manager_id = serializers.PrimaryKeyRelatedField(
+    queryset=Employee.objects.all(),
+    source="manager",
+    )
+
+    position_id = serializers.PrimaryKeyRelatedField(
+        queryset=JobPosition.objects.all(),
+        source="position",
+    )
+
+    schedule_id = serializers.PrimaryKeyRelatedField(
+        queryset=WorkSchedule.objects.all(),
+        source="schedule",
+    )
+
+    branch_id = serializers.PrimaryKeyRelatedField(
+        queryset=Branch.objects.all(),
+        source="branch",
+    )
+    
+    class Meta:
+        model = Employee
+        fields = [
+            "first_name", 
+            "last_name",
+            "password",
+            "work_email",
+            "phone",
+            "national_id",
+            "gender",
+            "role",
+            "date_of_birth",
+            "employment_status",
+            "employment_type",
+            "hire_date",
+            "address",
+            "department_id",
+            "manager_id",
+            "position_id",
+            "schedule_id",
+            "branch_id"
+        ]
+
+
+    def validate(self, data):
+        # You can add any validation logic here if needed
+        if data["gender"] not in ["male", "female"]:
+            raise serializers.ValidationError({"gender": "Gender must be either 'male' or 'female'."})
+        return data
+
+
+    def create(self, validated_data):
+            # Hash the password to store it in data base securely
+            password = validated_data.pop("password")
+
+            employee_code = generate_code()
+            while True:
+                if Employee.objects.filter(employee_code=employee_code).exists():
+                    employee_code = generate_code()
+                else:
+                    break
+            employee = Employee.objects.create(
+            **validated_data,
+            employee_code=employee_code,
+            )
+            # set_password hashes it; passing an already-hashed value would hash it twice
+            employee.set_password(password)
+
+            employee.save()
+
+            return employee
+
+class UpdateEmployeeSerializer(serializers.ModelSerializer):
+
+    employee_code = serializers.CharField(read_only=True)
+    password = serializers.CharField(write_only=True, required=False)
+    
+    class Meta:
+        model = Employee
+        fields = [
+                    "employee_code",
+                    "first_name", 
+                    "last_name",
+                    "password",
+                    "work_email",
+                    "phone",
+                    "national_id",
+                    "gender",
+                    "role",
+                    "date_of_birth",
+                    "employment_status",
+                    "employment_type",
+                    "hire_date",
+                    "address",
+                    "department_id",
+                    "manager_id",
+                    "position_id",
+                    "schedule_id",
+                    "branch_id"
+                ]
+
+    
+    
+    def validate(self, data):
+        if password := data.get("password"):
+            data["password"] = make_password(password)
+        return data

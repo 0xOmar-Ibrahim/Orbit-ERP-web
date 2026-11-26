@@ -14,9 +14,15 @@ import os
 from django.conf import settings
 from django.db import transaction
 from apps.helpers import save_uploaded_file, delete_stored_file, generate_unique_code
-
+from rest_framework import serializers
+from apps.accounts.models import Employee, Branch
+from apps.hr.models import Department, JobPosition, WorkSchedule
+from ..helpers import generate_code
+from django.contrib.auth.hashers import make_password
 EMPLOYEE_DOCUMENTS_FOLDER = "employee_documents"
 from apps.accounts.models import Employee
+
+
 
 
 # ==========================

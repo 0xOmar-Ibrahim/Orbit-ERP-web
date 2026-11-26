@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import LoginSerializer, SignUPSerializer
+from .serializers import LoginSerializer, SignUPSerializer, AddEmployeeSerializer, UpdateEmployeeSerializer
 from .models import Employee
 from django.conf import settings
 from django.http import JsonResponse
@@ -15,7 +15,7 @@ from authlib.integrations.base_client.errors import OAuthError
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import RegistrationRequest
 from .oidc import oauth
-from ..helpers import get_user_permissions, validate_email_regex
+from ..helpers import get_user_permissions, validate_email_regex, IsAdministratorUser
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -395,3 +395,109 @@ def sso_callback(request):
     )
 
 
+class Employees(APIView):
+    permission_classes = [IsAuthenticated]  # must be open, the user isn't logged in yet
+
+    def get(self, request):
+        parameters = request.query_params
+
+        allowed_filters = {
+            "employee_id",
+            "first_name",
+            "last_name",
+            "role_id",
+            "employee_code",
+            "work_email",
+            "phone",
+            "national_id",
+            "gender",
+            "employment_status",
+            "employment_type",
+            "hire_date",
+            "department_id",
+            "manager_id",
+            "position_id",
+            "schedule_id",
+            "branch_id"
+        }
+
+        filters = {
+            field: value
+            for field, value in parameters.items()
+            if field in allowed_filters and value
+        }
+        try: 
+            employees = [
+                            {
+                                **employee,
+                                "gender": Employee.Gender(employee["gender"]).label,
+                                
+                            }
+                            for employee in Employee.objects.select_related("role").values(
+                                "employee_id",
+                                "first_name",
+                                "last_name",
+                                "role__role_name",
+                                "employee_code",
+                                "work_email",
+                                "phone",
+                                "national_id",
+                                "gender",
+                                "employment_status",
+                                "employment_type",
+                                "hire_date",
+                                "department_id",
+                                "manager_id",
+                                "position_id",
+                                "schedule_id",
+                                "branch_id"
+                            ).filter(**filters)
+                        ]
+        except:
+            return Response({"error": "Invalid data entered."}, status=400)
+        
+        # You can add any validation logic here if needed
+        return Response({"Employees": employees})
+    
+    def post(self, request):
+        serializer = AddEmployeeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        # You can add any validation logic here if needed
+        return Response({"message": "Employee added successfully."})
+
+    def patch(self, request):
+        employee_code = request.data.get("employee_code")
+        if not employee_code:
+            return Response({"error": "Employee code is required."}, status=400)
+
+        try:
+            employee = Employee.objects.get(employee_code=employee_code)
+        except Employee.DoesNotExist:
+            return Response({"error": "Employee not found."}, status=404)
+
+        serializer = UpdateEmployeeSerializer(employee, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        # Save the update and its history rows together (every edited field is
+        # logged; see apps/hr/history.py — reuse it in any new employee-editing endpoint)
+        before = snapshot_employee(employee)
+        with transaction.atomic():
+            employee = serializer.save()
+            log_employee_changes(employee, before, recorded_by=request.user)
+
+        return Response({"message": "Employee updated successfully."})
+
+    def delete(self, request):
+        employee_code = request.data.get("employee_code")
+        if not employee_code:
+            return Response({"error": "Employee code is required."}, status=400)
+
+        try:
+            employee = Employee.objects.get(employee_code=employee_code)
+        except Employee.DoesNotExist:
+            return Response({"error": "Employee not found."}, status=404)
+
+        employee.delete()
+        return Response({"message": "Employee deleted successfully."})
