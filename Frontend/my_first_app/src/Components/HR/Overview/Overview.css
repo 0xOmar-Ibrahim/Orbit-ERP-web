@@ -6,8 +6,6 @@
   color: var(--text-color);
 }
 
-/* Overview Header */
-/* Page Heading - Same as History */
 
 .hr-overview-head {
   display: flex;
@@ -82,7 +80,6 @@
   stroke-linejoin: round;
 }
 
-/* Summary Cards Grid: عمودين فقط بدلاً من ثلاثة */
 .hr-overview-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -174,7 +171,6 @@
   }
 }
 
-/* Contracts Table */
 
 .hr-contracts-table {
   width: 100%;
@@ -303,7 +299,6 @@
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Light Mode Hover */
 
 .hr-contracts-table-content tbody tr:hover,
 .hr-contracts-table-content tbody tr.running-contract-row:hover {
@@ -315,7 +310,6 @@
   background-color: rgba(37, 99, 235, 0.09);
 }
 
-/* Contract Number */
 .hr-contract-number {
   display: flex;
   align-items: center;
@@ -326,7 +320,6 @@
   font-weight: 700;
 }
 
-/* Status */
 
 .hr-contract-status {
   display: inline-flex;
@@ -368,7 +361,6 @@
   background: #10b981;
 }
 
-/* Empty Search */
 
 .hr-contract-empty {
   height: 90px !important;
@@ -376,7 +368,6 @@
   text-align: center;
 }
 
-/* Table Footer */
 
 .hr-contracts-table-footer {
   display: flex;
@@ -390,7 +381,6 @@
   font-size: 10px;
 }
 
-/* Dark Mode */
 
 .home-page.dark-mode .hr-contracts-table {
   background-color: #101826;
@@ -424,7 +414,6 @@
   color: #dbe5f3;
 }
 
-/* Dark Mode Hover */
 
 .home-page.dark-mode .hr-contracts-table-content tbody tr:hover,
 .home-page.dark-mode .hr-contracts-table-content tbody tr.running-contract-row:hover {
@@ -436,8 +425,6 @@
   background-color: #1b3150;
   color: #ffffff;
 }
-
-/* Dark Mode Search */
 
 .home-page.dark-mode .hr-contract-search {
   background-color: #0b1220;
@@ -453,14 +440,12 @@
   color: #7f8da3;
 }
 
-/* Dark Mode Footer */
 
 .home-page.dark-mode .hr-contracts-table-footer {
   color: #94a3b8;
   border-color: #243044;
 }
 
-/* Responsive */
 
 @media (max-width: 900px) {
   .hr-overview-grid {

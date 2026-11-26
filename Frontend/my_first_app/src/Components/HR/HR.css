@@ -13,7 +13,6 @@
   overflow-x: hidden;
   overflow-y: auto;
 
-  /* More space from the top */
   padding: 30px 36px 64px;
 
   color: var(--text-color);
@@ -121,12 +120,11 @@
 .hr-identity {
   display: flex;
   align-items: center;
-  gap: 22px; /* المسافة المظبوطة بين الأفاتار والنصوص */
+  gap: 22px; 
   min-width: 0;
   flex: 1;
 }
 
-/* AVATAR BOX */
 .hr-avatar-wrap {
   position: relative;
   display: flex;
@@ -162,7 +160,6 @@
   border-color: #101826;
 }
 
-/* EMPLOYEE INFO */
 .hr-employee-info {
   display: flex;
   flex-direction: column;
@@ -170,11 +167,10 @@
   min-width: 0;
 }
 
-/* NAME LINE (الاسم والبادج في سطر واحد بدون كسر) */
 .hr-name-line {
   display: flex;
   align-items: center;
-  flex-wrap: nowrap; /* يمنع نزول البادج لسطر جديد */
+  flex-wrap: nowrap; 
   gap: 14px;
 }
 
@@ -188,7 +184,6 @@
   white-space: nowrap;
 }
 
-/* CONTRACT BADGE */
 .hr-contract-pill {
   display: inline-flex;
   align-items: center;
@@ -196,7 +191,7 @@
   height: 28px;
   padding: 0 14px 0 10px;
   border-radius: 999px;
-  background: #1742a0; /* نفس لون البادج الكحلي في الصورة */
+  background: #1742a0; 
   color: #ffffff;
   font-size: 12.5px;
   font-weight: 600;
@@ -207,11 +202,10 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #38bdf8; /* النقطة المشعة */
+  background: #38bdf8; 
   box-shadow: 0 0 6px #38bdf8;
 }
 
-/* SUBTITLE & METAS */
 .hr-role {
   margin: 6px 0 0;
   color: var(--text-color);
@@ -393,7 +387,6 @@
   align-items: center;
   gap: 28px;
 
-  /* Larger gap between profile and navbar */
   margin-top: 66px;
 
   border-bottom: 1px solid var(--hr-line);
@@ -509,7 +502,6 @@
   box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
 }
 
-/* Header */
 
 .hr-modal-head {
   display: flex;
@@ -537,7 +529,6 @@
   line-height: 1.5;
 }
 
-/* Close Button */
 
 .hr-modal-close {
   display: grid;
@@ -567,7 +558,6 @@
   color: #fff;
 }
 
-/* Form Grid */
 
 .hr-modal-grid {
   display: grid;
@@ -577,7 +567,6 @@
   row-gap: 20px;
 }
 
-/* Fields */
 
 .hr-modal-field {
   display: flex;
@@ -606,7 +595,6 @@
   color: #e05252 !important;
 }
 
-/* Inputs */
 
 .hr-modal-field input {
   box-sizing: border-box;
@@ -642,7 +630,6 @@
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
 }
 
-/* Validation */
 
 .hr-modal .hr-form-error {
   margin: 12px 0 0;
@@ -651,7 +638,6 @@
   font-size: 12px;
 }
 
-/* Footer Actions */
 
 .hr-modal-actions {
   display: flex;
@@ -693,7 +679,6 @@
   transform: scale(0.98);
 }
 
-/* Responsive */
 
 @media (max-width: 600px) {
   .hr-modal-backdrop {

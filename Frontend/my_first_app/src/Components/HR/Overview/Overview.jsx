@@ -97,7 +97,6 @@ export default function Overview() {
     return false;
   }).length;
 
-  // فلترة العقود في جدول العقود
   const filteredContracts = useMemo(() => {
     const term = contractQuery.trim().toLowerCase();
     if (!term) return contractsList;
@@ -121,7 +120,6 @@ export default function Overview() {
 
   return (
     <section className="hr-overview">
-      {/* Overview Head */}
       <div className="hr-overview-head">
         <div className="hr-overview-heading">
           <span className="hr-overview-kicker">EMPLOYEE RECORDS</span>
@@ -137,9 +135,7 @@ export default function Overview() {
         </Link>
       </div>
 
-           {/* Summary Cards Grid (2 Boxes) */}
            <div className="hr-overview-grid">
-        {/* Box 1: Current Contract */}
         <div className="hr-overview-card">
           <div className="hr-overview-icon blue">
             <BriefcaseIcon />
@@ -152,7 +148,6 @@ export default function Overview() {
           </div>
         </div>
 
-        {/* Box 2: Documents */}
         <div className="hr-overview-card">
           <div className="hr-overview-icon amber">
             <FileIcon />
@@ -169,7 +164,6 @@ export default function Overview() {
         </div>
       </div>
 
-      {/* Contracts Table */}
       <div className="hr-contracts-table">
         <div className="hr-contracts-table-head">
           <h3>Current Contract</h3>
