@@ -5,7 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
 from apps.accounts.models import Employee, RegistrationRequest, Branch
 from apps.hr.models import Department, JobPosition, WorkSchedule
-from ..helpers import get_user_permissions, validate_email_regex
+from ..helpers import get_user_permissions, validate_email_regex, generate_code
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 
