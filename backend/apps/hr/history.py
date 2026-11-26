@@ -1,10 +1,18 @@
 """
 Automatic EmployeeHistory logging.
 
-History is written only by the system (never through the API). Call these helpers
-inside the same transaction.atomic() block as the change they describe, so the
-change and its history row are saved together or not at all.
+History is written only by the system (the history API is read-only). Any endpoint that
+edits an employee must do:
+
+    before = snapshot_employee(employee)
+    with transaction.atomic():
+        employee = serializer.save()
+        log_employee_changes(employee, before, recorded_by=request.user)
+
+so the change and its history rows are saved together or not at all.
 """
+
+import datetime
 
 from django.utils import timezone
 
@@ -13,51 +21,79 @@ from .models import EmployeeHistory
 ChangeType = EmployeeHistory.ChangeType
 
 
+def _text(value):
+    """Readable text for a stored value: None -> "", dates -> ISO, anything else -> str."""
+    if value is None:
+        return ""
+    if isinstance(value, (datetime.date, datetime.datetime)):
+        return value.isoformat()
+    return str(value)
+
+
 def _full_name(employee):
     if not employee:
         return ""
     return f"{employee.first_name} {employee.last_name}".strip()
 
 
+def _related(attr, name_field):
+    """Reader for a FK: the related object's name field, or "" when empty."""
+    def read(employee):
+        obj = getattr(employee, attr)
+        return getattr(obj, name_field) if obj else ""
+    return read
+
+
+def _choice(field):
+    """Reader for a choices field: its display label, or "" when empty."""
+    def read(employee):
+        if not getattr(employee, field):
+            return ""
+        return getattr(employee, f"get_{field}_display")()
+    return read
+
+
+def _plain(field):
+    return lambda employee: getattr(employee, field)
+
+
+# Every employee field the API can edit (see UpdateEmployeeSerializer in
+# apps/admin_control/serializers.py).
 # field -> (change_type, label, function that turns the employee into a readable value)
 TRACKED_EMPLOYEE_FIELDS = {
-    "position": (
-        ChangeType.POSITION_CHANGE,
-        "Position",
-        lambda e: e.position.title if e.position else "",
-    ),
-    "department": (
-        ChangeType.TRANSFER,
-        "Department",
-        lambda e: e.department.department_name if e.department else "",
-    ),
-    "branch": (
-        ChangeType.TRANSFER,
-        "Branch",
-        lambda e: e.branch.branch_name if e.branch else "",
-    ),
-    "employment_status": (
-        ChangeType.STATUS_CHANGE,
-        "Employment status",
-        lambda e: e.get_employment_status_display() if e.employment_status else "",
-    ),
-    "employment_type": (
-        ChangeType.OTHER,
-        "Employment type",
-        lambda e: e.get_employment_type_display() if e.employment_type else "",
-    ),
-    "manager": (
-        ChangeType.OTHER,
-        "Manager",
-        lambda e: _full_name(e.manager),
-    ),
+    # Career changes
+    "position": (ChangeType.POSITION_CHANGE, "Position", _related("position", "title")),
+    "department": (ChangeType.TRANSFER, "Department", _related("department", "department_name")),
+    "branch": (ChangeType.TRANSFER, "Branch", _related("branch", "branch_name")),
+    "employment_status": (ChangeType.STATUS_CHANGE, "Employment status", _choice("employment_status")),
+    "employment_type": (ChangeType.OTHER, "Employment type", _choice("employment_type")),
+    "manager": (ChangeType.OTHER, "Manager", lambda e: _full_name(e.manager)),
+    "role": (ChangeType.OTHER, "Role", _related("role", "role_name")),
+    "schedule": (ChangeType.OTHER, "Work schedule", _related("schedule", "name")),
+    "hire_date": (ChangeType.OTHER, "Hire date", _plain("hire_date")),
+
+    # Personal / contact information
+    "first_name": (ChangeType.OTHER, "First name", _plain("first_name")),
+    "last_name": (ChangeType.OTHER, "Last name", _plain("last_name")),
+    "work_email": (ChangeType.OTHER, "Work email", _plain("work_email")),
+    "phone": (ChangeType.OTHER, "Phone", _plain("phone")),
+    "address": (ChangeType.OTHER, "Address", _plain("address")),
+    "national_id": (ChangeType.OTHER, "National ID", _plain("national_id")),
+    "gender": (ChangeType.OTHER, "Gender", _choice("gender")),
+    "date_of_birth": (ChangeType.OTHER, "Date of birth", _plain("date_of_birth")),
+
+    # Security: compared by hash, but the values are never written to history
+    "password": (ChangeType.OTHER, "Password", _plain("password")),
 }
+
+# Fields whose old/new values must not be stored in history
+MASKED_FIELDS = {"password"}
 
 
 def snapshot_employee(employee):
     """Readable value of every tracked field, e.g. {"position": "Sales Executive", ...}."""
     return {
-        field: str(read(employee))
+        field: _text(read(employee))
         for field, (_, _, read) in TRACKED_EMPLOYEE_FIELDS.items()
     }
 
@@ -72,11 +108,13 @@ def build_employee_changes(employee, before, recorded_by=None):
         if before.get(field) == after[field]:
             continue
 
+        masked = field in MASKED_FIELDS
+
         rows.append(EmployeeHistory(
             employee=employee,
             change_type=change_type,
-            old_value=before.get(field, ""),
-            new_value=after[field],
+            old_value="" if masked else before.get(field, ""),
+            new_value="" if masked else after[field],
             notes=f"{label} changed.",
             change_date=today,
             recorded_by=recorded_by,
