@@ -2,7 +2,7 @@
 //   GET/POST/PATCH/DELETE  /hr/attendance/
 import { authFetch, API } from "../../../Services/authFetch";
 
-const ATTENDANCE_URL = `${API}/hr/attendance/`;
+const ATTENDANCE_URL = `${API}/api/hr/attendance/`;
 
 /** Turns a DRF error body into a readable message + per-field errors. */
 function toError(data, status) {

@@ -83,12 +83,11 @@ export default function Overview() {
     fetchOverviewData();
   }, []);
 
-  // العقد الساري حالياً
-  const current = contractsList.find(
-    (item) => item.status === "Running" || item.status === "ACTIVE"
-  );
+  const current = contractsList.find((item) => {
+    const s = (item.status || "").toLowerCase();
+    return s === "running" || s === "active";
+  });
 
-  // المستندات التي توشك على الانتهاء
   const expiring = documentsList.filter((item) => {
     if (item.status === "Expiring soon" || item.status === "EXPIRING") return true;
     if (item.expiry_date) {

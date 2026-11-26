@@ -66,7 +66,7 @@ export default function HR() {
             name: fullName,
             title: u.role_name || u.position_title || "HR Manager",
             department: u.department_name || (u.role_name?.includes("HR") ? "Human Resources" : "Administration"),
-            location: u.branch_name || "Headquarters",
+            location: u.branch_name || "",
             employeeId: u.code || (u.id ? `EMP-${u.id}` : "EMP-0000"),
           };
 
@@ -80,9 +80,20 @@ export default function HR() {
             ? contractsData
             : contractsData.results || contractsData.contracts || [];
 
-          const isRunning = list.some(
-            (item) => item.status === "Running" || item.status === "ACTIVE"
-          );
+          const currentUser =
+            profileRes.status === "fulfilled"
+              ? profileRes.value?.user || profileRes.value?.employee || profileRes.value
+              : null;
+          const empId = currentUser?.employee_id ?? currentUser?.id;
+
+          const empContracts = empId
+            ? list.filter((item) => item.employee_id === empId)
+            : list;
+
+          const isRunning = empContracts.some((item) => {
+            const s = (item.status || "").toLowerCase();
+            return s === "running" || s === "active";
+          });
           setHasRunningContract(isRunning);
         }
       } catch (err) {
@@ -238,9 +249,19 @@ export default function HR() {
                 </p>
 
                 <p className="hr-meta">
-                  {loading ? "Loading..." : profile.location}
-                  <span> • </span>
-                  {loading ? "..." : profile.employeeId}
+                  {loading ? (
+                    "Loading..."
+                  ) : (
+                    <>
+                      {profile.location && (
+                        <>
+                          {profile.location}
+                          <span> • </span>
+                        </>
+                      )}
+                      {profile.employeeId}
+                    </>
+                  )}
                 </p>
               </div>
             </div>
