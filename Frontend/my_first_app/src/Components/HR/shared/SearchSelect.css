@@ -1,0 +1,89 @@
+/* Searchable select — from the design's "searchable-select" / "select-options" */
+
+.hr-search-select {
+  position: relative;
+  z-index: 5;
+}
+
+.hr-search-select .att-icon {
+  position: absolute;
+  top: 13px;
+  right: 12px;
+  color: #7c8392;
+  pointer-events: none;
+  transform: rotate(90deg);
+}
+
+.hr-select-options {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  max-height: 230px;
+  padding: 6px;
+  overflow-y: auto;
+  border: 1px solid var(--att-surface-dark);
+  border-radius: 12px;
+  background: var(--att-control);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+}
+
+.dark-mode .hr-select-options {
+  background: #080b13;
+}
+
+.hr-select-options button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 35px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--att-text-soft);
+  font-size: 10px;
+  text-align: left;
+}
+
+.hr-select-options button small {
+  color: var(--att-muted);
+  font-size: 9px;
+}
+
+.hr-select-options button:hover,
+.hr-select-options button[aria-selected="true"] {
+  background: var(--att-surface-dark);
+  color: var(--att-text);
+}
+
+.hr-select-options p {
+  margin: 0;
+  padding: 8px 10px;
+  color: var(--att-muted);
+  font-size: 10px;
+}
+
+.hr-select-options .hr-add-option {
+  justify-content: flex-start;
+  gap: 7px;
+  margin-top: 5px;
+  border-top: 1px solid var(--att-line);
+  border-radius: 0 0 7px 7px;
+  color: var(--att-primary);
+}
+
+.hr-select-options .hr-add-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hr-select-options .att-icon {
+  position: static;
+  color: currentColor;
+  transform: none;
+}

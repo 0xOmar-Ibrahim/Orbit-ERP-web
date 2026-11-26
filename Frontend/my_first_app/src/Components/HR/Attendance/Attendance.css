@@ -806,3 +806,26 @@
       font-size: 14px;
     }
   }
+/* Inside the HR employee profile the tab content lines up with the tabs,
+   like the design's page-content (padding 40px 0 72px, same width as the tabs) */
+.hr-tab-panel .att-page {
+  min-height: 0;
+  padding: 40px 0 72px;
+  background: transparent;
+}
+
+.hr-tab-panel .att-inner {
+  width: 100%;
+}
+
+@media (max-width: 720px) {
+  .hr-tab-panel .att-page {
+    padding: 28px 0 55px;
+  }
+}
+
+/* The attendance date is fixed to today and can't be changed */
+.att-field input.att-locked {
+  cursor: default;
+  pointer-events: none;
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Icon from "./Icon";
-import { NO_TIME_STATUSES, STATUS_OPTIONS, formatClock, toDateTime } from "./attendanceUtils";
+import { NO_TIME_STATUSES, STATUS_OPTIONS, formatClock, toDateTime, todayKey } from "./attendanceUtils";
 
 const clockOrEmpty = (value) => {
   const clock = formatClock(value);
@@ -27,7 +27,8 @@ function Field({ label, required, error, children }) {
 export default function AttendanceModal({ employeeLabel, employeeId, record, defaultDate, onClose, onSave, onDelete }) {
   const editing = Boolean(record);
 
-  const [date, setDate] = useState(record?.attendance_date || defaultDate);
+  // New records are always for today; an existing record keeps its own date
+  const date = editing ? record.attendance_date : todayKey();
   const [checkIn, setCheckIn] = useState(clockOrEmpty(record?.check_in));
   const [checkOut, setCheckOut] = useState(clockOrEmpty(record?.check_out));
   const [status, setStatus] = useState(record?.status || "");
@@ -41,6 +42,19 @@ export default function AttendanceModal({ employeeLabel, employeeId, record, def
   const closeTimer = useRef(null);
 
   const needsTime = !NO_TIME_STATUSES.includes(status);
+  const orderError =
+    needsTime && checkIn && checkOut && checkOut <= checkIn ? "Check-out must be later than check-in" : "";
+
+  /** Updates a field and clears its old error */
+  const change = (setter, key) => (value) => {
+    setter(value);
+    setErrors((prev) => {
+      if (!prev[key]) return prev;
+      const rest = { ...prev };
+      delete rest[key];
+      return rest;
+    });
+  };
 
   useEffect(() => {
     const onKey = (e) => {
@@ -141,12 +155,12 @@ export default function AttendanceModal({ employeeLabel, employeeId, record, def
           <form onSubmit={submit} noValidate>
             <div className="att-form-grid">
               <Field label="Date" required error={errors.attendance_date}>
-                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                <input type="date" value={date} readOnly tabIndex={-1} className="att-locked" title="Attendance is recorded for today's date" />
               </Field>
               <Field label="Status" required error={errors.status}>
                 <select
                   value={status}
-                  onChange={(e) => setStatus(e.target.value)}
+                  onChange={(e) => change(setStatus, "status")(e.target.value)}
                   className={status ? "" : "is-placeholder"}
                 >
                   <option value="" disabled>
@@ -164,16 +178,18 @@ export default function AttendanceModal({ employeeLabel, employeeId, record, def
                 <input
                   type="time"
                   value={needsTime ? checkIn : ""}
+                  max={checkOut || undefined}
                   disabled={!needsTime}
-                  onChange={(e) => setCheckIn(e.target.value)}
+                  onChange={(e) => change(setCheckIn, "check_in")(e.target.value)}
                 />
               </Field>
-              <Field label="Check out" required={needsTime} error={errors.check_out}>
+              <Field label="Check out" required={needsTime} error={errors.check_out || orderError}>
                 <input
                   type="time"
                   value={needsTime ? checkOut : ""}
+                  min={checkIn || undefined}
                   disabled={!needsTime}
-                  onChange={(e) => setCheckOut(e.target.value)}
+                  onChange={(e) => change(setCheckOut, "check_out")(e.target.value)}
                 />
               </Field>
             </div>

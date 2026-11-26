@@ -177,7 +177,8 @@ export default function Attendance() {
     ];
   }, [shown]);
 
-  const defaultDate = monthKeyOf(todayKey()) === selectedMonth ? todayKey() : `${selectedMonth}-01`;
+  // New records always start on today's date
+  const defaultDate = todayKey();
 
   const save = async (payload, isEdit) => {
     if (isEdit) await updateAttendance(payload);

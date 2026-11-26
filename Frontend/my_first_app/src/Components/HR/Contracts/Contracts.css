@@ -1,11 +1,59 @@
+/* Contracts tab — from the design's "contracts-table" (shares Attendance.css tokens) */
 
-.module-page {
-  padding: 30px;
-  color: var(--text-color);
+.hr-contracts-table .att-row {
+  grid-template-columns: 2fr 1.3fr 1fr 0.8fr 35px;
 }
 
-.module-page h1 {
-  margin-bottom: 12px;
-  font-size: 28px;
+.att-row span > small {
+  display: block;
+  margin-top: 6px;
+  color: var(--att-muted);
+  font-size: 9px;
 }
 
+.att-row.selected {
+  background: var(--att-surface);
+}
+
+.att-row.selected:hover {
+  background: var(--att-row-hover);
+}
+
+.dark-mode .att-row.selected {
+  background: #0f2974;
+}
+
+.dark-mode .att-row.selected:hover {
+  background: #0e2567;
+}
+
+.hr-row-action button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  color: #98a0b0;
+}
+
+.hr-row-action button:hover {
+  border-color: var(--att-primary);
+  color: var(--att-text);
+}
+
+.att-form-grid .att-field input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+@media (max-width: 720px) {
+  .att-row > span > small {
+    margin: 0;
+    text-align: right;
+  }
+
+  .hr-row-action {
+    display: none !important;
+  }
+}
