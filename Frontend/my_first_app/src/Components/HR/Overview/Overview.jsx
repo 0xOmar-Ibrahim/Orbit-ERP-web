@@ -1,8 +1,7 @@
-
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Overview.css";
-import { contracts, documents, skills } from "../hrData";
+import { apiRequest } from "../../../Services/api";
 
 function BriefcaseIcon() {
   return (
@@ -34,201 +33,228 @@ function FileIcon() {
   );
 }
 
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
+
 export default function Overview() {
+  const [contractsList, setContractsList] = useState([]);
+  const [documentsList, setDocumentsList] = useState([]);
+  const [skillsList, setSkillsList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [contractQuery, setContractQuery] = useState("");
 
-  const current = contracts.find(
-    (item) => item.status === "Running"
+  useEffect(() => {
+    async function fetchOverviewData() {
+      try {
+        setLoading(true);
+        const [contractsRes, docsRes, skillsRes] = await Promise.allSettled([
+          apiRequest("/hr/contracts/"),
+          apiRequest("/hr/documents/"),
+          apiRequest("/hr/employee-skills/"),
+        ]);
+
+        if (contractsRes.status === "fulfilled") {
+          const c = contractsRes.value;
+          setContractsList(Array.isArray(c) ? c : c.results || c.contracts || []);
+        }
+
+        if (docsRes.status === "fulfilled") {
+          const d = docsRes.value;
+          setDocumentsList(Array.isArray(d) ? d : d.results || d.documents || []);
+        }
+
+        if (skillsRes.status === "fulfilled") {
+          const s = skillsRes.value;
+          setSkillsList(Array.isArray(s) ? s : s.results || s.skills || []);
+        }
+      } catch (err) {
+        console.error("Overview data fetch failed:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchOverviewData();
+  }, []);
+
+  // العقد الساري حالياً
+  const current = contractsList.find(
+    (item) => item.status === "Running" || item.status === "ACTIVE"
   );
 
-  const expiring = documents.filter(
-    (item) => item.status === "Expiring soon"
-  ).length;
+  // المستندات التي توشك على الانتهاء
+  const expiring = documentsList.filter((item) => {
+    if (item.status === "Expiring soon" || item.status === "EXPIRING") return true;
+    if (item.expiry_date) {
+      const diff = new Date(item.expiry_date) - new Date();
+      return diff > 0 && diff < 30 * 24 * 60 * 60 * 1000;
+    }
+    return false;
+  }).length;
 
+  // فلترة العقود في جدول العقود
   const filteredContracts = useMemo(() => {
     const term = contractQuery.trim().toLowerCase();
+    if (!term) return contractsList;
 
-    if (!term) return contracts;
-
-    return contracts.filter((item) =>
-      [
-        item.number,
-        item.type,
-        item.startDate,
+    return contractsList.filter((item) => {
+      const searchStr = [
+        item.contract_number || item.number,
+        item.contract_type || item.type,
+        item.start_date || item.startDate,
         item.wage,
         item.schedule,
         item.status,
       ]
+        .filter(Boolean)
         .join(" ")
-        .toLowerCase()
-        .includes(term)
-    );
-  }, [contractQuery]);
+        .toLowerCase();
+
+      return searchStr.includes(term);
+    });
+  }, [contractQuery, contractsList]);
 
   return (
     <section className="hr-overview">
-
-      {/* Overview Header */}
+      {/* Overview Head */}
       <div className="hr-overview-head">
         <div className="hr-overview-heading">
-          <p className="hr-overview-kicker">
-            EMPLOYEE RECORDS
-          </p>
-
+          <span className="hr-overview-kicker">EMPLOYEE RECORDS</span>
           <h2>Overview</h2>
-
           <p className="hr-overview-description">
-            Summary of contract, skills and career history.
+            Quick snapshot of employment terms, compliance documents, and active profile details.
           </p>
         </div>
 
         <Link to="/hr/documents" className="hr-overview-docs">
           <FileIcon />
-          View documents
+          View Documents
         </Link>
       </div>
 
-      {/* Summary Cards */}
-      <div className="hr-overview-grid">
-
-        <article className="hr-overview-card">
-          <span className="hr-overview-icon blue">
+           {/* Summary Cards Grid (2 Boxes) */}
+           <div className="hr-overview-grid">
+        {/* Box 1: Current Contract */}
+        <div className="hr-overview-card">
+          <div className="hr-overview-icon blue">
             <BriefcaseIcon />
-          </span>
-
-          <span className="hr-overview-copy">
+          </div>
+          <div className="hr-overview-copy">
             <span>Current contract</span>
-            <strong>{current ? current.status : "None"}</strong>
-          </span>
-        </article>
+            <strong>
+              {loading ? "..." : current ? "Running" : "None"}
+            </strong>
+          </div>
+        </div>
 
-        <article className="hr-overview-card">
-          <span className="hr-overview-icon blue">
-            <PeopleIcon />
-          </span>
-
-          <span className="hr-overview-copy">
-            <span>Skills</span>
-            <strong>{skills.length}</strong>
-          </span>
-        </article>
-
-        <article className="hr-overview-card">
-          <span className="hr-overview-icon amber">
+        {/* Box 2: Documents */}
+        <div className="hr-overview-card">
+          <div className="hr-overview-icon amber">
             <FileIcon />
-          </span>
-
-          <span className="hr-overview-copy">
+          </div>
+          <div className="hr-overview-copy">
             <span>Documents</span>
-            <strong>{documents.length}</strong>
-
-            {expiring > 0 && (
+            <strong>{loading ? "..." : documentsList.length}</strong>
+            {expiring > 0 ? (
               <em>{expiring} expiring soon</em>
+            ) : (
+              <span className="hr-doc-sub">All active</span>
             )}
-          </span>
-        </article>
-
+          </div>
+        </div>
       </div>
 
-      {/* Current Contract Table */}
+      {/* Contracts Table */}
       <div className="hr-contracts-table">
-
         <div className="hr-contracts-table-head">
-          <h3>Current contract</h3>
+          <h3>Current Contract</h3>
 
-          <label className="hr-contract-search">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="11" cy="11" r="7" />
-              <path d="M20 20l-3.2-3.2" />
-            </svg>
-
+          <div className="hr-contract-search">
+            <SearchIcon />
             <input
-              type="search"
+              type="text"
+              placeholder="Search contracts..."
               value={contractQuery}
-              onChange={(event) =>
-                setContractQuery(event.target.value)
-              }
-              placeholder="Search contract..."
-              aria-label="Search contracts"
+              onChange={(e) => setContractQuery(e.target.value)}
             />
-          </label>
+          </div>
         </div>
 
         <div className="hr-contracts-table-scroll">
           <table className="hr-contracts-table-content">
-
             <thead>
               <tr>
-                <th>NUMBER</th>
+                <th>CONTRACT NUMBER</th>
                 <th>TYPE</th>
                 <th>START DATE</th>
-                <th>WAGE</th>
+                <th>WAGE / SALARY</th>
                 <th>SCHEDULE</th>
                 <th>STATUS</th>
               </tr>
             </thead>
 
             <tbody>
-              {filteredContracts.length > 0 ? (
-                filteredContracts.map((item) => (
-                  <tr
-                    key={item.number}
-                    className={
-                      item.status === "Running"
-                        ? "running-contract-row"
-                        : ""
-                    }
-                  >
-                    <td>
-                     <div className="hr-contract-number">
-  <strong>{item.number}</strong>
-</div>
-                    </td>
+              {loading ? (
+                <tr>
+                  <td colSpan="6" className="hr-contract-empty">
+                    Loading contracts from server...
+                  </td>
+                </tr>
+              ) : filteredContracts.length > 0 ? (
+                filteredContracts.map((c) => {
+                  const isRunning = c.status === "Running" || c.status === "ACTIVE";
+                  const statusClass = isRunning ? "status-running" : "status-expired";
 
-                    <td>{item.type}</td>
-                    <td>{item.startDate}</td>
-                    <td>{item.wage}</td>
-                    <td>{item.schedule}</td>
+                  return (
+                    <tr
+                      key={c.contract_id || c.id || c.number}
+                      className={isRunning ? "running-contract-row" : ""}
+                    >
+                      <td>
+                        <div className="hr-contract-number">
+                          <strong>{c.contract_number || c.number || "—"}</strong>
+                        </div>
+                      </td>
 
-                    <td>
-                      <span
-                        className={`hr-contract-status ${
-                          item.status === "Running"
-                            ? "status-running"
-                            : "status-expired"
-                        }`}
-                      >
-                        <i />
-                        {item.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                      <td>{c.contract_type || c.type || "Permanent"}</td>
+
+                      <td>{c.start_date || c.startDate || "—"}</td>
+
+                      <td>{c.wage ? `$${c.wage}` : "—"}</td>
+
+                      <td>{c.schedule || c.work_schedule || "Standard 9–5"}</td>
+
+                      <td>
+                        <span className={`hr-contract-status ${statusClass}`}>
+                          <i />
+                          {c.status || "—"}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
-                  <td
-                    colSpan="6"
-                    className="hr-contract-empty"
-                  >
-                    No contracts found.
+                  <td colSpan="6" className="hr-contract-empty">
+                    No contracts found matching your search.
                   </td>
                 </tr>
               )}
             </tbody>
-
           </table>
         </div>
 
         <div className="hr-contracts-table-footer">
-          <span>
-            Showing {filteredContracts.length} of {contracts.length} contracts
-          </span>
-
-          <span>Last updated today at 14:32</span>
+          <span>Showing {filteredContracts.length} of {contractsList.length} contracts</span>
+          <span>Records synced with Orbit HR Core</span>
         </div>
-
       </div>
-
     </section>
   );
 }

@@ -1,41 +1,6 @@
-
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Documents.css";
-
-const INITIAL_DOCUMENTS = [
-  {
-    id: 1,
-    name: "National ID",
-    type: "Identification",
-    expiryDate: "2028-05-20",
-    uploaded: "May 8, 2025",
-    file: null,
-  },
-  {
-    id: 2,
-    name: "Permanent employment contract",
-    type: "Contract",
-    expiryDate: "",
-    uploaded: "Aug 12, 2024",
-    file: null,
-  },
-  {
-    id: 3,
-    name: "Performance Review 2024",
-    type: "Performance",
-    expiryDate: "",
-    uploaded: "May 28, 2025",
-    file: null,
-  },
-  {
-    id: 4,
-    name: "Design Leadership Certificate",
-    type: "Certificate",
-    expiryDate: "2027-09-10",
-    uploaded: "Jan 14, 2025",
-    file: null,
-  },
-];
+import { apiRequest } from "../../../Services/api";
 
 const ALLOWED_TYPES = [
   "application/pdf",
@@ -45,9 +10,25 @@ const ALLOWED_TYPES = [
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
+// أنواع المستندات المتوافقة تماماً مع الـ Choices في الباك إند (Django)
+const DOCUMENT_TYPE_CHOICES = [
+  { value: "national_id", label: "National ID" },
+  { value: "passport", label: "Passport" },
+  { value: "contract", label: "Contract" },
+  { value: "cv", label: "CV" },
+  { value: "certificate", label: "Certificate" },
+  { value: "other", label: "Other" },
+];
+
 export default function Documents() {
-  const [documents, setDocuments] = useState(INITIAL_DOCUMENTS);
+  const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
+  const [currentEmployeeId, setCurrentEmployeeId] = useState(null);
+
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [documentType, setDocumentType] = useState("");
   const [documentName, setDocumentName] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
@@ -55,6 +36,43 @@ export default function Documents() {
   const [errors, setErrors] = useState({});
 
   const fileRef = useRef(null);
+
+  // جلب المستندات والمستخدم الحالي من الباك إند عند فتح الصفحة
+  const fetchDocuments = async () => {
+    try {
+      setLoading(true);
+      setFetchError("");
+
+      const [docsData, userData] = await Promise.allSettled([
+        apiRequest("/hr/documents/"),
+        apiRequest("/auth/me/"),
+      ]);
+
+      if (docsData.status === "fulfilled") {
+        const data = docsData.value;
+        const list = Array.isArray(data) ? data : data.results || data.documents || [];
+        setDocuments(list);
+      } else {
+        setFetchError("Failed to load documents from server.");
+      }
+
+      if (userData.status === "fulfilled" && userData.value) {
+        const res = userData.value;
+        const u = res.user || res.employee || res;
+        const empId = u.id || u.employee_id || 33;
+        setCurrentEmployeeId(empId);
+      }
+    } catch (err) {
+      console.error("Failed to fetch documents:", err);
+      setFetchError("Failed to load documents from server.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
 
   const resetForm = () => {
     setDocumentType("");
@@ -105,10 +123,15 @@ export default function Documents() {
     }));
   };
 
-  const handleSave = (event) => {
+  // إرسال المستند للباك إند (POST FormData)
+  const handleSave = async (event) => {
     event.preventDefault();
 
     const newErrors = {};
+
+    if (!documentType) {
+      newErrors.documentType = "Please select document type.";
+    }
 
     if (!documentName.trim()) {
       newErrors.documentName = "Please enter document name.";
@@ -130,21 +153,71 @@ export default function Documents() {
 
     if (Object.keys(newErrors).length > 0) return;
 
-    const newDocument = {
-      id: Date.now(),
-      name: documentName.trim(),
-      type: documentType,
-      expiryDate,
-      uploaded: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-      file: selectedFile,
-    };
+    try {
+      setIsSubmitting(true);
 
-    setDocuments((prev) => [...prev, newDocument]);
-    closeUpload();
+      // التأكد من وجود employee_id (حسابك الحالي ID = 33)
+      let empId = currentEmployeeId;
+      if (!empId) {
+        try {
+          const userRes = await apiRequest("/auth/me/");
+          const u = userRes.user || userRes.employee || userRes;
+          empId = u.id || u.employee_id || 33;
+          setCurrentEmployeeId(empId);
+        } catch {
+          empId = 33; // Fallback للحساب الحالي المسجل
+        }
+      }
+
+      const formData = new FormData();
+      formData.append("employee_id", empId);
+      formData.append("document_type", documentType);
+      formData.append("document_name", documentName.trim());
+      
+      // فقط إذا أدخل المستخدم تاريخ انتهاء نرسله، لو فارغ لا نرسله عشان ميضربش 400
+      if (expiryDate && expiryDate.trim()) {
+        formData.append("expiry_date", expiryDate.trim());
+      }
+      formData.append("file", selectedFile);
+
+      const token = localStorage.getItem("access_token");
+      const response = await fetch("http://localhost:8000/api/hr/documents/", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      });
+
+      const responseData = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        console.error("Backend Error Details:", responseData);
+        const errorMsg =
+          responseData.employee_id?.[0] ||
+          responseData.file?.[0] ||
+          responseData.document_type?.[0] ||
+          responseData.expiry_date?.[0] ||
+          responseData.error ||
+          responseData.detail ||
+          responseData.message ||
+          "Failed to upload document.";
+        throw new Error(errorMsg);
+      }
+
+      // بعد النجاح: قفل المودال وإعادة تحميل البيانات من السيرفر
+      closeUpload();
+      await fetchDocuments();
+    } catch (err) {
+      console.error("Upload error:", err);
+      setErrors((prev) => ({
+        ...prev,
+        submit: err.message,
+      }));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const formatDate = (date) => {
@@ -158,19 +231,17 @@ export default function Documents() {
   };
 
   const handleDownload = (document) => {
-    if (!document.file) return;
+    const docId = document.document_id || document.id;
+    const token = localStorage.getItem("access_token");
 
-    const url = URL.createObjectURL(document.file);
+    const downloadUrl = `http://localhost:8000/api/hr/documents/download/?document_id=${docId}&token=${encodeURIComponent(token)}`;
+
     const link = window.document.createElement("a");
-
-    link.href = url;
-    link.download = document.file.name;
-
+    link.href = downloadUrl;
+    link.setAttribute("download", document.document_name || "document");
     window.document.body.appendChild(link);
     link.click();
     link.remove();
-
-    URL.revokeObjectURL(url);
   };
 
   return (
@@ -216,48 +287,68 @@ export default function Documents() {
           </thead>
 
           <tbody>
-            {documents.length > 0 ? (
-              documents.map((document) => (
-                <tr key={document.id}>
-                  <td>
-                    <div className="hr-document-name">
+            {loading ? (
+              <tr>
+                <td colSpan="5" className="hr-no-documents">
+                  Loading documents from server...
+                </td>
+              </tr>
+            ) : fetchError ? (
+              <tr>
+                <td colSpan="5" className="hr-no-documents" style={{ color: "red" }}>
+                  {fetchError}
+                </td>
+              </tr>
+            ) : documents.length > 0 ? (
+              documents.map((document) => {
+                const docId = document.document_id || document.id;
+                const name = document.document_name || document.name;
+                const type = document.document_type || document.type;
+                const expiry = document.expiry_date || document.expiryDate;
+                const uploaded = document.uploaded_at
+                  ? new Date(document.uploaded_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : document.uploaded || "—";
 
-                      <span>{document.name}</span>
-                    </div>
-                  </td>
+                return (
+                  <tr key={docId}>
+                    <td>
+                      <div className="hr-document-name">
+                        <span>{name}</span>
+                      </div>
+                    </td>
 
-                  <td>
-                    <span className="hr-document-type">
-                      {document.type || "—"}
-                    </span>
-                  </td>
+                    <td>
+                      <span className="hr-document-type">
+                        {type || "—"}
+                      </span>
+                    </td>
 
-                  <td>{formatDate(document.expiryDate)}</td>
+                    <td>{formatDate(expiry)}</td>
 
-                  <td>{document.uploaded}</td>
+                    <td>{uploaded}</td>
 
-                  <td className="hr-download-cell">
-                    <button
-                      type="button"
-                      className="hr-download-btn"
-                      onClick={() => handleDownload(document)}
-                      disabled={!document.file}
-                      aria-label={`Download ${document.name}`}
-                      title={
-                        document.file
-                          ? "Download document"
-                          : "No attached file"
-                      }
-                    >
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 3v12" />
-                        <path d="m7 10 5 5 5-5" />
-                        <path d="M5 20h14" />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-              ))
+                    <td className="hr-download-cell">
+                      <button
+                        type="button"
+                        className="hr-download-btn"
+                        onClick={() => handleDownload(document)}
+                        aria-label={`Download ${name}`}
+                        title="Download document"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M12 3v12" />
+                          <path d="m7 10 5 5 5-5" />
+                          <path d="M5 20h14" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan="5" className="hr-no-documents">
@@ -306,9 +397,15 @@ export default function Documents() {
             </div>
 
             <form onSubmit={handleSave} noValidate>
+              {errors.submit && (
+                <div style={{ color: "red", marginBottom: "1rem", fontSize: "0.875rem" }}>
+                  {errors.submit}
+                </div>
+              )}
+
               <label className="hr-upload-field">
                 <span>
-                  Document type
+                  Document type <b>*</b>
                 </span>
 
                 <select
@@ -320,9 +417,19 @@ export default function Documents() {
                       documentType: "",
                     }));
                   }}
+                  className={errors.documentType ? "has-error" : ""}
                 >
                   <option value="">Select document type</option>
+                  {DOCUMENT_TYPE_CHOICES.map((choice) => (
+                    <option key={choice.value} value={choice.value}>
+                      {choice.label}
+                    </option>
+                  ))}
                 </select>
+
+                {errors.documentType && (
+                  <small>{errors.documentType}</small>
+                )}
               </label>
 
               <label className="hr-upload-field">
@@ -411,6 +518,7 @@ export default function Documents() {
                   type="button"
                   className="hr-upload-cancel"
                   onClick={closeUpload}
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </button>
@@ -418,8 +526,9 @@ export default function Documents() {
                 <button
                   type="submit"
                   className="hr-upload-submit"
+                  disabled={isSubmitting}
                 >
-                  Upload &amp; save
+                  {isSubmitting ? "Uploading..." : "Upload & save"}
                 </button>
               </div>
             </form>

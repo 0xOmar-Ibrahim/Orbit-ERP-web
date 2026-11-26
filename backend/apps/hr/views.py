@@ -1,10 +1,10 @@
-
 import os
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.db.models import ProtectedError, Q
 from django.core.exceptions import (
     ValidationError as DjangoValidationError,
@@ -1011,9 +1011,27 @@ class EmployeeDocumentManagement(APIView):
 
 class EmployeeDocumentDownload(APIView):
     """Streams a stored employee document to authenticated users."""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
+        # Allow authentication via query param ?token=... or standard Authorization header
+        token = request.query_params.get("token")
+        if token:
+            try:
+                jwt_auth = JWTAuthentication()
+                validated_token = jwt_auth.get_validated_token(token)
+                request.user = jwt_auth.get_user(validated_token)
+            except Exception:
+                return Response(
+                    {"error": "Invalid or expired token."},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+        elif not request.user or not request.user.is_authenticated:
+            return Response(
+                {"error": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
         document_id = request.query_params.get("document_id")
 
         if not document_id:

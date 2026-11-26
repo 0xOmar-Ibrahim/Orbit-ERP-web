@@ -82,75 +82,96 @@
   stroke-linejoin: round;
 }
 
-/* Summary Cards */
-
+/* Summary Cards Grid: عمودين فقط بدلاً من ثلاثة */
 .hr-overview-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
   margin-top: 24px;
 }
 
 .hr-overview-card {
   display: flex;
   align-items: center;
-  gap: 15px;
-  min-height: 108px;
-  padding: 20px;
-  border: 1px solid var(--hr-line, var(--border-color));
-  border-radius: 17px;
-  background: var(--hr-card, var(--sidebar-bg));
+  gap: 18px;
+  min-height: 104px;
+  padding: 20px 24px;
+  border: 1px solid var(--hr-line, rgba(255, 255, 255, 0.08));
+  border-radius: 18px;
+  background: var(--hr-card, #0b1329);
   color: inherit;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .hr-overview-card:hover {
-  border-color: var(--hr-blue, #2563eb);
+  border-color: #2563eb;
 }
 
 .hr-overview-icon {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  color: #ffffff;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
 }
 
 .hr-overview-icon.blue {
-  background: #173b91;
+  background: #0f3277;
+  color: #3b82f6;
 }
 
 .hr-overview-icon.amber {
-  background: #76502b;
+  background: #3b2a1a;
+  color: #d97706;
+}
+
+.hr-overview-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
 }
 
 .hr-overview-copy {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   min-width: 0;
 }
 
 .hr-overview-copy span {
-  color: var(--hr-muted, var(--muted-color));
-  font-size: 12px;
+  color: var(--hr-muted, #94a3b8);
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .hr-overview-copy strong {
-  font-size: 24px;
-  font-weight: 750;
-  letter-spacing: -0.4px;
+  color: var(--text-color, #ffffff);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
   line-height: 1.2;
 }
 
 .hr-overview-copy em {
   margin-top: 2px;
   color: #f59e0b;
-  font-size: 11px;
+  font-size: 12px;
   font-style: normal;
   font-weight: 600;
+}
+
+.hr-overview-copy .hr-doc-sub {
+  margin-top: 2px;
+  color: #10b981;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+@media (max-width: 650px) {
+  .hr-overview-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Contracts Table */
