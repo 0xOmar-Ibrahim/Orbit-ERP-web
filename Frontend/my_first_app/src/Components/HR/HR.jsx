@@ -23,22 +23,23 @@ export default function HR() {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
-    const [profile, setProfile] = useState({
-      name: "Loading...",
-      title: "Loading...",
-      department: "Loading...",
-      location: "Loading...",
-      employeeId: "Loading...",
-    });
-  
-    const [draft, setDraft] = useState({
-      name: "",
-      title: "",
-      department: "",
-      location: "",
-      employeeId: "",
-    });
+  const [profile, setProfile] = useState({
+    name: "Loading...",
+    title: "Loading...",
+    department: "Loading...",
+    location: "Loading...",
+    employeeId: "Loading...",
+  });
 
+  const [draft, setDraft] = useState({
+    name: "",
+    title: "",
+    department: "",
+    location: "",
+    employeeId: "",
+  });
+
+  const [user, setUser] = useState(null);
   const [hasRunningContract, setHasRunningContract] = useState(false);
   const [formError, setFormError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -56,6 +57,8 @@ export default function HR() {
         if (profileRes.status === "fulfilled" && profileRes.value) {
           const res = profileRes.value;
           const u = res.user || res.employee || res;
+
+          setUser(u);
 
           const fullName = `${u.first_name || ""} ${u.last_name || ""}`.trim() || u.username || "Employee";
 
@@ -151,13 +154,12 @@ export default function HR() {
       await apiRequest("/admin/employee/", {
         method: "PATCH",
         body: JSON.stringify({
-          employee_code: profile.employeeId, 
+          employee_code: profile.employeeId,
           first_name: firstName,
           last_name: lastName,
         }),
       });
 
-      // تحديث الحالة في الفرونت إند فوراً
       setProfile({
         ...profile,
         name: draft.name.trim(),
@@ -215,7 +217,6 @@ export default function HR() {
                 <span className="hr-avatar-badge" />
               </div>
 
-              {/* Text Info */}
               <div className="hr-employee-info">
                 <div className="hr-name-line">
                   <h1>{loading ? "Loading..." : profile.name}</h1>
@@ -244,7 +245,6 @@ export default function HR() {
               </div>
             </div>
 
-            {/* Profile Actions */}
             <div className="hr-profile-actions">
               <button
                 type="button"
@@ -284,13 +284,13 @@ export default function HR() {
           </nav>
 
           <div className="hr-tab-panel">
-            <Outlet context={{ profile, loading }} />
+            <Outlet context={{ profile, loading, user }} />
           </div>
         </>
       ) : (
         <div className="hr-empty">
           <h2>No employee records</h2>
-          <p>Nothing matches “{query.trim()}”.</p>
+          <p>Nothing matches &ldquo;{query.trim()}&rdquo;.</p>
         </div>
       )}
 
