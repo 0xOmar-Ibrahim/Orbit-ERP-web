@@ -6,25 +6,25 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 # ABO ELNOUR: HR Module — Full schema built from scratch.
 #
 # Table creation order (respects FK dependencies):
-#   1. Department          — needs accounts.Employee (manager) via string ref
-#   2. JobPosition         — needs Department
-#   3. WorkSchedule        — independent
-#   4. WorkScheduleLine    — needs WorkSchedule
-#   5. EmployeeDocument    — needs accounts.Employee
-#   6. EmployeeHistory     — needs accounts.Employee
-#   7. EmploymentContract  — needs Employee, JobPosition, WorkSchedule
-#   8. Attendance          — needs accounts.Employee
-#   9. LeaveType           — independent
-#  10. PublicHoliday       — independent
-#  11. LeaveAllocation     — needs Employee, LeaveType
-#  12. LeaveRequest        — needs Employee, LeaveType
-#  13. SkillCategory       — independent
-#  14. Skill               — needs SkillCategory
-#  15. EmployeeSkill       — needs Employee, Skill
-#  16. Appraisal           — needs accounts.Employee (x2)
-#  17. RecruitmentJob      — needs Department, JobPosition, Employee
-#  18. Applicant           — needs RecruitmentJob, Employee
-#  19. Payroll             — needs Employee, EmploymentContract
+#   1. Department          — needs accounts.Employee (manager) via string ref   in-progress(Omar) 
+#   2. JobPosition         — needs Department                                   in-progress(Omar)
+#   3. WorkSchedule        — independent                                        in-progress(Abdo)
+#   4. WorkScheduleLine    — needs WorkSchedule                                 in-progress(Abdo)
+#   5. EmployeeDocument    — needs accounts.Employee                            Done (Abdo)
+#   6. EmployeeHistory     — needs accounts.Employee                            Done (Abdo)
+#   7. EmploymentContract  — needs Employee, JobPosition, WorkSchedule          Done (Abdo)
+#   8. Attendance          — needs accounts.Employee                            Done (Omar)
+#   9. LeaveType           — independent                                        in-progress(Abdo)
+#  10. PublicHoliday       — independent                                        in-progress(Omar) 
+#  11. LeaveAllocation     — needs Employee, LeaveType                          in-progress(Abdo)
+#  12. LeaveRequest        — needs Employee, LeaveType                          in-progress(Abdo)
+#  13. SkillCategory       — independent                                        Done (Omar)
+#  14. Skill               — needs SkillCategory                                Done (Omar)
+#  15. EmployeeSkill       — needs Employee, Skill                              Done (Omar)
+#  16. Appraisal           — needs accounts.Employee (x2)                       in-progress(Omar)
+#  17. RecruitmentJob      — needs Department, JobPosition, Employee            in-progress(Abdo)
+#  18. Applicant           — needs RecruitmentJob, Employee                     in-progress(Abdo)
+#  19. Payroll             — needs Employee, EmploymentContract                 in-progress(Omar)
 # ==============================================================================
 
 
